@@ -1,16 +1,15 @@
 package myClasses;
 
-//import myJavacc.Token;
-import Token;
+import basic.Token;
 
 public class Concept {
 	private String description;
-	
+	 
 	public Concept(String description) {
-		this.description = description;   // acertar isso !!!!
+		this.description = description;   
 	}
 	public Concept(Token token) {
-		this.description = token.image;  // acertar isso !!!!
+		this.description = token.image.trim(); 
 	}
 	
 	

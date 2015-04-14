@@ -5,9 +5,11 @@ options {
   STATIC = true;
 }
 PARSER_BEGIN(Wrapterms)
-//package myJavacc;
+package basic;
+
 import java.io.*;
 import myClasses.*; 
+
 public class Wrapterms {
    
    public static void main(String args[])  throws ParseException  {

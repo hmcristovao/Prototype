@@ -6,7 +6,7 @@ public class ListConcept {
 	private LinkedList<Concept> list;
 	
 	public ListConcept() {
-		super();
+		this.list = new LinkedList<Concept>();
 	}
 	public ListConcept(LinkedList<Concept> list) {
 		super();
