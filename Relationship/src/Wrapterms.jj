@@ -1,20 +1,22 @@
 /*  Wrapterms.jj  -  It wraps terms to SPARQL query */
 options {
-  JDK_VERSION = "1.5";
   DEBUG_PARSER = false;
   DEBUG_TOKEN_MANAGER = false;
+  STATIC = true;
 }
 PARSER_BEGIN(Wrapterms)
+//package myJavacc;
 import java.io.*;
 import myClasses.*; 
 public class Wrapterms {
-   static Tabela tabela = new Tabela();
+   
    public static void main(String args[])  throws ParseException  {
-      Wrapterms analisador = null;
+      Wrapterms parser = null;
       try {
-         analisador = new Wrapterms(new FileInputStream("prog_fonte.my"));
-         Wrapterms.inicio();
-         System.out.println(tabela.toString());
+         parser = new Wrapterms(new FileInputStream("terms.txt"));
+         ListConcept originalList = new ListConcept();
+         Wrapterms.start(originalList);
+         System.out.println(originalList);
       }
       catch(FileNotFoundException e) {
          System.out.println("Err: file not found");
@@ -28,72 +30,31 @@ public class Wrapterms {
    }
 }
 PARSER_END(Wrapterms)
-SKIP : { " " | "\t" | "\r" | "\n" }
-TOKEN [IGNORE_CASE] : {
-      <EXIBE: "exibe" >
-}
 TOKEN : {
-      < IDENT:   (["a"-"z"])+ > |
-      < ATRIB:   ":=" >         | 
-      < ADICAO:  "+" >          |
-      < PT_VIRG: ";" >          |
-      < UM:      "I" >          |
-      < DOIS:    "II" >         |
-      < TRES:    "III" >        |
-      < QUATRO:  "IV" >         |
-      < CINCO:   "V" >          |
-      < SEIS:    "VI" >         |
-      < SETE:    "VII" >        |
-      < OITO:    "VIII" >       |
-      < NOVE:    "IX" >         |
-      < DEZ:     "X" >          |
-      < VINTE:   "XX" >         |
-      < TRINTA:  "XXX" >       
+      < CHARACTER:  ["a"-"z","A"-"Z","0"-"9","-","_"] > |
+      < TERM:       < CHARACTER > 
+                    (
+                      ( < CHARACTER > | " " )*
+                      < CHARACTER >
+                    )?
+      > |
+      < SEPARATORS:  ( "\n" | "\r" | "," | ";" | "/" | " " )+ >
 }
-void inicio() : {} 
+/* Gramar:
+start   ->  ( element() )*  < EOF > 
+element ->  < TERM > ( < SEPARATORS > )*
+*/
+
+void start(ListConcept originalList) : {} 
 {
-   ( linhaComando() )* <EOF>
+   ( element(originalList) )* < EOF >
 }
-void linhaComando() : {}  
+void element(ListConcept originalList) : {Token token; Concept concept;}  
 {
-      comando() <PT_VIRG>
+	token = < TERM >
+    {		concept = new Concept(token);
+		originalList.insert(concept);			
+    }
+    ( < SEPARATORS > )*
 }
-void comando() : {}  
-{
-      exibe() | atribui()
-}
-void exibe() : {} 
-{
-      <EXIBE> <IDENT>
-}
-void atribui() : {Simbolo simb; Token t;}  
-{
-      t=<IDENT>
-      {
-            simb = new Simbolo(t.image);
-            tabela.inclui(simb);
-      } 
-      <ATRIB> expressao()
-}
-void expressao() : {}  
-{
-      fator() ( <ADICAO> fator() )*
-}
-void fator() : {}  
-{
-      <IDENT> | numero()
-}
-void numero() : {}  
-{
-      dezena() ( unidade() )? 
-    | 
-      unidade()
-}
-void unidade() : {}  
-{
-      <UM> | <DOIS> | <TRES> | <QUATRO> | <CINCO> | <SEIS> | <SETE> | <OITO> | <NOVE>
-}
-void dezena() : {}  
-{
-      <DEZ> | <VINTE> | <TRINTA>
-}
+
