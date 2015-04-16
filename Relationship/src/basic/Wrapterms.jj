@@ -16,18 +16,25 @@ public class Wrapterms {
       Wrapterms parser = null;
       try {
          parser = new Wrapterms(new FileInputStream("terms.txt"));
-         ListConcept originalList = new ListConcept();
+         ListQuerySparql originalList = new ListQuerySparql();
          Wrapterms.start(originalList);
          System.out.println(originalList);
+         System.out.println("\n"+originalList.getListConcept());
       }
       catch(FileNotFoundException e) {
-         System.out.println("Err: file not found");
+         System.out.println("Error: file not found.");
       }
+      catch (IOException e) {
+		 System.out.println("Error: problem with the persistent file: " + e.getMessage());
+	  }
       catch(TokenMgrError e) {
-         System.out.println("Lexical err\n" + e.getMessage());
+         System.out.println("Lexical error: " + e.getMessage());
+      }
+       catch(SemanticError e) {
+         System.out.println("Semantic error: " + e.getMessage());
       }
       catch(ParseException e) {
-         System.out.println("Sintax err\n" + e.getMessage());
+         System.out.println("Sintax error: " + e.getMessage());
       }
    }
 }
@@ -47,11 +54,11 @@ start   ->  ( element() )*  < EOF >
 element ->  < TERM > ( < SEPARATORS > )*
 */
 
-void start(ListConcept originalList) : {} 
+void start(ListQuerySparql originalList) : {} 
 {
    ( element(originalList) )* < EOF >
 }
-void element(ListConcept originalList) : {Token token; Concept concept;}  
+void element(ListQuerySparql originalList) : {Token token; Concept concept;}  
 {
 	token = < TERM >
     {		concept = new Concept(token);

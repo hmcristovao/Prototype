@@ -10,18 +10,25 @@ public class Wrapterms implements WraptermsConstants {
       Wrapterms parser = null;
       try {
          parser = new Wrapterms(new FileInputStream("terms.txt"));
-         ListConcept originalList = new ListConcept();
+         ListQuerySparql originalList = new ListQuerySparql();
          Wrapterms.start(originalList);
          System.out.println(originalList);
+         System.out.println("\u005cn"+originalList.getListConcept());
       }
       catch(FileNotFoundException e) {
-         System.out.println("Err: file not found");
+         System.out.println("Error: file not found.");
       }
+      catch (IOException e) {
+                 System.out.println("Error: problem with the persistent file: " + e.getMessage());
+          }
       catch(TokenMgrError e) {
-         System.out.println("Lexical err\u005cn" + e.getMessage());
+         System.out.println("Lexical error: " + e.getMessage());
+      }
+       catch(SemanticError e) {
+         System.out.println("Semantic error: " + e.getMessage());
       }
       catch(ParseException e) {
-         System.out.println("Sintax err\u005cn" + e.getMessage());
+         System.out.println("Sintax error: " + e.getMessage());
       }
    }
 
@@ -29,7 +36,7 @@ public class Wrapterms implements WraptermsConstants {
 start   ->  ( element() )*  < EOF > 
 element ->  < TERM > ( < SEPARATORS > )*
 */
-  static final public void start(ListConcept originalList) throws ParseException {
+  static final public void start(ListQuerySparql originalList) throws ParseException {
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -45,8 +52,8 @@ element ->  < TERM > ( < SEPARATORS > )*
     jj_consume_token(0);
   }
 
-  static final public void element(ListConcept originalList) throws ParseException {
-                                          Token token; Concept concept;
+  static final public void element(ListQuerySparql originalList) throws ParseException {
+                                              Token token; Concept concept;
     token = jj_consume_token(TERM);
                 concept = new Concept(token);
                 originalList.insert(concept);
