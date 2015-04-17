@@ -3,27 +3,39 @@ package myClasses;
 import basic.Token;
 
 public class Concept {
-	private String description;
+	private String originalConcept;
+	private String formatedConcept; // with two points and underlines
 	 
-	public Concept(String description) {
-		this.description = description;   
+	public Concept(String originalConcept) {
+		this.originalConcept = originalConcept.trim();
+		this.formatedConcept = Concept.format(this.originalConcept);
 	}
 	public Concept(Token token) {
-		this.description = token.image.trim(); 
+		this.originalConcept = token.image.trim();
+		this.formatedConcept = Concept.format(this.originalConcept);
 	}
 	
+	// put ":" at first and replace blank for underline
+	public static String format(String str) {
+		return ":" + str.replace(" ","_");
+	}
 	
-	public String getDescription() {
-		return this.description;
+	public String getOriginalConcept() {
+		return this.originalConcept;
+	}
+	public String getFormatedConcept() {
+		return this.formatedConcept;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setConcept(String originalDescription) {
+		this.originalConcept = originalConcept.trim();
+		this.formatedConcept = Concept.format(this.originalConcept);
 	}
 
 	@Override
 	public String toString() {
-		return "Concept [description=" + description + "]";
+		return "Concept = " + this.getOriginalConcept() + " / " 
+	           + this.getFormatedConcept() + "]";
 	}
 
 

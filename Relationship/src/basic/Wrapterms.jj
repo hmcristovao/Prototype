@@ -2,7 +2,7 @@
 options {
   DEBUG_PARSER = false;
   DEBUG_TOKEN_MANAGER = false;
-  STATIC = true;
+  STATIC = false;
 }
 PARSER_BEGIN(Wrapterms)
 package basic;
@@ -17,9 +17,10 @@ public class Wrapterms {
       try {
          parser = new Wrapterms(new FileInputStream("terms.txt"));
          ListQuerySparql originalList = new ListQuerySparql();
-         Wrapterms.start(originalList);
+         parser.start(originalList);
          System.out.println(originalList);
          System.out.println("\n"+originalList.getListConcept());
+         
       }
       catch(FileNotFoundException e) {
          System.out.println("Error: file not found.");

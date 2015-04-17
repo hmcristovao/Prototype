@@ -12,6 +12,12 @@ public class QuerySparql {
 		this.listRDF = listRDF;
 	}
 	
+	public QuerySparql(Concept concept) {
+		this.concept = concept;
+		this.query = new Query(concept);
+		this.listRDF = new ListRDF();
+	}
+	
 	public Concept getConcept() {
 		return this.concept;
 	}
