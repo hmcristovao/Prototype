@@ -1,4 +1,4 @@
-package myClasses;
+    package myClasses;
 
 public class QuerySparql {
 	
@@ -17,17 +17,19 @@ public class QuerySparql {
 		this.query = new Query(concept);
 		this.listRDF = new ListRDF();
 	}
-	
+
 	public Concept getConcept() {
 		return this.concept;
 	}
-
 	public Query getQuery() {
 		return this.query;
 	}
-
 	public ListRDF getListRDF() {
 		return this.listRDF;
+	}
+
+	public void setQuery(Query query) {
+		this.query = query;
 	}
 
 	@Override

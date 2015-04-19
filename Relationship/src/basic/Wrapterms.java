@@ -14,7 +14,7 @@ public class Wrapterms implements WraptermsConstants {
          parser.start(originalList);
          System.out.println(originalList);
          System.out.println("\u005cn"+originalList.getListConcept());
-
+         originalList.fillQuery();
       }
       catch(FileNotFoundException e) {
          System.out.println("Error: file not found.");

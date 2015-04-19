@@ -1,8 +1,11 @@
 package myClasses;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.LinkedList;
 
-public class ListQuerySparql {
+public class ListQuerySparql implements ConstListQuerySparql {
 	private LinkedList<QuerySparql> list;
 	
 	// private formatoGephi;
@@ -34,6 +37,42 @@ public class ListQuerySparql {
 		}
 		return out.toString();
 	}
+
+	private StringBuffer readFileQueryDefault() throws IOException {
+		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(ListQuerySparql.nameFileQueryDefault));
+		StringBuffer queryDefault = new StringBuffer();
+		String linhaAux = new String();
+	    while (linhaAux != null) {
+	       linhaAux = fileQueryDefault.readLine(); 
+	       queryDefault.append(linhaAux);
+	    }
+        fileQueryDefault.close();
+        return queryDefault;
+	}
+	
+	// make a copy of the query
+	private StringBuffer replaceQueryDefault(StringBuffer queryDefault, String concept) {
+		StringBuffer newQueryDefault = new StringBuffer(queryDefault);
+		int start = 0;
+		while( (start = newQueryDefault.indexOf(":Concept", start)) != -1)
+		   newQueryDefault.replace(start, start+8, concept);
+		return newQueryDefault;
+	}
+	
+	public void fillQuery() throws IOException {
+		
+	    StringBuffer queryDefault = this.readFileQueryDefault();
+	    StringBuffer newQueryDefault = null;
+	    String newConcept = null;
+	    Query query = null;
+		for(QuerySparql x: this.list) {
+			newConcept = x.getConcept().getFormatedConcept();
+			newQueryDefault = this.replaceQueryDefault(queryDefault, newConcept);
+			query = new Query(newQueryDefault);
+			x.setQuery(query);
+		}
+	}
+	
 	
 	@Override
 	public String toString() {
