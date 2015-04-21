@@ -1,4 +1,4 @@
-/*  Wrapterms.jj  -  It wraps terms to SPARQL query */
+/*  Wrapterms.jj  -  It wraps terms to SPARQL query */ 
 options {
   DEBUG_PARSER = false;
   DEBUG_TOKEN_MANAGER = false;
