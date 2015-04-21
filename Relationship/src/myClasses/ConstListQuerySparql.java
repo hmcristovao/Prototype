@@ -1,5 +1,5 @@
 package myClasses;
 
 public interface ConstListQuerySparql {
-	String nameFileQueryDefault = "query.txt";
+	String nameFileQueryDefault = "txt_files\\query.txt";
 }

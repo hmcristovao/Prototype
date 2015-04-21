@@ -9,7 +9,7 @@ public class Wrapterms implements WraptermsConstants {
    public static void main(String args[])  throws ParseException  {
       Wrapterms parser = null;
       try {
-         parser = new Wrapterms(new FileInputStream("terms.txt"));
+         parser = new Wrapterms(new FileInputStream("txt_files\u005c\u005cterms.txt"));
          ListQuerySparql originalList = new ListQuerySparql();
          parser.start(originalList);
                  System.out.println("originalList=\u005cn");
