@@ -12,9 +12,13 @@ public class Wrapterms implements WraptermsConstants {
          parser = new Wrapterms(new FileInputStream("terms.txt"));
          ListQuerySparql originalList = new ListQuerySparql();
          parser.start(originalList);
+                 System.out.println("originalList=\u005cn");
          System.out.println(originalList);
          System.out.println("\u005cn"+originalList.getListConcept());
          originalList.fillQuery();
+                 System.out.println("originalList (after fill query)=\u005cn");
+         System.out.println(originalList);
+
       }
       catch(FileNotFoundException e) {
          System.out.println("Error: file not found.");
@@ -25,7 +29,7 @@ public class Wrapterms implements WraptermsConstants {
       catch(TokenMgrError e) {
          System.out.println("Lexical error: " + e.getMessage());
       }
-       catch(SemanticError e) {
+       catch(SemanticException e) {
          System.out.println("Semantic error: " + e.getMessage());
       }
       catch(ParseException e) {

@@ -45,6 +45,7 @@ public class ListQuerySparql implements ConstListQuerySparql {
 	    while (linhaAux != null) {
 	       linhaAux = fileQueryDefault.readLine(); 
 	       queryDefault.append(linhaAux);
+	       queryDefault.append("\n");
 	    }
         fileQueryDefault.close();
         return queryDefault;
@@ -59,8 +60,7 @@ public class ListQuerySparql implements ConstListQuerySparql {
 		return newQueryDefault;
 	}
 	
-	public void fillQuery() throws IOException {
-		
+	public void fillQuery() throws IOException {	
 	    StringBuffer queryDefault = this.readFileQueryDefault();
 	    StringBuffer newQueryDefault = null;
 	    String newConcept = null;
