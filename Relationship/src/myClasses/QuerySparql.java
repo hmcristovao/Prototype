@@ -3,40 +3,40 @@
 public class QuerySparql {
 	
 	private Concept concept;
-	private Query query;
+	private QueryString queryString;
 	private ListRDF listRDF;
 	
-	public QuerySparql(Concept concept, Query query, ListRDF listRDF) {
+	public QuerySparql(Concept concept, QueryString queryString, ListRDF listRDF) {
 		this.concept = concept;
-		this.query = query;
+		this.queryString = queryString;
 		this.listRDF = listRDF;
 	}
 	
 	public QuerySparql(Concept concept) {
 		this.concept = concept;
-		this.query = new Query(concept);
+		this.queryString = new QueryString(concept);
 		this.listRDF = new ListRDF();
 	}
 
 	public Concept getConcept() {
 		return this.concept;
 	}
-	public Query getQuery() {
-		return this.query;
+	public QueryString getQueryString() {
+		return this.queryString;
 	}
 	public ListRDF getListRDF() {
 		return this.listRDF;
 	}
 
-	public void setQuery(Query query) {
-		this.query = query;
+	public void setQuery(QueryString queryString) {
+		this.queryString = queryString;
 	}
 
 	@Override
 	public String toString() {
 		return "QuerySparql [concept=" + 
 				this.getConcept() + ", Query=" + 
-				this.getQuery() + ", listRDF=" + 
+				this.getQueryString() + ", listRDF=" + 
 				this.getListRDF() + "]";
 	}
 

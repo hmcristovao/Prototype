@@ -4,10 +4,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
-import com.hp.hpl.jena.query.QuerySolution;
+import com.hp.hpl.jena.query.QueryFactory;
+//import com.hp.hpl.jena.query.QuerySolution;
 import com.hp.hpl.jena.query.ResultSet;
+import com.hp.hpl.jena.query.ResultSetFormatter;
 
 import basic.*;
 
@@ -41,6 +44,10 @@ public class MainProcess {
 		catch(ParseException e) {
 			System.out.println("Sintax error: " + e.getMessage());
 		}
+		// get the rest
+		catch(Exception e) {
+			System.out.println("Other: " + e.getMessage());
+		}
 	}
 	
 	public static void showConsoleList(ListQuerySparql list) {
@@ -48,17 +55,33 @@ public class MainProcess {
 		System.out.println(list);
 	}
 	
-	public static void fillRDFs(ListQuerySparql list) {
-		String queryStr = " ";
-		QueryExecution queryExecution = QueryExecutionFactory.sparqlService("http://dbpedia.org/sparql",  queryStr);
+	public static void fillRDFs(ListQuerySparql list) throws Exception {
+		
+		// query string de teste
+		//String queryStr = "PREFIX : <http://dbpedia.org/resource/> CONSTRUCT { :Concept ?predicate ?object . } WHERE {  :Concept ?predicate ?object . FILTER regex(?object, \"http://dbpedia.org/resource/\") }";
+		
+		// pegando a primeira query string
+		String queryStr = list.getList().get(0).getQueryString().getValueString();
+		// imprime para testar:
+		System.out.println("\n\nqueryStr=\n"+queryStr);
+		
+		Query query = QueryFactory.create(queryStr);
+		QueryExecution queryExecution = QueryExecutionFactory.sparqlService(ConstListQuerySparql.serviceEndpoint,  query);
 		ResultSet resultSet = queryExecution.execSelect();
 		while (resultSet.hasNext()){
-		    QuerySolution querySolution = resultSet.nextSolution();
-		    System.out.println(querySolution.getResource("?URI").toString());
+		    resultSet.nextSolution();
+		    System.out.println(ResultSetFormatter.asText(resultSet));
 		}
+		queryExecution.close();
 	}
-	// ver este código, depois de resolver o problema ...
-	// http://stackoverflow.com/questions/24116853/query-sparql-to-dbpedia-using-java-code
+	//
+	// Como estava antes:
+	/*
+	while (resultSet.hasNext()){
+	    QuerySolution querySolution = resultSet.nextSolution();
+	    System.out.println(querySolution.getResource("?URI").toString());
+	}
+	*/
 	
 
 }

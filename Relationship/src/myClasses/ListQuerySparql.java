@@ -24,11 +24,13 @@ public class ListQuerySparql implements ConstListQuerySparql {
 	}
 	// cria um objeto QuerySparql preenchendo-o com concept e o insere na lista
 	public void insert(Concept concept) {
-		Query auxQuery = new Query();
+		QueryString auxQuery = new QueryString();
 		ListRDF auxListRDF = new ListRDF();
 		QuerySparql querySparql = new QuerySparql(concept, auxQuery, auxListRDF);
 		this.list.add(querySparql);  
 	}
+	
+	// exceptional function - for test
 	public String getListConcept() {
 		StringBuffer out = new StringBuffer();
 		for(QuerySparql x: this.list) {
@@ -62,14 +64,15 @@ public class ListQuerySparql implements ConstListQuerySparql {
 	
 	public void fillQuery() throws IOException {	
 	    StringBuffer queryDefault = this.readFileQueryDefault();
+	    Debug.DEBUG("queryDefault",queryDefault.toString());
 	    StringBuffer newQueryDefault = null;
 	    String newConcept = null;
-	    Query query = null;
+	    QueryString queryString = null;
 		for(QuerySparql x: this.list) {
 			newConcept = x.getConcept().getFormatedConcept();
 			newQueryDefault = this.replaceQueryDefault(queryDefault, newConcept);
-			query = new Query(newQueryDefault);
-			x.setQuery(query);
+			queryString = new QueryString(newQueryDefault);
+			x.setQuery(queryString);
 		}
 	}
 	

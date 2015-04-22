@@ -1,16 +1,16 @@
 package myClasses;
 
-public class Query implements ConstSparql {
+public class QueryString implements ConstSparql {
 	
 	private StringBuffer value;
 	
-	public Query() {
+	public QueryString() {
 		this.value = new StringBuffer();
 	}
-	public Query(StringBuffer value) {
+	public QueryString(StringBuffer value) {
 		this.value = value;
 	}
-	public Query(Concept concept) {
+	public QueryString(Concept concept) {
 		this.value = this.buildQuery(concept);
 	}
 	
