@@ -43,9 +43,11 @@ public class ListQuerySparql implements ConstListQuerySparql {
 	private StringBuffer readFileQueryDefault() throws IOException {
 		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(ListQuerySparql.nameFileQueryDefault));
 		StringBuffer queryDefault = new StringBuffer();
-		String linhaAux = new String();
-	    while (linhaAux != null) {
-	       linhaAux = fileQueryDefault.readLine(); 
+		String linhaAux = null;
+	    while (true) {
+	       linhaAux = fileQueryDefault.readLine();
+	       if(linhaAux == null)
+	    	   break;
 	       queryDefault.append(linhaAux);
 	       queryDefault.append("\n");
 	    }
@@ -53,7 +55,7 @@ public class ListQuerySparql implements ConstListQuerySparql {
         return queryDefault;
 	}
 	
-	// make a copy of the query
+	// replace and make a copy of the query
 	private StringBuffer replaceQueryDefault(StringBuffer queryDefault, String concept) {
 		StringBuffer newQueryDefault = new StringBuffer(queryDefault);
 		int start = 0;
@@ -64,7 +66,6 @@ public class ListQuerySparql implements ConstListQuerySparql {
 	
 	public void fillQuery() throws IOException {	
 	    StringBuffer queryDefault = this.readFileQueryDefault();
-	    Debug.DEBUG("queryDefault",queryDefault.toString());
 	    StringBuffer newQueryDefault = null;
 	    String newConcept = null;
 	    QueryString queryString = null;
