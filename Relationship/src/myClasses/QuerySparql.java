@@ -1,10 +1,13 @@
     package myClasses;
 
+import com.hp.hpl.jena.rdf.model.Model;
+
 public class QuerySparql {
 	
 	private Concept concept;
 	private QueryString queryString;
 	private ListRDF listRDF;
+	private Model model;
 	
 	public QuerySparql(Concept concept, QueryString queryString, ListRDF listRDF) {
 		this.concept = concept;
@@ -26,6 +29,9 @@ public class QuerySparql {
 	}
 	public ListRDF getListRDF() {
 		return this.listRDF;
+	}
+	public Model getModel() {
+		return this.model;
 	}
 
 	public void setQuery(QueryString queryString) {

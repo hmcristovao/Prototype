@@ -12,6 +12,13 @@ import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.query.ResultSet;
 import com.hp.hpl.jena.query.ResultSetFormatter;
 import com.hp.hpl.jena.rdf.model.Model;
+import com.hp.hpl.jena.rdf.model.Property;
+import com.hp.hpl.jena.rdf.model.RDFList;
+import com.hp.hpl.jena.rdf.model.RDFNode;
+import com.hp.hpl.jena.rdf.model.Resource;
+import com.hp.hpl.jena.rdf.model.Statement;
+import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.resultset.SPARQLResult;
 
 import basic.*;
 
@@ -79,7 +86,7 @@ public class MainProcess {
 		Debug.DEBUG(query.toString());
 		
 		// it's ok!
-		QueryExecution queryExecution = QueryExecutionFactory.sparqlService(ConstListQuerySparql.serviceEndpoint,  query);
+		QueryExecution queryExecution = QueryExecutionFactory.sparqlService(ConstListQuerySparql.serviceEndpoint2,  query);
 		Debug.DEBUG("1");
 		
 		
@@ -89,33 +96,27 @@ public class MainProcess {
 		Model data = queryExecution.execConstruct();
 		Debug.DEBUG("3");
 		
-		// data.write(System.out,"TURTLE");
-		Debug.DEBUG(data.toString());
+		Debug.DEBUG("Size=", data.size());
 		
-        //Model model = queryExecution.execConstruct();
-		//Debug.DEBUG("2");
-		/*
-		while (resultSet.hasNext()){
-		
-			Debug.DEBUG("3");
+		StmtIterator stmtIterator = data.listStatements();
 
-		    resultSet.nextSolution();
-			Debug.DEBUG("4");
+		// print out the predicate, subject and object of each statement
+		while (stmtIterator.hasNext()) {
+		    Statement statement      = stmtIterator.nextStatement();  // get next statement
+		    Resource  subject   = statement.getSubject();     // get the subject
+		    Property  predicate = statement.getPredicate();   // get the predicate
+		    RDFNode   object    = statement.getObject();      // get the object
 
-		    System.out.println(ResultSetFormatter.asText(resultSet));
+		    System.out.print(subject.toString());
+		    System.out.print(" " + predicate.toString() + " ");
+		    if (object instanceof Resource) {
+		       System.out.print(object.toString());
+		    } else {
+		        // object is a literal
+		        System.out.print(" \"" + object.toString() + "\"");
+		    }
+
+		    System.out.println(" .");
 		}
-		queryExecution.close();
-		*/
-		Debug.DEBUG("FIM!");
-	}
-	//
-	// Como estava antes:
-	/*
-	while (resultSet.hasNext()){
-	    QuerySolution querySolution = resultSet.nextSolution();
-	    System.out.println(querySolution.getResource("?URI").toString());
-	}
-	*/
-	
-	
+	}	
 }

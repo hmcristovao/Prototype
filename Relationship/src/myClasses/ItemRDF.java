@@ -1,10 +1,13 @@
 package myClasses;
 
+import com.hp.hpl.jena.rdf.model.Statement;
+
 public class ItemRDF {
 	
 	private SubjectRDF subject;
 	private PredicateRDF predicate;
 	private ObjectRDF object;
+	private Statement statement;
 	
 	public SubjectRDF getSubject() {
 		return this.subject;
@@ -14,6 +17,9 @@ public class ItemRDF {
 	}
 	public ObjectRDF getObject() {
 		return this.object;
+	}
+	public Statement getStatement() {
+		return this.statement;
 	}
 	
 	public ItemRDF(SubjectRDF subject, PredicateRDF predicate, ObjectRDF object) {
