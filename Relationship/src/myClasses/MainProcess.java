@@ -3,6 +3,7 @@ package myClasses;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -70,53 +71,50 @@ public class MainProcess {
 	}
 	
 	public static void fillRDFs(ListQuerySparql list) throws Exception {
-		
-		// query string of test
-		//String queryStr = "PREFIX : <http://dbpedia.org/resource/> CONSTRUCT { :Concept ?predicate ?object . } WHERE {  :Concept ?predicate ?object . FILTER regex(?object, \"http://dbpedia.org/resource/\") }";
-		String queryStr = "PREFIX foaf: <http://xmlns.com/foaf/0.1/> CONSTRUCT { ?subj foaf:name ?name } WHERE { ?subj foaf:name ?name  FILTER regex(?subj, \"Henrique\") } LIMIT 10";
-		
-		// to test, to get the first query string
-		//String queryStr = list.getList().get(0).getQueryString().getValueString();
-		// imprime para testar:
-		//Debug.DEBUG("queryStr",queryStr);
-		
-		// it's ok!
-		Query query = QueryFactory.create(queryStr);
-		
-		Debug.DEBUG(query.toString());
-		
-		// it's ok!
-		QueryExecution queryExecution = QueryExecutionFactory.sparqlService(ConstListQuerySparql.serviceEndpoint2,  query);
-		Debug.DEBUG("1");
-		
-		
-		Debug.DEBUG(queryExecution.toString());
-		Debug.DEBUG("2");
-		
-		Model data = queryExecution.execConstruct();
-		Debug.DEBUG("3");
-		
-		Debug.DEBUG("Size=", data.size());
-		
-		StmtIterator stmtIterator = data.listStatements();
+		QuerySparql querySparql;
+		String queryStr;
+		Query query;
+		QueryExecution queryExecution;
+		Model model;
+		ListRDF listRDF;
+		StmtIterator stmtIterator;
+		Statement statement;
+		Resource  subject;
+		Property  predicate;
+		RDFNode   object;
+		ItemRDF itemRDF;
+		SubjectRDF subjectRDF;
+		PredicateRDF predicateRDF;
+		ObjectRDF objectRDF;
+		for(int i=0; i < list.getList().size(); i++) {
+			querySparql = list.getList().get(i);
+			queryStr = querySparql.getQueryString().getValueString();
+			query = QueryFactory.create(queryStr);
+			queryExecution = QueryExecutionFactory.sparqlService(ConstListQuerySparql.serviceEndpoint,  query);
+			model = queryExecution.execConstruct();
+			querySparql.setModel(model);
+			listRDF = querySparql.getListRDF();
+			
+			stmtIterator = model.listStatements();
 
-		// print out the predicate, subject and object of each statement
-		while (stmtIterator.hasNext()) {
-		    Statement statement      = stmtIterator.nextStatement();  // get next statement
-		    Resource  subject   = statement.getSubject();     // get the subject
-		    Property  predicate = statement.getPredicate();   // get the predicate
-		    RDFNode   object    = statement.getObject();      // get the object
-
-		    System.out.print(subject.toString());
-		    System.out.print(" " + predicate.toString() + " ");
-		    if (object instanceof Resource) {
-		       System.out.print(object.toString());
-		    } else {
-		        // object is a literal
-		        System.out.print(" \"" + object.toString() + "\"");
-		    }
-
-		    System.out.println(" .");
+			while (stmtIterator.hasNext()) {
+				// read elements of the model
+				statement = stmtIterator.nextStatement();  
+				subject   = statement.getSubject();     
+				predicate = statement.getPredicate();   
+				object    = statement.getObject();
+				
+				// create complete item 
+				subjectRDF   = new SubjectRDF(subject.toString());
+				predicateRDF = new PredicateRDF(predicate.toString());
+				objectRDF    = new ObjectRDF(object.toString());
+				itemRDF      = new ItemRDF(statement, subjectRDF, predicateRDF, objectRDF);
+				
+				// insert complete item into list of the RDFs
+				listRDF.getList().add(itemRDF);
+			}
+		    queryExecution.close();
 		}
 	}	
 }
+

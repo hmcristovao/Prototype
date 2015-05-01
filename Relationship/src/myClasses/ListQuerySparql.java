@@ -5,15 +5,16 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import org.graphstream.graph.Graph;
+import org.graphstream.graph.implementations.SingleGraph;
+
 public class ListQuerySparql implements ConstListQuerySparql {
 	private LinkedList<QuerySparql> list;
-	
-	// private formatoGephi;
-	// private dados para o gráfico ??
-	// private metricas ...
+	private Graph graph;
 	
 	public ListQuerySparql() {
 		this.list = new LinkedList<QuerySparql>();
+		this.graph = new SingleGraph("Graph");
 	}
 
 	public LinkedList<QuerySparql> getList() {

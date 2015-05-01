@@ -33,6 +33,9 @@ public class QuerySparql {
 	public Model getModel() {
 		return this.model;
 	}
+	public void setModel(Model model) {
+		this.model = model;
+	}
 
 	public void setQuery(QueryString queryString) {
 		this.queryString = queryString;

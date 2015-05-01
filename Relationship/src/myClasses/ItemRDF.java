@@ -4,10 +4,10 @@ import com.hp.hpl.jena.rdf.model.Statement;
 
 public class ItemRDF {
 	
+	private Statement statement;
 	private SubjectRDF subject;
 	private PredicateRDF predicate;
 	private ObjectRDF object;
-	private Statement statement;
 	
 	public SubjectRDF getSubject() {
 		return this.subject;
@@ -22,7 +22,8 @@ public class ItemRDF {
 		return this.statement;
 	}
 	
-	public ItemRDF(SubjectRDF subject, PredicateRDF predicate, ObjectRDF object) {
+	public ItemRDF(Statement statement, SubjectRDF subject, PredicateRDF predicate, ObjectRDF object) {
+		this.statement = statement;
 		this.subject   = subject;
 		this.predicate = predicate;
 		this.object    = object;
