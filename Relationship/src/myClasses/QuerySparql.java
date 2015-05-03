@@ -41,6 +41,10 @@ public class QuerySparql {
 		this.queryString = queryString;
 	}
 
+	public int sizeListRDF() {
+		return this.listRDF.size();
+	}
+	
 	@Override
 	public String toString() {
 		return "QuerySparql [concept=" + 

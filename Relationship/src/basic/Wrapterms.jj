@@ -32,15 +32,15 @@ start   ->  ( element() )*  < EOF >
 element ->  < TERM > ( < SEPARATORS > )*
 */
 
-void start(ListQuerySparql originalList) : {} 
+void start(Dataset originalDataset) : {} 
 {
-   ( element(originalList) )* < EOF >
+   ( element(originalDataset) )* < EOF >
 }
-void element(ListQuerySparql originalList) : {Token token; Concept concept;}  
+void element(Dataset originalDataset) : {Token token; Concept concept;}  
 {
 	token = < TERM >
     {		concept = new Concept(token);
-		originalList.insert(concept);			
+		originalDataset.getListQuerySparql().insert(concept);			
     }
     ( < SEPARATORS > )*
 }

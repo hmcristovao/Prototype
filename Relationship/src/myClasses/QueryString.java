@@ -1,6 +1,6 @@
 package myClasses;
 
-public class QueryString implements ConstSparql {
+public class QueryString {
 	
 	private StringBuffer value;
 	
