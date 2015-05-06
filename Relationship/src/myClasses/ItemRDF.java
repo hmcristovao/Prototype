@@ -31,9 +31,9 @@ public class ItemRDF {
 
 	@Override
 	public String toString() {
-		return this.getSubject()+" -> "
-	          +this.getPredicate()+" -> "
-	          +this.getPredicate();
+		return  "\nsubject = " + this.getSubject() + 
+				"\npredicate = " + this.getPredicate() + 
+				"\nobject = " + this.getObject();
 	}
 }
 

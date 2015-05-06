@@ -35,6 +35,6 @@ public class ListQuerySparql {
 	
 	@Override
 	public String toString() {
-		return "ListQuerySparql [list=\n" + this.getList() + "]";
+		return "\nlist = " + this.getList().toString();
 	}
 }

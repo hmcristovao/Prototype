@@ -6,17 +6,21 @@ import java.io.IOException;
 
 import basic.*;
 
-public class MainProcess {
+public class MainProcess implements Constants {
 
 	public static void head(Wrapterms parser) {
 		try {
-			parser = new Wrapterms(new FileInputStream("txt_files\\terms.txt"));
+			parser = new Wrapterms(new FileInputStream("txt_files\\"+Constants.nameFileInput));
 			Dataset originalDataset  = new Dataset();
 			parser.start(originalDataset);
+			Debug.DEBUG(originalDataset.toString());
 			originalDataset.fillQuery();
+			Debug.DEBUG(originalDataset.toString());
 			originalDataset.fillRDFs();
-			Debug.DEBUG("Quantity of concepts" , originalDataset.getTotalConcepts());
-			Debug.DEBUG("Quantity of RDFs" , originalDataset.getTotalRDFs());
+			Debug.DEBUG(originalDataset.toString());
+			originalDataset.buildGraph();
+			Debug.DEBUG(originalDataset.toString());
+			originalDataset.getGraph().getGraph().display(true);
 		}
 		catch(FileNotFoundException e) {
 			System.out.println("Error: file not found.");
