@@ -184,43 +184,19 @@ public class Dataset {
 		QuerySparql querySparql;
 		ListRDF listRDF;
 		ItemRDF itemRDF;
-		SubjectRDF subjectRDF;
-		PredicateRDF predicateRDF;
-		ObjectRDF objectRDF;
+		NumAdded numAdded;
 		for(int i=0; i < this.getListQuerySparql().getList().size(); i++) {
 			querySparql = this.getListQuerySparql().getList().get(i);
 			listRDF = querySparql.getListRDF();
 			for(int j=0; j < listRDF.size(); j++) {
 				// get RDF elements
 				itemRDF = listRDF.getList().get(j);
-				subjectRDF = itemRDF.getSubject();
-				predicateRDF = itemRDF.getPredicate();
-				objectRDF = itemRDF.getObject();
 				// insert into of graph
-				if(graphData.insertNode(subjectRDF.getValue())) {
-					this.incTotalNodes();
-					Debug.DEBUG("inserted node:", subjectRDF.getValue());
-				}
-				else {
-					this.incTotalNodesDuplicate();
-					Debug.DEBUG("not inserted node:", subjectRDF.getValue());
-				}
-				if(graphData.insertNode(objectRDF.getValue())) {
-					this.incTotalNodes();
-					Debug.DEBUG("inserted node:", objectRDF.getValue());
-				}
-				else {
-					this.incTotalNodesDuplicate();
-					Debug.DEBUG("not inserted node:", subjectRDF.getValue());
-				}
-				if(graphData.insertEdge(predicateRDF.getValue(), subjectRDF.getValue(), objectRDF.getValue())) {
-					this.incTotalEdges();
-					Debug.DEBUG("inserted edge:", predicateRDF.getValue()+" - "+subjectRDF.getValue()+" - "+objectRDF.getValue());
-				}
-				else {
-					this.incTotalEdgesDuplicate();
-					Debug.DEBUG("not inserted edge:", predicateRDF.getValue()+" - "+subjectRDF.getValue()+" - "+objectRDF.getValue());
-				}
+				numAdded = this.graphData.insertRDF(itemRDF);
+				this.incTotalNodes(numAdded.numNodes);
+				this.incTotalEdges(numAdded.numEdges);
+				this.incTotalNodesDuplicate(2 - numAdded.numNodes);
+				this.incTotalEdgesDuplicate(1 - numAdded.numEdges);
 			}
 		}
 	}
