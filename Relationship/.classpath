@@ -8,5 +8,7 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JenaLibs"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/GraphStreamLibs"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/gs-gephi"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JSON"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

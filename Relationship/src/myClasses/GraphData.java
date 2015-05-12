@@ -63,14 +63,15 @@ public class GraphData {
 		NumAdded numAdded = new NumAdded();
 		try {
 			node = this.graph.addNode(subjectRDF.getValue());
-			Debug.DEBUG("inserted node:", subjectRDF.getValue());
+			//Debug.DEBUG("inserted node:", subjectRDF.getValue());
 			numAdded.numNodes++;
-			node.addAttribute("label", subjectRDF.getValue());
+			if(Constants.nodeLabel)
+				node.addAttribute("label", subjectRDF.getValue());
 		}
 		catch(IdAlreadyInUseException e) {
 			// repeated node, do nothing
 			node = this.graph.getNode(subjectRDF.getValue());
-			Debug.DEBUG("not inserted node:", subjectRDF.getValue());
+			//Debug.DEBUG("not inserted node:", subjectRDF.getValue());
 		}
 		if(predicateRDF.getValue().equals("http://relationship.org/homepage"))
 			node.addAttribute("homepage", objectRDF.getValue());
@@ -78,27 +79,30 @@ public class GraphData {
 			try {
 				node = this.graph.addNode(objectRDF.getValue());
 				numAdded.numNodes++;
-				Debug.DEBUG("inserted node:", objectRDF.getValue());
-				node.addAttribute("label", objectRDF.getValue());
+				//Debug.DEBUG("inserted node:", objectRDF.getValue());
+				if(Constants.nodeLabel)
+					node.addAttribute("label", objectRDF.getValue());
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated node, do nothing
 				node = this.graph.getNode(objectRDF.getValue());
-				Debug.DEBUG("not inserted node:", objectRDF.getValue());
+				//Debug.DEBUG("not inserted node:", objectRDF.getValue());
 			}
 			try {
 				edge = this.graph.addEdge(predicateRDF.getValue(), subjectRDF.getValue(), objectRDF.getValue(),true);
 				numAdded.numEdges++;
-				edge.addAttribute("label", predicateRDF.getValue());
-				Debug.DEBUG("inserted edge:", predicateRDF.getValue()+" - "+subjectRDF.getValue()+" - "+objectRDF.getValue());
+				if(Constants.edgeLabel)
+					edge.addAttribute("label", predicateRDF.getValue());
+				//Debug.DEBUG("inserted edge:", predicateRDF.getValue()+" - "+subjectRDF.getValue()+" - "+objectRDF.getValue());
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated edge, insert a different element in the identifying string and try again
 				GraphData.incModifier();
 				edge = this.graph.addEdge(predicateRDF.getValue()+" - "+GraphData.getStrModifier(), subjectRDF.getValue(), objectRDF.getValue(),true);
 				numAdded.numEdges++;
-				edge.addAttribute("label", predicateRDF.getValue()+" - "+GraphData.getStrModifier());
-				Debug.DEBUG("inserted edge (changed):", predicateRDF.getValue()+" - "+GraphData.getStrModifier()+" - "+subjectRDF.getValue()+" - "+objectRDF.getValue());
+				if(Constants.edgeLabel)
+					edge.addAttribute("label", predicateRDF.getValue()+" - "+GraphData.getStrModifier());
+				//Debug.DEBUG("inserted edge (changed):", predicateRDF.getValue()+" - "+GraphData.getStrModifier()+" - "+subjectRDF.getValue()+" - "+objectRDF.getValue());
 			}
 		}
 		return numAdded;
