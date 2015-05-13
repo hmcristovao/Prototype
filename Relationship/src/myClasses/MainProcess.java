@@ -3,6 +3,7 @@ package myClasses;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintStream;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.stream.gephi.JSONSender;
@@ -13,17 +14,22 @@ public class MainProcess implements Constants {
 
 	public static void head(Wrapterms parser) {
 		try {
-			parser = new Wrapterms(new FileInputStream("txt_files\\"+Constants.nameFileInput));
+			PrintStream fileConsoleOut = new PrintStream(Constants.nameFileConsoleOut);
+			PrintStream fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
+			System.setOut(fileConsoleOut);
+			System.setErr(fileConsoleErr);
+			
+			parser = new Wrapterms(new FileInputStream(Constants.nameFileInput));
 			Dataset originalDataset  = new Dataset();
 			parser.start(originalDataset);
-			//Debug.DEBUG(originalDataset.toString());
+			Debug.DEBUG("1",originalDataset.toString());
 			originalDataset.fillQuery();
-			//Debug.DEBUG(originalDataset.toString());
+			Debug.DEBUG("2",originalDataset.toString());
 			originalDataset.fillRDFs();
-			//Debug.DEBUG(originalDataset.toString());
+			Debug.DEBUG("3",originalDataset.toString());
 			
 			Graph currentGraph = originalDataset.getGraph().getGraph();
-			//Debug.DEBUG(originalDataset.toString());
+			Debug.DEBUG("4",originalDataset.toString());
 			
 			currentGraph.display(true);
 			
@@ -35,6 +41,8 @@ public class MainProcess implements Constants {
 			
 			MainProcess.sleep();
 			//currentGraph.clear();
+			fileConsoleOut.close();
+			fileConsoleErr.close();
 		}
 		catch(FileNotFoundException e) {
 			System.out.println("Error: file not found.");

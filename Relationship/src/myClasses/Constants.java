@@ -1,15 +1,16 @@
 package myClasses;
 
 public interface Constants {
-	String nameFileInput = "terms.txt";
+	String nameFileConsoleOut = "txt_files\\consoleOut.txt";
+	String nameFileConsoleErr = "txt_files\\consoleErr.txt";
+	String nameFileInput = "txt_files\\terms.txt";
 	String nameFileQueryDefault = "txt_files\\query.txt";
-	String serviceEndpoint = "http://dbpedia.org/sparql";
-	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
+	String serviceEndpoint2 = "http://dbpedia.org/sparql";
+	String serviceEndpoint = "http://lod.openlinksw.com/sparql/";
 	String nameGraph = "Graph relationship";
 	String nameGephiWorkspace = "workspace0";
 	int totalNodes = 20000;
 	int totalEdges = 20000;
 	boolean edgeLabel = false;
-	boolean nodeLabel = false;
-	
+	boolean nodeLabel = false; // original concepts always have label
 }
