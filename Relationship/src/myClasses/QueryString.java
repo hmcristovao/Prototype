@@ -2,42 +2,38 @@ package myClasses;
 
 public class QueryString {
 	
-	private StringBuffer value;
+	private StringBuffer queryStr;
 	
 	public QueryString() {
-		this.value = new StringBuffer();
+		this.queryStr = new StringBuffer();
 	}
-	public QueryString(StringBuffer value) {
-		this.value = value;
+	public QueryString(StringBuffer queryStr) {
+		this.queryStr = queryStr;
 	}
 	public QueryString(Concept concept) {
-		this.value = this.buildQuery(concept);
+		this.queryStr = this.buildQuery(concept);
 	}
-	
 	public StringBuffer buildQuery(Concept concept) {
 		StringBuffer aux = new StringBuffer();
-		
 		return aux;
 	}
-	
-	
-	public StringBuffer getValue() {
-		return this.value;
+	public StringBuffer getQueryStr() {
+		return this.queryStr;
 	}
-	public String getValueString() {
-		return this.value.toString();
+	public String getQueryStrString() {
+		return this.queryStr.toString();
 	}
 	public void append(String str) {
-		this.value.append(str);
+		this.queryStr.append(str);
 		return;
 	}
 	public void appendLine(String str) {
-		this.value.append("\n");
-		this.value.append(str);
+		this.queryStr.append("\n");
+		this.queryStr.append(str);
 		return;
 	}
 	@Override
 	public String toString() {
-		return this.getValue().toString();
+		return this.getQueryStr().toString();
 	}
 }

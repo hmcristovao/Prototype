@@ -47,10 +47,9 @@ public class QuerySparql {
 	
 	@Override
 	public String toString() {
-		return "QuerySparql [concept=" + 
-				this.getConcept() + ", Query=" + 
-				this.getQueryString() + ", listRDF=" + 
-				this.getListRDF() + "]";
+		return  "concept = " + this.getConcept() + 
+				"\nquery = \n" + this.getQueryString() + 
+				"\nlistRDF = \n" + this.getListRDF();
 	}
 
 	

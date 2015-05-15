@@ -19,19 +19,15 @@ public class Dataset {
 	private ListQuerySparql listQuerySparql;
 	private GraphData graphData;
 	private int totalRDF;
-    private int totalNodes;
-    private int totalEdges;
-    private int totalNodesDuplicate;
-	private int totalEdgesDuplicate;
+    private QuantityNodesEdges added;
+    private QuantityNodesEdges duplicate;
 	
 	public Dataset() {
 		this.listQuerySparql = new ListQuerySparql();
 		this.graphData = new GraphData();
-		this.totalRDF            = 0;
-		this.totalNodes          = 0;
-		this.totalEdges          = 0;
-		this.totalNodesDuplicate = 0;
-		this.totalEdgesDuplicate = 0;
+		this.totalRDF  = 0;
+		this.added = new QuantityNodesEdges();
+		this.duplicate = new QuantityNodesEdges();
 	}
 	
 	public ListQuerySparql getListQuerySparql() {
@@ -54,45 +50,44 @@ public class Dataset {
 	public void incTotalRDFs(int value) {
 		this.totalRDF += value;
 	}
-	
 	public int getTotalNodes() {
-		return this.totalNodes;
+		return this.added.getNumNodes();
 	}
 	public void incTotalNodes() {
-		this.totalNodes++;
+		this.added.incNumNodes();
 	}
 	public void incTotalNodes(int value) {
-		this.totalNodes += value;
+		this.added.incNumNodes(value);
 	}
 
 	public int getTotalEdges() {
-		return this.totalEdges;
+		return this.added.getNumEdges();
 	}
 	public void incTotalEdges() {
-		this.totalEdges++;
+		this.added.incNumEdges();
 	}
 	public void incTotalEdges(int value) {
-		this.totalEdges += value;
+		this.added.incNumEdges(value);
 	}
 
 	public int getTotalNodesDuplicate() {
-		return this.totalNodesDuplicate;
+		return this.duplicate.getNumNodes();
 	}
 	public void incTotalNodesDuplicate() {
-		this.totalNodesDuplicate++;
+		this.duplicate.incNumNodes();
 	}
 	public void incTotalNodesDuplicate(int value) {
-		this.totalNodesDuplicate += value;
+		this.duplicate.incNumNodes(value);
 	}
 
 	public int getTotalEdgesDuplicate() {
-		return this.totalEdgesDuplicate;
+		return this.duplicate.getNumEdges();
 	}
 	public void incTotalEdgesDuplicate() {
-		this.totalEdgesDuplicate++;
+		this.duplicate.incNumEdges();
 	}
 	public void incTotalEdgesDuplicate(int value) {
-		this.totalEdgesDuplicate += value;
+		this.duplicate.incNumEdges(value);
 	}
 
 	private StringBuffer readFileQueryDefault() throws IOException {
@@ -114,7 +109,7 @@ public class Dataset {
 	private StringBuffer replaceQueryDefault(StringBuffer queryDefault, String concept) {
 		StringBuffer newQueryDefault = new StringBuffer(queryDefault);
 		int start = 0;
-		while( (start = newQueryDefault.indexOf(":Concept", start)) != -1)
+		while( (start = newQueryDefault.indexOf(":#######", start)) != -1)
 		   // add ":" before concept
 		   newQueryDefault.replace(start, start+8, ":"+concept);
 		return newQueryDefault;
@@ -132,8 +127,6 @@ public class Dataset {
 			x.setQuery(queryString);
 		}
 	}
-	
-	private int levelConcept(String concept)
 	
 	public void fillRDFs() throws Exception {
 		QuerySparql querySparql;
@@ -153,7 +146,7 @@ public class Dataset {
 		ItemRDF objectRDF;
 		for(int i=0; i < this.getListQuerySparql().getList().size(); i++) {
 			querySparql = this.getListQuerySparql().getList().get(i);
-			queryStr = querySparql.getQueryString().getValueString();
+			queryStr = querySparql.getQueryString().getQueryStrString();
 			query = QueryFactory.create(queryStr);
 			queryExecution = QueryExecutionFactory.sparqlService(Constants.serviceEndpoint,  query);
 			model = queryExecution.execConstruct();
@@ -170,9 +163,9 @@ public class Dataset {
 				object    = statement.getObject();
 				
 				// create complete registerRDF 
-				subjectRDF   = new SubjectRDF(subject.toString(), subject, this.levelConcept(subject.toString() );
+				subjectRDF   = new SubjectRDF(subject.toString(), subject, this);
 				predicateRDF = new PredicateRDF(predicate.toString(), predicate);
-				objectRDF    = new ObjectRDF(object.toString(), object, this.levelConcept(subject.toString() );
+				objectRDF    = new ObjectRDF(object.toString(), object, this);
 				oneRDF       = new OneRDF(statement, subjectRDF, predicateRDF, objectRDF);
 				
 				// insert complete item into list of the RDFs
@@ -188,7 +181,7 @@ public class Dataset {
 		QuerySparql querySparql;
 		ListRDF listRDF;
 		OneRDF oneRDF;
-		NumAdded numAdded;
+		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
 		for(int i=0; i < this.getListQuerySparql().getList().size(); i++) {
 			querySparql = this.getListQuerySparql().getList().get(i);
 			listRDF = querySparql.getListRDF();
@@ -196,22 +189,24 @@ public class Dataset {
 				// get RDF elements
 				oneRDF = listRDF.getList().get(j);
 				// insert into of graph
-				numAdded = this.graphData.insertRDF(oneRDF);
-				this.incTotalNodes(numAdded.numNodes);
-				this.incTotalEdges(numAdded.numEdges);
-				this.incTotalNodesDuplicate(2 - numAdded.numNodes);
-				this.incTotalEdgesDuplicate(1 - numAdded.numEdges);
+
+				quantityNodesEdges.reset();
+				this.graphData.insertRDF(oneRDF, quantityNodesEdges);
+				this.incTotalNodes(quantityNodesEdges.getNumNodes());
+				this.incTotalEdges(quantityNodesEdges.getNumEdges());
+				this.incTotalNodesDuplicate(2 - quantityNodesEdges.getNumNodes());
+				this.incTotalEdgesDuplicate(1 - quantityNodesEdges.getNumEdges());
 			}
 		}
 	}
 
 	public String toString() {
-		return  "\nlistQuerySparql = \n" + this.getListQuerySparql().toString() + 
-				"\ngraph = " + this.getGraph().toString() +
-				"\ntotalRDF = " + this.getTotalRDFs() +
-				"\ntotalNodes = " + this.getTotalNodes() +
-				"\ntotalEdges = " + this.getTotalEdges() + 
-				"\ntotalNodesDuplicate = " + this.getTotalNodesDuplicate() +
-				"\ntotalEdgesDuplicate = " + this.getTotalEdgesDuplicate();
+		return  "\nlistQuerySparql = "		+ this.getListQuerySparql().toString() + 
+				"\n\ngraph = " 				+ this.getGraph().toString() +
+				"\ntotalRDF = " 			+ this.getTotalRDFs() +
+				"\ntotalNodes = " 			+ this.getTotalNodes() +
+				"\ntotalEdges = " 			+ this.getTotalEdges() + 
+				"\ntotalNodesDuplicate = " 	+ this.getTotalNodesDuplicate() +
+				"\ntotalEdgesDuplicate = " 	+ this.getTotalEdgesDuplicate();
 	}	
 }

@@ -29,15 +29,14 @@ public class MainProcess implements Constants {
 			Debug.DEBUG("3",originalDataset.toString());
 			
 			Graph currentGraph = originalDataset.getGraph().getGraph();
-			Debug.DEBUG("4",originalDataset.toString());
-			
-			currentGraph.display(true);
+						
+			//currentGraph.display(true);
 			
 			JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 		    currentGraph.addSink(sender);
 		    			
 			originalDataset.buildGraph();
-		    
+			Debug.DEBUG("4",originalDataset.toString());
 			
 			MainProcess.sleep();
 			//currentGraph.clear();

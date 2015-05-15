@@ -8,11 +8,11 @@ public class Concept {
 	 
 	public Concept(String originalConcept) {
 		this.originalConcept = originalConcept.trim();
-		this.underlineConcept = Concept.underlineToBlank(this.originalConcept);
+		this.underlineConcept = Concept.blankToUnderline(this.originalConcept);
 	}
 	public Concept(Token token) {
 		this.originalConcept = token.image.trim();
-		this.underlineConcept = Concept.underlineToBlank(this.originalConcept);
+		this.underlineConcept = Concept.blankToUnderline(this.originalConcept);
 	}
 	
 	
@@ -37,8 +37,8 @@ public class Concept {
 
 	@Override
 	public String toString() {
-		return "Concept = " + this.getOriginalConcept() + " / " 
-	           + this.getUnderlineConcept() + "]";
+		return this.getOriginalConcept() + " / " 
+	           + this.getUnderlineConcept();
 	}
 
 

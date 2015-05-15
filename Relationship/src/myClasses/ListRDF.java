@@ -24,6 +24,6 @@ public class ListRDF {
 	}
 	@Override
 	public String toString() {
-		return "\nlistRDF = " + this.getList().toString();
+		return this.getList().toString();
 	}
 }

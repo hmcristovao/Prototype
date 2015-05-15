@@ -4,12 +4,12 @@ public interface Constants {
 	String nameFileConsoleOut = "txt_files\\consoleOut.txt";
 	String nameFileConsoleErr = "txt_files\\consoleErr.txt";
 
-	String nameFileInput = "txt_files\\terms.txt";
+	String nameFileInput = "txt_files\\terms3.txt";
 	
 	String nameFileQueryDefault = "txt_files\\query.txt";
 
-	String serviceEndpoint2 = "http://dbpedia.org/sparql";
-	String serviceEndpoint = "http://lod.openlinksw.com/sparql/";
+	String serviceEndpoint = "http://dbpedia.org/sparql";
+	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
 
 	String nameGraph = "Graph relationship";
 
@@ -20,6 +20,7 @@ public interface Constants {
 
 	boolean edgeLabel = true;
 	boolean nodeLabel = false; // original concepts always have label
+	boolean ignoreCaseConcept = false;
 
 	enum Level {originalConcept, commonConcept};
 }

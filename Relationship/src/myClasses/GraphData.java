@@ -53,23 +53,22 @@ public class GraphData {
 		}
 	}
 	
-	public NumAdded insertRDF(OneRDF oneRDF) { 
+	public QuantityNodesEdges insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
 		ItemRDF predicateRDF = oneRDF.getPredicate();
 		ItemRDF objectRDF    = oneRDF.getObject();
 		Node node = null;
 		Edge edge = null;
-		NumAdded numAdded = new NumAdded();
 		try {
 			node = this.graph.addNode(subjectRDF.getValue());
-			numAdded.numNodes++;
+			quantityNodesEdges.incNumNodes();
 			if(Constants.nodeLabel)
 				node.addAttribute("label", subjectRDF.getShortName());
-			if(subjectRDF.getLevel() == Constants.Level.originalConcept) { 
+			// if main node, put label
+			if(((NodeRDF)subjectRDF).getLevel() == Constants.Level.originalConcept) { 
 				node.addAttribute("label", Concept.underlineToBlank(subjectRDF.getShortName()));
-			}
-				
+			}		
 		}
 		catch(IdAlreadyInUseException e) {
 			// repeated node, do nothing
@@ -80,9 +79,13 @@ public class GraphData {
 		else {
 			try {
 				node = this.graph.addNode(objectRDF.getValue());
-				numAdded.numNodes++;
+				quantityNodesEdges.incNumNodes();
 				if(Constants.nodeLabel)
 					node.addAttribute("label", objectRDF.getShortName());
+				// if main node, put label 
+				if(((NodeRDF)objectRDF).getLevel() == Constants.Level.originalConcept) { 
+					node.addAttribute("label", Concept.underlineToBlank(objectRDF.getShortName()));
+				}
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated node, do nothing
@@ -90,7 +93,7 @@ public class GraphData {
 			}
 			try {
 				edge = this.graph.addEdge(predicateRDF.getValue(), subjectRDF.getValue(), objectRDF.getValue(),true);
-				numAdded.numEdges++;
+				quantityNodesEdges.incNumEdges();
 				if(Constants.edgeLabel)
 					edge.addAttribute("label", predicateRDF.getShortName());
 			}
@@ -98,16 +101,16 @@ public class GraphData {
 				// repeated edge, insert a different element in the identifying string and try again
 				GraphData.incModifier();
 				edge = this.graph.addEdge(predicateRDF.getValue()+" - "+GraphData.getStrModifier(), subjectRDF.getValue(), objectRDF.getValue(),true);
-				numAdded.numEdges++;
+				quantityNodesEdges.incNumEdges();
 				if(Constants.edgeLabel)
 					// add modifier to differentiate each link into the graph
 					edge.addAttribute("label", predicateRDF.getShortName()+" - "+GraphData.getStrModifier());
 			}
 		}
-		return numAdded;
+		return quantityNodesEdges;
 	}
 	
 	public String toString() {
-		return "\ngraph = ...";
+		return this.getGraph().toString();
 	}
 }

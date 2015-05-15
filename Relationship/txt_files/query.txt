@@ -12,23 +12,23 @@ PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX relationship: <http://relationship.org/>
 
 CONSTRUCT {
-   :Concept ?predicate ?object .
-   :Concept relationship:homepage ?homepage . 
-   ?subject ?predicate2 :Concept .
+   :####### ?predicate ?object .
+   :####### relationship:homepage ?homepage . 
+   ?subject ?predicate2 :####### .
 }
 WHERE {
   {
     { 
-      :Concept ?predicate ?object . 
+      :####### ?predicate ?object . 
       FILTER regex(?object, "http://dbpedia.org/resource/")
     }
     UNION
     { 
-      :Concept foaf:isPrimaryTopicOf ?homepage .   
+      :####### foaf:isPrimaryTopicOf ?homepage .   
     }
     UNION
     { 
-      ?subject ?predicate2 :Concept .
+      ?subject ?predicate2 :####### .
       FILTER regex(?subject, "http://dbpedia.org/resource/")
     }
   }
