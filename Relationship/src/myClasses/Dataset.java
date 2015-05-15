@@ -115,7 +115,8 @@ public class Dataset {
 		StringBuffer newQueryDefault = new StringBuffer(queryDefault);
 		int start = 0;
 		while( (start = newQueryDefault.indexOf(":Concept", start)) != -1)
-		   newQueryDefault.replace(start, start+8, concept);
+		   // add ":" before concept
+		   newQueryDefault.replace(start, start+8, ":"+concept);
 		return newQueryDefault;
 	}
 	
@@ -125,12 +126,15 @@ public class Dataset {
 	    String newConcept = null;
 	    QueryString queryString = null;
 		for(QuerySparql x: this.getListQuerySparql().getList()) {
-			newConcept = x.getConcept().getFormatedConcept();
+			newConcept = x.getConcept().getUnderlineConcept();
 			newQueryDefault = this.replaceQueryDefault(queryDefault, newConcept);
 			queryString = new QueryString(newQueryDefault);
 			x.setQuery(queryString);
 		}
 	}
+	
+	private int levelConcept(String concept)
+	
 	public void fillRDFs() throws Exception {
 		QuerySparql querySparql;
 		String queryStr;
@@ -143,10 +147,10 @@ public class Dataset {
 		Resource  subject;
 		Property  predicate;
 		RDFNode   object;
-		ItemRDF itemRDF;
-		SubjectRDF subjectRDF;
-		PredicateRDF predicateRDF;
-		ObjectRDF objectRDF;
+		OneRDF oneRDF;
+		ItemRDF subjectRDF;
+		ItemRDF predicateRDF;
+		ItemRDF objectRDF;
 		for(int i=0; i < this.getListQuerySparql().getList().size(); i++) {
 			querySparql = this.getListQuerySparql().getList().get(i);
 			queryStr = querySparql.getQueryString().getValueString();
@@ -165,14 +169,14 @@ public class Dataset {
 				predicate = statement.getPredicate();   
 				object    = statement.getObject();
 				
-				// create complete item 
-				subjectRDF   = new SubjectRDF(subject.toString());
-				predicateRDF = new PredicateRDF(predicate.toString());
-				objectRDF    = new ObjectRDF(object.toString());
-				itemRDF      = new ItemRDF(statement, subjectRDF, predicateRDF, objectRDF);
+				// create complete registerRDF 
+				subjectRDF   = new SubjectRDF(subject.toString(), subject, this.levelConcept(subject.toString() );
+				predicateRDF = new PredicateRDF(predicate.toString(), predicate);
+				objectRDF    = new ObjectRDF(object.toString(), object, this.levelConcept(subject.toString() );
+				oneRDF       = new OneRDF(statement, subjectRDF, predicateRDF, objectRDF);
 				
 				// insert complete item into list of the RDFs
-				listRDF.getList().add(itemRDF);
+				listRDF.getList().add(oneRDF);
 				
 				this.incTotalRDFs();
 			}
@@ -183,16 +187,16 @@ public class Dataset {
 	public void buildGraph() {
 		QuerySparql querySparql;
 		ListRDF listRDF;
-		ItemRDF itemRDF;
+		OneRDF oneRDF;
 		NumAdded numAdded;
 		for(int i=0; i < this.getListQuerySparql().getList().size(); i++) {
 			querySparql = this.getListQuerySparql().getList().get(i);
 			listRDF = querySparql.getListRDF();
 			for(int j=0; j < listRDF.size(); j++) {
 				// get RDF elements
-				itemRDF = listRDF.getList().get(j);
+				oneRDF = listRDF.getList().get(j);
 				// insert into of graph
-				numAdded = this.graphData.insertRDF(itemRDF);
+				numAdded = this.graphData.insertRDF(oneRDF);
 				this.incTotalNodes(numAdded.numNodes);
 				this.incTotalEdges(numAdded.numEdges);
 				this.incTotalNodesDuplicate(2 - numAdded.numNodes);

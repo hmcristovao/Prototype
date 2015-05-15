@@ -1,39 +1,32 @@
 package myClasses;
 
-import com.hp.hpl.jena.rdf.model.Statement;
-
 public class ItemRDF {
 	
-	private Statement statement;
-	private SubjectRDF subject;
-	private PredicateRDF predicate;
-	private ObjectRDF object;
+	private String value;
+	private String shortName;
 	
-	public SubjectRDF getSubject() {
-		return this.subject;
+	public ItemRDF(String value) {
+		this.value = value;
+		this.shortName = ItemRDF.doShortName(value);
 	}
-	public PredicateRDF getPredicate() {
-		return this.predicate;
+	public String getValue() {
+		return this.value;
 	}
-	public ObjectRDF getObject() {
-		return this.object;
-	}
-	public Statement getStatement() {
-		return this.statement;
+	public String getShortName() {
+		return this.shortName;
 	}
 	
-	public ItemRDF(Statement statement, SubjectRDF subject, PredicateRDF predicate, ObjectRDF object) {
-		this.statement = statement;
-		this.subject   = subject;
-		this.predicate = predicate;
-		this.object    = object;
+	// shortening a name, normally cut the address part and keep on the suffix until the bar
+	static private String doShortName(String longName) {
+		String shortName;
+		int positionLastBar = longName.lastIndexOf("/");
+		shortName = longName.substring(positionLastBar+1);
+		return shortName;
 	}
-
+	
 	@Override
 	public String toString() {
-		return  "\nsubject = " + this.getSubject() + 
-				"\npredicate = " + this.getPredicate() + 
-				"\nobject = " + this.getObject();
+		return this.getValue() + " (" + this.getShortName() + ")";
 	}
-}
 
+}
