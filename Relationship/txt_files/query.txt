@@ -9,27 +9,43 @@ PREFIX dbpedia2: <http://dbpedia.org/property/>
 PREFIX dbpedia: <http://dbpedia.org/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 
-PREFIX relationship: <http://relationship.org/>
+PREFIX relationship: <http://relationship/>
 
 CONSTRUCT {
    :####### ?predicate ?object .
-   :####### relationship:homepage ?homepage . 
    ?subject ?predicate2 :####### .
+   :####### relationship:homepage ?homepage . 
+   :####### relationship:comment ?comment . 
+   :####### relationship:abstract ?abstract . 
+   :####### relationship:image ?image . 
 }
 WHERE {
-  {
-    { 
+   { 
       :####### ?predicate ?object . 
       FILTER regex(?object, "http://dbpedia.org/resource/")
-    }
-    UNION
-    { 
-      :####### foaf:isPrimaryTopicOf ?homepage .   
-    }
-    UNION
-    { 
+   }
+   UNION
+   { 
       ?subject ?predicate2 :####### .
       FILTER regex(?subject, "http://dbpedia.org/resource/")
-    }
-  }
+   }
+   UNION
+   { 
+      :####### foaf:isPrimaryTopicOf ?homepage .   
+   }
+   UNION
+   { 
+      :####### rdfs:comment ?comment .
+      FILTER(lang(?comment)="en")   
+   }
+   UNION
+   { 
+      :####### <http://dbpedia.org/ontology/abstract> ?abstract .
+      FILTER(lang(?abstract)="en")   
+   }
+   UNION
+   { 
+      :####### dbpedia2:image ?image .
+      FILTER(lang(?image)="en")   
+   }
 }

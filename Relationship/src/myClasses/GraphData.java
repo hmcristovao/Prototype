@@ -74,8 +74,16 @@ public class GraphData {
 			// repeated node, do nothing
 			node = this.graph.getNode(subjectRDF.getValue());
 		}
-		if(predicateRDF.getValue().equals("http://relationship.org/homepage"))
+		// if predicate is known, transform it in attributes into node
+		if(predicateRDF.getValue().equals(Constants.addressBasic + "homepage"))
 			node.addAttribute("homepage", objectRDF.getValue());
+		else if(predicateRDF.getValue().equals(Constants.addressBasic + "comment"))
+			node.addAttribute("comment", objectRDF.getValue());
+		else if(predicateRDF.getValue().equals(Constants.addressBasic + "abstract"))
+			node.addAttribute("abstract", objectRDF.getValue());
+		else if(predicateRDF.getValue().equals(Constants.addressBasic + "image"))
+			node.addAttribute("image", objectRDF.getValue());
+        // insert common predicate (unknown)
 		else {
 			try {
 				node = this.graph.addNode(objectRDF.getValue());

@@ -4,13 +4,16 @@ public interface Constants {
 	String nameFileConsoleOut = "txt_files\\consoleOut.txt";
 	String nameFileConsoleErr = "txt_files\\consoleErr.txt";
 
-	String nameFileInput = "txt_files\\terms3.txt";
+	String nameFileInput = "txt_files\\terms4.txt";
 	
 	String nameFileQueryDefault = "txt_files\\query.txt";
 
 	String serviceEndpoint = "http://dbpedia.org/sparql";
 	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
 
+	String addressBasic = "http://relationship/";
+	String addressImage = "http://http://commons.wikimedia.org/wiki/File:";
+	
 	String nameGraph = "Graph relationship";
 
 	String nameGephiWorkspace = "workspace0";
