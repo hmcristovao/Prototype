@@ -8,6 +8,8 @@ import org.graphstream.graph.implementations.MultiGraph;
 public class GraphData {
 	private Graph graph;
 	private static int modifier = 0;
+	private QuantityNodesEdges added;
+    private QuantityNodesEdges duplicate;
 
 	public GraphData() {
 		this.graph = new MultiGraph(Constants.nameGraph,
@@ -15,12 +17,53 @@ public class GraphData {
 				                    false,                  // auto-create
 				                    Constants.totalNodes,
 				                    Constants.totalEdges);
+		this.added = new QuantityNodesEdges();
+		this.duplicate = new QuantityNodesEdges();
 	}
 	
 	public Graph getGraph() {
 		return this.graph;
 	}
-	
+	public int getTotalNodes() {
+		return this.added.getNumNodes();
+	}
+	public void incTotalNodes() {
+		this.added.incNumNodes();
+	}
+	public void incTotalNodes(int value) {
+		this.added.incNumNodes(value);
+	}
+
+	public int getTotalEdges() {
+		return this.added.getNumEdges();
+	}
+	public void incTotalEdges() {
+		this.added.incNumEdges();
+	}
+	public void incTotalEdges(int value) {
+		this.added.incNumEdges(value);
+	}
+
+	public int getTotalNodesDuplicate() {
+		return this.duplicate.getNumNodes();
+	}
+	public void incTotalNodesDuplicate() {
+		this.duplicate.incNumNodes();
+	}
+	public void incTotalNodesDuplicate(int value) {
+		this.duplicate.incNumNodes(value);
+	}
+
+	public int getTotalEdgesDuplicate() {
+		return this.duplicate.getNumEdges();
+	}
+	public void incTotalEdgesDuplicate() {
+		this.duplicate.incNumEdges();
+	}
+	public void incTotalEdgesDuplicate(int value) {
+		this.duplicate.incNumEdges(value);
+	}
+
 	public static String getStrModifier() {
 		return String.valueOf(GraphData.modifier); 
 	}
@@ -28,7 +71,27 @@ public class GraphData {
 	public static void incModifier() {
 		GraphData.modifier++;
 	}
-
+	public void buildGraph(SetQuerySparql setQuerySparql) {
+		QuerySparql querySparql;
+		ListRDF listRDF;
+		OneRDF oneRDF;
+		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
+		for(int i=0; i < setQuerySparql.getList().size(); i++) {
+			querySparql = setQuerySparql.getList().get(i);
+			listRDF = querySparql.getListRDF();
+			for(int j=0; j < listRDF.size(); j++) {
+				// get RDF elements
+				oneRDF = listRDF.getList().get(j);
+				// insert into of graph
+				quantityNodesEdges.reset();
+				this.insertRDF(oneRDF, quantityNodesEdges);
+				this.incTotalNodes(quantityNodesEdges.getNumNodes());
+				this.incTotalEdges(quantityNodesEdges.getNumEdges());
+				this.incTotalNodesDuplicate(2 - quantityNodesEdges.getNumNodes());
+				this.incTotalEdgesDuplicate(1 - quantityNodesEdges.getNumEdges());
+			}
+		}
+	}
 	public boolean insertNode(String strNode) {
 		try {
 			Node node;
@@ -119,6 +182,10 @@ public class GraphData {
 	}
 	
 	public String toString() {
-		return this.getGraph().toString();
+		return  this.getGraph().toString() +
+				"\ntotalNodes = " 			+ this.getTotalNodes() +
+				"\ntotalEdges = " 			+ this.getTotalEdges() + 
+				"\ntotalNodesDuplicate = " 	+ this.getTotalNodesDuplicate() +
+				"\ntotalEdgesDuplicate = " 	+ this.getTotalEdgesDuplicate();
 	}
 }

@@ -3,6 +3,7 @@ package myClasses;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -15,32 +16,21 @@ import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
 
-public class Dataset {
-	private ListQuerySparql listQuerySparql;
-	private GraphData graphData;
+public class SetQuerySparql {
+	private LinkedList<QuerySparql> list;
 	private int totalRDF;
-    private QuantityNodesEdges added;
-    private QuantityNodesEdges duplicate;
-	
-	public Dataset() {
-		this.listQuerySparql = new ListQuerySparql();
-		this.graphData = new GraphData();
+
+	public SetQuerySparql() {
+		this.list = new LinkedList<QuerySparql>();
 		this.totalRDF  = 0;
-		this.added = new QuantityNodesEdges();
-		this.duplicate = new QuantityNodesEdges();
 	}
 	
-	public ListQuerySparql getListQuerySparql() {
-		return this.listQuerySparql;
+	public LinkedList<QuerySparql> getList() {
+		return this.list;
 	}
-	public GraphData getGraph() {
-		return this.graphData;
-	}
-	
 	public int getTotalConcepts() {
-		return this.listQuerySparql.getList().size();
+		return this.list.size();
 	}
-	
 	public int getTotalRDFs() {
 		return this.totalRDF;
 	}
@@ -50,46 +40,26 @@ public class Dataset {
 	public void incTotalRDFs(int value) {
 		this.totalRDF += value;
 	}
-	public int getTotalNodes() {
-		return this.added.getNumNodes();
+	public void insert(QuerySparql querySparql) {
+		this.list.add(querySparql);  
 	}
-	public void incTotalNodes() {
-		this.added.incNumNodes();
+	// create a object QuerySparql, fill it with concept, and insert it into list
+	public void insert(Concept concept) {
+		QueryString auxQuery = new QueryString();
+		ListRDF auxListRDF = new ListRDF();
+		QuerySparql querySparql = new QuerySparql(concept, auxQuery, auxListRDF);
+		this.list.add(querySparql);  
 	}
-	public void incTotalNodes(int value) {
-		this.added.incNumNodes(value);
+	
+	// exceptional function - must be deleted
+	public String getListConcept() {
+		StringBuffer out = new StringBuffer();
+		for(QuerySparql x: this.list) {
+			out.append(x.getConcept().toString());
+			out.append("\n");
+		}
+		return out.toString();
 	}
-
-	public int getTotalEdges() {
-		return this.added.getNumEdges();
-	}
-	public void incTotalEdges() {
-		this.added.incNumEdges();
-	}
-	public void incTotalEdges(int value) {
-		this.added.incNumEdges(value);
-	}
-
-	public int getTotalNodesDuplicate() {
-		return this.duplicate.getNumNodes();
-	}
-	public void incTotalNodesDuplicate() {
-		this.duplicate.incNumNodes();
-	}
-	public void incTotalNodesDuplicate(int value) {
-		this.duplicate.incNumNodes(value);
-	}
-
-	public int getTotalEdgesDuplicate() {
-		return this.duplicate.getNumEdges();
-	}
-	public void incTotalEdgesDuplicate() {
-		this.duplicate.incNumEdges();
-	}
-	public void incTotalEdgesDuplicate(int value) {
-		this.duplicate.incNumEdges(value);
-	}
-
 	private StringBuffer readFileQueryDefault() throws IOException {
 		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(Constants.nameFileQueryDefault));
 		StringBuffer queryDefault = new StringBuffer();
@@ -104,7 +74,6 @@ public class Dataset {
         fileQueryDefault.close();
         return queryDefault;
 	}
-	
 	// replace and make a copy of the query
 	private StringBuffer replaceQueryDefault(StringBuffer queryDefault, String concept) {
 		StringBuffer newQueryDefault = new StringBuffer(queryDefault);
@@ -120,7 +89,7 @@ public class Dataset {
 	    StringBuffer newQueryDefault = null;
 	    String newConcept = null;
 	    QueryString queryString = null;
-		for(QuerySparql x: this.getListQuerySparql().getList()) {
+		for(QuerySparql x: this.getList()) {
 			newConcept = x.getConcept().getUnderlineConcept();
 			newQueryDefault = this.replaceQueryDefault(queryDefault, newConcept);
 			queryString = new QueryString(newQueryDefault);
@@ -144,8 +113,8 @@ public class Dataset {
 		ItemRDF subjectRDF;
 		ItemRDF predicateRDF;
 		ItemRDF objectRDF;
-		for(int i=0; i < this.getListQuerySparql().getList().size(); i++) {
-			querySparql = this.getListQuerySparql().getList().get(i);
+		for(int i=0; i < this.getList().size(); i++) {
+			querySparql = this.getList().get(i);
 			queryStr = querySparql.getQueryString().getQueryStrString();
 			query = QueryFactory.create(queryStr);
 			queryExecution = QueryExecutionFactory.sparqlService(Constants.serviceEndpoint,  query);
@@ -177,36 +146,17 @@ public class Dataset {
 		}
 	}
 	
-	public void buildGraph() {
-		QuerySparql querySparql;
-		ListRDF listRDF;
-		OneRDF oneRDF;
-		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
-		for(int i=0; i < this.getListQuerySparql().getList().size(); i++) {
-			querySparql = this.getListQuerySparql().getList().get(i);
-			listRDF = querySparql.getListRDF();
-			for(int j=0; j < listRDF.size(); j++) {
-				// get RDF elements
-				oneRDF = listRDF.getList().get(j);
-				// insert into of graph
-
-				quantityNodesEdges.reset();
-				this.graphData.insertRDF(oneRDF, quantityNodesEdges);
-				this.incTotalNodes(quantityNodesEdges.getNumNodes());
-				this.incTotalEdges(quantityNodesEdges.getNumEdges());
-				this.incTotalNodesDuplicate(2 - quantityNodesEdges.getNumNodes());
-				this.incTotalEdgesDuplicate(1 - quantityNodesEdges.getNumEdges());
-			}
-		}
-	}
-
+	@Override
 	public String toString() {
-		return  "\nlistQuerySparql = "		+ this.getListQuerySparql().toString() + 
-				"\n\ngraph = " 				+ this.getGraph().toString() +
-				"\ntotalRDF = " 			+ this.getTotalRDFs() +
-				"\ntotalNodes = " 			+ this.getTotalNodes() +
-				"\ntotalEdges = " 			+ this.getTotalEdges() + 
-				"\ntotalNodesDuplicate = " 	+ this.getTotalNodesDuplicate() +
-				"\ntotalEdgesDuplicate = " 	+ this.getTotalEdgesDuplicate();
-	}	
+		StringBuffer out = new StringBuffer();
+		int n = 1;
+		for(QuerySparql x: this.list) {
+			out.append("\n***** Concept number ");
+			out.append(n++);
+			out.append(" *****\n");
+			out.append(x.toString());
+			out.append("\n");
+		}
+		return out.toString();
+	}
 }

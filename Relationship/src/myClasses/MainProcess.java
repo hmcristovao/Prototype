@@ -14,31 +14,32 @@ public class MainProcess implements Constants {
 
 	public static void head(Wrapterms parser) {
 		try {
+			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
+			GraphData graphData = new GraphData();
+
 			PrintStream fileConsoleOut = new PrintStream(Constants.nameFileConsoleOut);
 			PrintStream fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
 			System.setOut(fileConsoleOut);
 			System.setErr(fileConsoleErr);
 			
 			parser = new Wrapterms(new FileInputStream(Constants.nameFileInput));
-			Dataset originalDataset  = new Dataset();
-			parser.start(originalDataset);
-			Debug.DEBUG("1",originalDataset.toString());
-			originalDataset.fillQuery();
-			Debug.DEBUG("2",originalDataset.toString());
-			originalDataset.fillRDFs();
-			Debug.DEBUG("3",originalDataset.toString());
+			parser.start(originalSetQuerySparql);
+			Debug.DEBUG("1",originalSetQuerySparql.toString());
+			originalSetQuerySparql.fillQuery();
+			Debug.DEBUG("2",originalSetQuerySparql.toString());
+			originalSetQuerySparql.fillRDFs();
+			Debug.DEBUG("3",originalSetQuerySparql.toString());
 			
-			Graph currentGraph = originalDataset.getGraph().getGraph();
+			Graph currentGraph = graphData.getGraph();
 						
 			//currentGraph.display(true);
 			
 			JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 		    currentGraph.addSink(sender);
 		    			
-			originalDataset.buildGraph();
-			Debug.DEBUG("4",originalDataset.toString());
+			graphData.buildGraph(originalSetQuerySparql);
+			Debug.DEBUG("4",graphData.toString());
 			
-			MainProcess.sleep();
 			//currentGraph.clear();
 			fileConsoleOut.close();
 			fileConsoleErr.close();
@@ -70,15 +71,9 @@ public class MainProcess implements Constants {
 		}
 	}
 	
-	protected static void showConsoleList(ListQuerySparql list) {
+	protected static void showConsoleList(SetQuerySparql list) {
 		System.out.println("\n=====================================================\n");
 		System.out.println(list);
-	}
-	
-	protected static void sleep() {
-		try {
-			Thread.sleep(5000);
-		} catch (Exception e) {}
 	}
 }
 	

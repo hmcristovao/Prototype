@@ -14,7 +14,7 @@ public class Wrapterms implements WraptermsConstants {
 start   ->  ( element() )*  < EOF > 
 element ->  < TERM > ( < SEPARATORS > )*
 */
-  final public void start(Dataset originalDataset) throws ParseException {
+  final public void start(SetQuerySparql originalSetQuerySparql) throws ParseException {
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -25,16 +25,16 @@ element ->  < TERM > ( < SEPARATORS > )*
         jj_la1[0] = jj_gen;
         break label_1;
       }
-      element(originalDataset);
+      element(originalSetQuerySparql);
     }
     jj_consume_token(0);
   }
 
-  final public void element(Dataset originalDataset) throws ParseException {
-                                         Token token; Concept concept;
+  final public void element(SetQuerySparql originalSetQuerySparql) throws ParseException {
+                                                       Token token; Concept concept;
     token = jj_consume_token(TERM);
                 concept = new Concept(token);
-                originalDataset.getListQuerySparql().insert(concept);
+                originalSetQuerySparql.insert(concept);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {

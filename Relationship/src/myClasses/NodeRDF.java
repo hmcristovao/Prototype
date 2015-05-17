@@ -6,16 +6,16 @@ public class NodeRDF extends ItemRDF {
 	// Contants.Level.originalConcept
 	// Constants.Level.commonConcept
 	
-	public NodeRDF(String value, Dataset dataset) {
+	public NodeRDF(String value, SetQuerySparql setQuerySparql) {
 		super(value);
-		this.level = this.qualifyLevel(dataset);
+		this.level = this.qualifyLevel(setQuerySparql);
 	}
 	public Constants.Level getLevel() {
 		return this.level;
 	}
 	
-	public Constants.Level qualifyLevel(Dataset dataset) {
-		for(QuerySparql x: dataset.getListQuerySparql().getList()) {
+	public Constants.Level qualifyLevel(SetQuerySparql setQuerySparql) {
+		for(QuerySparql x: setQuerySparql.getList()) {
 			if(Constants.ignoreCaseConcept) {
 				if(this.getShortName().equalsIgnoreCase(x.getConcept().getUnderlineConcept())) 
 					return Constants.Level.originalConcept;
