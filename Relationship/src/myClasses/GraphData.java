@@ -1,4 +1,5 @@
 package myClasses;
+import org.graphstream.algorithm.BetweennessCentrality;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
@@ -94,7 +95,7 @@ public class GraphData {
 	}
 	public boolean insertNode(String strNode) {
 		try {
-			Node node;
+			NodeData node;
 			node = this.graph.addNode(strNode);
 			node.addAttribute("label", strNode);
 			return true;
@@ -121,10 +122,10 @@ public class GraphData {
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
 		ItemRDF predicateRDF = oneRDF.getPredicate();
 		ItemRDF objectRDF    = oneRDF.getObject();
-		Node node = null;
+		NodeData node = null;
 		Edge edge = null;
 		try {
-			node = this.graph.addNode(subjectRDF.getValue());
+			node = (NodeData)this.graph.addNode(subjectRDF.getValue());
 			quantityNodesEdges.incNumNodes();
 			if(Constants.nodeLabel)
 				node.addAttribute("label", subjectRDF.getShortName());
@@ -135,7 +136,7 @@ public class GraphData {
 		}
 		catch(IdAlreadyInUseException e) {
 			// repeated node, do nothing
-			node = this.graph.getNode(subjectRDF.getValue());
+			node = (NodeData)this.graph.getNode(subjectRDF.getValue());
 		}
 		// if predicate is known, transform it in attributes into node
 		if(predicateRDF.getValue().equals(Constants.addressBasic + "homepage"))
@@ -149,7 +150,7 @@ public class GraphData {
         // insert common predicate (unknown)
 		else {
 			try {
-				node = this.graph.addNode(objectRDF.getValue());
+				node = (NodeData)this.graph.addNode(objectRDF.getValue());
 				quantityNodesEdges.incNumNodes();
 				if(Constants.nodeLabel)
 					node.addAttribute("label", objectRDF.getShortName());
@@ -160,7 +161,7 @@ public class GraphData {
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated node, do nothing
-				node = this.graph.getNode(objectRDF.getValue());
+				node = (NodeData)this.graph.getNode(objectRDF.getValue());
 			}
 			try {
 				edge = this.graph.addEdge(predicateRDF.getValue(), subjectRDF.getValue(), objectRDF.getValue(),true);
@@ -179,6 +180,25 @@ public class GraphData {
 			}
 		}
 		return quantityNodesEdges;
+	}
+	
+	public void computeBetweennessCentrality() {
+		BetweennessCentrality betweenness = new BetweennessCentrality();
+		betweenness.setUnweighted();
+		betweenness.setCentralityAttributeName("Betweeness");
+		betweenness.init(this.getGraph());
+		betweenness.compute();
+	}
+	
+	public String toStringGraph() {
+		StringBuffer str = new StringBuffer();
+		Graph graph = this.getGraph();
+		for( Node node : graph.getEachNode() ) {
+			NodeData nodeData = (NodeData)node;
+		    str.append(nodeData.toString());
+		    str.append("\n");
+		}
+		return str.toString();
 	}
 	
 	public String toString() {

@@ -15454,13 +15454,4 @@ predicate = http://dbpedia.org/property/genre (genre)
 object = http://dbpedia.org/resource/Mind_map (Mind_map)]
 
 -----------------------------------------------------------------------------------
-
-===================================================================================
-4
-<=>
-Graph relationship
-totalNodes = 2899
-totalEdges = 2899
-totalNodesDuplicate = 6655
-totalEdgesDuplicate = 6655
------------------------------------------------------------------------------------
+Other: org.graphstream.graph.implementations.MultiNode cannot be cast to myClasses.NodeData

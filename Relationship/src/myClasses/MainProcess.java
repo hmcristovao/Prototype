@@ -18,31 +18,39 @@ public class MainProcess implements Constants {
 			GraphData graphData = new GraphData();
 
 			PrintStream fileConsoleOut = new PrintStream(Constants.nameFileConsoleOut);
-			PrintStream fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
+			//PrintStream fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
 			System.setOut(fileConsoleOut);
-			System.setErr(fileConsoleErr);
+			//System.setErr(fileConsoleErr);
 			
+			Debug.err("Parsing terms...");
 			parser = new Wrapterms(new FileInputStream(Constants.nameFileInput));
 			parser.start(originalSetQuerySparql);
-			Debug.DEBUG("1",originalSetQuerySparql.toString());
+			Debug.out("1",originalSetQuerySparql.toString());
+			
+			Debug.err("Assembling queries...");
 			originalSetQuerySparql.fillQuery();
-			Debug.DEBUG("2",originalSetQuerySparql.toString());
+			Debug.out("2",originalSetQuerySparql.toString());
+			
+			Debug.err("Collecting RDFs...");
 			originalSetQuerySparql.fillRDFs();
-			Debug.DEBUG("3",originalSetQuerySparql.toString());
+			Debug.out("3",originalSetQuerySparql.toString());
 			
+			Debug.err("Building graph...");
 			Graph currentGraph = graphData.getGraph();
-						
 			//currentGraph.display(true);
-			
 			JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 		    currentGraph.addSink(sender);
-		    			
-			graphData.buildGraph(originalSetQuerySparql);
-			Debug.DEBUG("4",graphData.toString());
-			
+
+		    Debug.err("Drawing graph...");
+		    graphData.buildGraph(originalSetQuerySparql);
+			Debug.out("4",graphData.toString());
+
+		    Debug.err("Computing betweenness centrality...");
+		    graphData.computeBetweennessCentrality();
+		    
 			//currentGraph.clear();
 			fileConsoleOut.close();
-			fileConsoleErr.close();
+			//fileConsoleErr.close();
 		}
 		catch(FileNotFoundException e) {
 			System.out.println("Error: file not found.");
