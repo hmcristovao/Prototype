@@ -121,7 +121,6 @@ public class SetQuerySparql {
 			model = queryExecution.execConstruct();
 			querySparql.setModel(model);
 			listRDF = querySparql.getListRDF();
-			
 			stmtIterator = model.listStatements();
 
 			while (stmtIterator.hasNext()) {

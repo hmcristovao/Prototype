@@ -315,11 +315,6 @@ public class NodeData implements Node {
 		return false;
 	}
 	public String toString() {
-		return 
-				"Label: " + 			this.getLabel("label") +
-				"\nDegree total: " + 	this.getDegree() + 
-				"\nDegree (in): "  + 	this.getInDegree() +
-				"\nDegree (out): " + 	this.getOutDegree() +
-				"\nBetweenness: " + 	this.getLabel("betweenness");
+		return "";
 	}
 }

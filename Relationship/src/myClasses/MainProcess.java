@@ -11,7 +11,7 @@ import org.graphstream.stream.gephi.JSONSender;
 import basic.*;
 
 public class MainProcess implements Constants {
-
+	
 	public static void head(Wrapterms parser) {
 		try {
 			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
@@ -37,44 +37,55 @@ public class MainProcess implements Constants {
 			
 			Debug.err("Building graph...");
 			Graph currentGraph = graphData.getGraph();
-			//currentGraph.display(true);
-			JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
-		    currentGraph.addSink(sender);
-
-		    Debug.err("Drawing graph...");
+			if(Constants.graphStreamVisualization) 
+				currentGraph.display(true);
+			if(Constants.gephiVisualization) {
+				JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
+				currentGraph.addSink(sender);
+			}
 		    graphData.buildGraph(originalSetQuerySparql);
-			Debug.out("4",graphData.toString());
-
+		    if(Constants.gephiVisualization) {
+				currentGraph.clearSinks();
+			}
+		    
 		    Debug.err("Computing betweenness centrality...");
 		    graphData.computeBetweennessCentrality();
+		    Debug.err("Computing closeness centrality...");
+		    //graphData.computeClosenessCentrality();
+		    Debug.err("Computing eigenvector centrality...");
+		    graphData.computeEigenvectorCentrality();
+		    Debug.out("4",graphData.toString());
 		    
-			//currentGraph.clear();
+		    Debug.err("Closing...");
+		    if(Constants.graphStreamVisualization) 
+				currentGraph.clear();
 			fileConsoleOut.close();
 			//fileConsoleErr.close();
+			Debug.err("Ok!");
 		}
 		catch(FileNotFoundException e) {
-			System.out.println("Error: file not found.");
+			System.err.println("Error: file not found.");
 			e.printStackTrace();
 		}
 		catch (IOException e) {
-			System.out.println("Error: problem with the persistent file: " + e.getMessage());
+			System.err.println("Error: problem with the persistent file: " + e.getMessage());
 			e.printStackTrace();
 		}
 		catch(TokenMgrError e) {
-			System.out.println("Lexical error: " + e.getMessage());
+			System.err.println("Lexical error: " + e.getMessage());
 			e.printStackTrace();
 		}
 		catch(SemanticException e) {
-			System.out.println("Semantic error: " + e.getMessage());
+			System.err.println("Semantic error: " + e.getMessage());
 			e.printStackTrace();
 		}
 		catch(ParseException e) {
-			System.out.println("Sintax error: " + e.getMessage());
+			System.err.println("Sintax error: " + e.getMessage());
 			e.printStackTrace();
 		}
-		// get the rest
+		// get the another errs
 		catch(Exception e) {
-			System.out.println("Other: " + e.getMessage());
+			System.err.println("Other: " + e.getMessage());
 			e.printStackTrace();
 		}
 	}

@@ -1,5 +1,7 @@
 package myClasses;
 import org.graphstream.algorithm.BetweennessCentrality;
+import org.graphstream.algorithm.measure.ClosenessCentrality;
+import org.graphstream.algorithm.measure.EigenvectorCentrality;
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
@@ -117,16 +119,17 @@ public class GraphData {
 		}
 	}
 	
-	public QuantityNodesEdges insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
+	public void insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
 		ItemRDF predicateRDF = oneRDF.getPredicate();
 		ItemRDF objectRDF    = oneRDF.getObject();
-		NodeData node = null;
+		Node node = null;
 		Edge edge = null;
 		try {
-			node = (NodeData)this.graph.addNode(subjectRDF.getValue());
+			node = this.graph.addNode(subjectRDF.getValue());
 			quantityNodesEdges.incNumNodes();
+			node.addAttribute("shortname", Concept.underlineToBlank(subjectRDF.getShortName()));
 			if(Constants.nodeLabel)
 				node.addAttribute("label", subjectRDF.getShortName());
 			// if main node, put label
@@ -136,7 +139,7 @@ public class GraphData {
 		}
 		catch(IdAlreadyInUseException e) {
 			// repeated node, do nothing
-			node = (NodeData)this.graph.getNode(subjectRDF.getValue());
+			node = this.graph.getNode(subjectRDF.getValue());
 		}
 		// if predicate is known, transform it in attributes into node
 		if(predicateRDF.getValue().equals(Constants.addressBasic + "homepage"))
@@ -150,8 +153,9 @@ public class GraphData {
         // insert common predicate (unknown)
 		else {
 			try {
-				node = (NodeData)this.graph.addNode(objectRDF.getValue());
+				node = this.graph.addNode(objectRDF.getValue());
 				quantityNodesEdges.incNumNodes();
+				node.addAttribute("shortname", Concept.underlineToBlank(objectRDF.getShortName()));
 				if(Constants.nodeLabel)
 					node.addAttribute("label", objectRDF.getShortName());
 				// if main node, put label 
@@ -161,7 +165,7 @@ public class GraphData {
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated node, do nothing
-				node = (NodeData)this.graph.getNode(objectRDF.getValue());
+				node = this.graph.getNode(objectRDF.getValue());
 			}
 			try {
 				edge = this.graph.addEdge(predicateRDF.getValue(), subjectRDF.getValue(), objectRDF.getValue(),true);
@@ -179,32 +183,86 @@ public class GraphData {
 					edge.addAttribute("label", predicateRDF.getShortName()+" - "+GraphData.getStrModifier());
 			}
 		}
-		return quantityNodesEdges;
 	}
 	
 	public void computeBetweennessCentrality() {
 		BetweennessCentrality betweenness = new BetweennessCentrality();
-		betweenness.setUnweighted();
-		betweenness.setCentralityAttributeName("Betweeness");
 		betweenness.init(this.getGraph());
+		//betweenness.setUnweighted();
+		betweenness.setCentralityAttributeName("betweenness");
 		betweenness.compute();
 	}
 	
+	public void computeClosenessCentrality() {
+		ClosenessCentrality closeness = new ClosenessCentrality();
+		closeness.init(this.getGraph());
+		closeness.setCentralityAttribute("closeness");
+		closeness.compute();
+	}
+	
+	public void computeEigenvectorCentrality() {
+		EigenvectorCentrality eingenvector = new EigenvectorCentrality();
+		eingenvector.init(this.getGraph());
+		eingenvector.setCentralityAttribute("eingenvector");
+		eingenvector.compute();	
+	}
+	
+	public static String nodeToString(Node node) {
+		StringBuffer str = new StringBuffer();
+		str.append("\nID: ");
+		str.append(node.toString());
+		str.append("\nShort name: ");
+		str.append(node.getAttribute("shortname"));
+		str.append("\nDegree: ");
+		str.append(node.getDegree());
+		str.append("\nIn degree: ");
+		str.append(node.getInDegree());
+		str.append("\nOutDegree: ");
+		str.append(node.getOutDegree());
+		if(node.getAttribute("label") != null) {
+			str.append("\nLabel: ");
+			str.append(node.getAttribute("label"));
+		}
+		if(node.getAttribute("homepage") != null) {
+			str.append("\nHomepage: ");
+			str.append(node.getAttribute("homepage"));
+		}
+		if(node.getAttribute("abstract") != null) {
+			str.append("\nAbstract: ");
+			str.append(node.getAttribute("abstract"));
+		}
+		if(node.getAttribute("comment") != null) {
+			str.append("\nComment: ");
+			str.append(node.getAttribute("comment"));
+		}
+		if(node.getAttribute("image") != null) {
+			str.append("\nImage: ");
+			str.append(node.getAttribute("image"));
+		}
+		str.append("\nBetweenness centrality: ");
+		str.append(node.getAttribute("betweenness"));
+		str.append("\nCloseness centrality: ");
+		str.append(node.getAttribute("closeness"));
+		str.append("\nEingenvector centrality: ");
+		str.append(node.getAttribute("eigenvector"));
+		return str.toString();
+	}
+ 
 	public String toStringGraph() {
 		StringBuffer str = new StringBuffer();
 		Graph graph = this.getGraph();
 		for( Node node : graph.getEachNode() ) {
-			NodeData nodeData = (NodeData)node;
-		    str.append(nodeData.toString());
-		    str.append("\n");
+			str.append(GraphData.nodeToString(node));
+			str.append("\n");
 		}
 		return str.toString();
 	}
 	
 	public String toString() {
-		return  this.getGraph().toString() +
-				"\ntotalNodes = " 			+ this.getTotalNodes() +
-				"\ntotalEdges = " 			+ this.getTotalEdges() + 
+		return  this.toStringGraph() +
+				"\ntotalNodes (count)= " 	+ this.getTotalNodes() +
+				"\ntotalNodes (real) = " 	+ this.getGraph().getNodeCount() +
+				"\ntotalEdges (count)= " 	+ this.getTotalEdges() + 
 				"\ntotalNodesDuplicate = " 	+ this.getTotalNodesDuplicate() +
 				"\ntotalEdgesDuplicate = " 	+ this.getTotalEdgesDuplicate();
 	}
