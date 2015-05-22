@@ -8,14 +8,14 @@ import org.graphstream.graph.IdAlreadyInUseException;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
 
-public class GraphData {
-	private Graph graph;
+public class StreamGraphData {
+	private Graph streamGraph;
 	private static int modifier = 0;
 	private QuantityNodesEdges added;
     private QuantityNodesEdges duplicate;
 
-	public GraphData() {
-		this.graph = new MultiGraph(Constants.nameGraph,
+	public StreamGraphData() {
+		this.streamGraph = new MultiGraph(Constants.nameGraph,
 				                    true,                   // non-fatal error throws an exception = verify duplicated nodes
 				                    false,                  // auto-create
 				                    Constants.totalNodes,
@@ -24,8 +24,8 @@ public class GraphData {
 		this.duplicate = new QuantityNodesEdges();
 	}
 	
-	public Graph getGraph() {
-		return this.graph;
+	public Graph getStreamGraph() {
+		return this.streamGraph;
 	}
 	public int getTotalNodes() {
 		return this.added.getNumNodes();
@@ -68,12 +68,37 @@ public class GraphData {
 	}
 
 	public static String getStrModifier() {
-		return String.valueOf(GraphData.modifier); 
+		return String.valueOf(StreamGraphData.modifier); 
 	}
 	
 	public static void incModifier() {
-		GraphData.modifier++;
+		StreamGraphData.modifier++;
 	}
+
+	public boolean insertNode(String strNode) {
+		try {
+			NodeData node;
+			node = this.streamGraph.addNode(strNode);
+			node.addAttribute("label", strNode);
+			return true;
+		}
+		catch(IdAlreadyInUseException e) {
+			return false;
+		}
+	}
+	
+	public boolean insertEdge(String strLink, String strSourceNode, String strTargetNode) {
+		try {
+			Edge edge;
+			edge = this.streamGraph.addEdge(strLink, strSourceNode, strTargetNode);
+			edge.addAttribute("label", strLink);
+			return true;
+		}
+		catch(IdAlreadyInUseException e) {
+			return false;
+		}
+	}
+	
 	public void buildGraph(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
@@ -95,30 +120,7 @@ public class GraphData {
 			}
 		}
 	}
-	public boolean insertNode(String strNode) {
-		try {
-			NodeData node;
-			node = this.graph.addNode(strNode);
-			node.addAttribute("label", strNode);
-			return true;
-		}
-		catch(IdAlreadyInUseException e) {
-			return false;
-		}
-	}
-	
-	public boolean insertEdge(String strLink, String strSourceNode, String strTargetNode) {
-		try {
-			Edge edge;
-			edge = this.graph.addEdge(strLink, strSourceNode, strTargetNode);
-			edge.addAttribute("label", strLink);
-			return true;
-		}
-		catch(IdAlreadyInUseException e) {
-			return false;
-		}
-	}
-	
+
 	public void insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
@@ -127,7 +129,7 @@ public class GraphData {
 		Node node = null;
 		Edge edge = null;
 		try {
-			node = this.graph.addNode(subjectRDF.getValue());
+			node = this.streamGraph.addNode(subjectRDF.getValue());
 			quantityNodesEdges.incNumNodes();
 			node.addAttribute("shortname", Concept.underlineToBlank(subjectRDF.getShortName()));
 			if(Constants.nodeLabel)
@@ -139,7 +141,7 @@ public class GraphData {
 		}
 		catch(IdAlreadyInUseException e) {
 			// repeated node, do nothing
-			node = this.graph.getNode(subjectRDF.getValue());
+			node = this.streamGraph.getNode(subjectRDF.getValue());
 		}
 		// if predicate is known, transform it in attributes into node
 		if(predicateRDF.getValue().equals(Constants.addressBasic + "homepage"))
@@ -153,7 +155,7 @@ public class GraphData {
         // insert common predicate (unknown)
 		else {
 			try {
-				node = this.graph.addNode(objectRDF.getValue());
+				node = this.streamGraph.addNode(objectRDF.getValue());
 				quantityNodesEdges.incNumNodes();
 				node.addAttribute("shortname", Concept.underlineToBlank(objectRDF.getShortName()));
 				if(Constants.nodeLabel)
@@ -165,29 +167,29 @@ public class GraphData {
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated node, do nothing
-				node = this.graph.getNode(objectRDF.getValue());
+				node = this.streamGraph.getNode(objectRDF.getValue());
 			}
 			try {
-				edge = this.graph.addEdge(predicateRDF.getValue(), subjectRDF.getValue(), objectRDF.getValue(),true);
+				edge = this.streamGraph.addEdge(predicateRDF.getValue(), subjectRDF.getValue(), objectRDF.getValue(),true);
 				quantityNodesEdges.incNumEdges();
 				if(Constants.edgeLabel)
 					edge.addAttribute("label", predicateRDF.getShortName());
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated edge, insert a different element in the identifying string and try again
-				GraphData.incModifier();
-				edge = this.graph.addEdge(predicateRDF.getValue()+" - "+GraphData.getStrModifier(), subjectRDF.getValue(), objectRDF.getValue(),true);
+				StreamGraphData.incModifier();
+				edge = this.streamGraph.addEdge(predicateRDF.getValue()+" - "+StreamGraphData.getStrModifier(), subjectRDF.getValue(), objectRDF.getValue(),true);
 				quantityNodesEdges.incNumEdges();
 				if(Constants.edgeLabel)
 					// add modifier to differentiate each link into the graph
-					edge.addAttribute("label", predicateRDF.getShortName()+" - "+GraphData.getStrModifier());
+					edge.addAttribute("label", predicateRDF.getShortName()+" - "+StreamGraphData.getStrModifier());
 			}
 		}
 	}
 	
 	public void computeBetweennessCentrality() {
 		BetweennessCentrality betweenness = new BetweennessCentrality();
-		betweenness.init(this.getGraph());
+		betweenness.init(this.getStreamGraph());
 		//betweenness.setUnweighted();
 		betweenness.setCentralityAttributeName("betweenness");
 		betweenness.compute();
@@ -195,14 +197,14 @@ public class GraphData {
 	
 	public void computeClosenessCentrality() {
 		ClosenessCentrality closeness = new ClosenessCentrality();
-		closeness.init(this.getGraph());
+		closeness.init(this.getStreamGraph());
 		closeness.setCentralityAttribute("closeness");
 		closeness.compute();
 	}
 	
 	public void computeEigenvectorCentrality() {
 		EigenvectorCentrality eingenvector = new EigenvectorCentrality();
-		eingenvector.init(this.getGraph());
+		eingenvector.init(this.getStreamGraph());
 		eingenvector.setCentralityAttribute("eingenvector");
 		eingenvector.compute();	
 	}
@@ -250,9 +252,9 @@ public class GraphData {
  
 	public String toStringGraph() {
 		StringBuffer str = new StringBuffer();
-		Graph graph = this.getGraph();
+		Graph graph = this.getStreamGraph();
 		for( Node node : graph.getEachNode() ) {
-			str.append(GraphData.nodeToString(node));
+			str.append(StreamGraphData.nodeToString(node));
 			str.append("\n");
 		}
 		return str.toString();
@@ -261,7 +263,7 @@ public class GraphData {
 	public String toString() {
 		return  this.toStringGraph() +
 				"\ntotalNodes (count)= " 	+ this.getTotalNodes() +
-				"\ntotalNodes (real) = " 	+ this.getGraph().getNodeCount() +
+				"\ntotalNodes (real) = " 	+ this.getStreamGraph().getNodeCount() +
 				"\ntotalEdges (count)= " 	+ this.getTotalEdges() + 
 				"\ntotalNodesDuplicate = " 	+ this.getTotalNodesDuplicate() +
 				"\ntotalEdgesDuplicate = " 	+ this.getTotalEdgesDuplicate();

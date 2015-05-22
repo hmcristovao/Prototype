@@ -15,7 +15,7 @@ public class MainProcess implements Constants {
 	public static void head(Wrapterms parser) {
 		try {
 			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
-			GraphData graphData = new GraphData();
+			StreamGraphData streamGraphData = new StreamGraphData();
 
 			PrintStream fileConsoleOut = new PrintStream(Constants.nameFileConsoleOut);
 			//PrintStream fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
@@ -36,25 +36,34 @@ public class MainProcess implements Constants {
 			Debug.out("3",originalSetQuerySparql.toString());
 			
 			Debug.err("Building graph...");
-			Graph currentGraph = graphData.getGraph();
+			Graph currentGraph = streamGraphData.getStreamGraph();
 			if(Constants.graphStreamVisualization) 
 				currentGraph.display(true);
 			if(Constants.gephiVisualization) {
 				JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 				currentGraph.addSink(sender);
 			}
-		    graphData.buildGraph(originalSetQuerySparql);
+		    streamGraphData.buildGraph(originalSetQuerySparql);
 		    if(Constants.gephiVisualization) {
 				currentGraph.clearSinks();
 			}
 		    
 		    Debug.err("Computing betweenness centrality...");
-		    graphData.computeBetweennessCentrality();
-		    Debug.err("Computing closeness centrality...");
+		    streamGraphData.computeBetweennessCentrality();
+		    
 		    //graphData.computeClosenessCentrality();
+		    
+		    Debug.err("Built Gephi Graph...");
+		    GephiGraphData gephiGraphData = new GephiGraphData();
+		    gephiGraphData.init(streamGraphData);
+		    Debug.err("Computing closeness centrality...");
+		    gephiGraphData.computeClosenessCentrality();
+		    
 		    Debug.err("Computing eigenvector centrality...");
-		    graphData.computeEigenvectorCentrality();
-		    Debug.out("4",graphData.toString());
+		    streamGraphData.computeEigenvectorCentrality();
+		    Debug.out("4",streamGraphData.toString());
+		    
+		    
 		    
 		    Debug.err("Closing...");
 		    if(Constants.graphStreamVisualization) 
