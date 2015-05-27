@@ -15,7 +15,7 @@ public class MainProcess implements Constants {
 	public static void head(Wrapterms parser) {
 		try {
 			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
-			StreamGraphData streamGraphData = new StreamGraphData();
+			SystemGraphData systemGraphData = new SystemGraphData();
 
 			PrintStream fileConsoleOut = new PrintStream(Constants.nameFileConsoleOut);
 			//PrintStream fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
@@ -36,32 +36,32 @@ public class MainProcess implements Constants {
 			Debug.out("3",originalSetQuerySparql.toString());
 			
 			Debug.err("Building graph...");
-			Graph currentGraph = streamGraphData.getStreamGraph();
+			Graph currentGraph = systemGraphData.getStreamGraphData().getStreamGraph();
 			if(Constants.graphStreamVisualization) 
 				currentGraph.display(true);
 			if(Constants.gephiVisualization) {
 				JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 				currentGraph.addSink(sender);
 			}
-		    streamGraphData.buildGraph(originalSetQuerySparql);
+		    systemGraphData.getStreamGraphData().buildGraph(originalSetQuerySparql);
 		    if(Constants.gephiVisualization) {
 				currentGraph.clearSinks();
 			}
 		    
 		    Debug.err("Computing betweenness centrality...");
-		    streamGraphData.computeBetweennessCentrality();
+		    systemGraphData.getStreamGraphData().computeBetweennessCentrality();
 		    
 		    //graphData.computeClosenessCentrality();
 		    
 		    Debug.err("Built Gephi Graph...");
 		    GephiGraphData gephiGraphData = new GephiGraphData();
-		    gephiGraphData.init(streamGraphData);
+		    gephiGraphData.init(systemGraphData.getStreamGraphData());
 		    Debug.err("Computing closeness centrality...");
 		    gephiGraphData.computeClosenessCentrality();
 		    
 		    Debug.err("Computing eigenvector centrality...");
-		    streamGraphData.computeEigenvectorCentrality();
-		    Debug.out("4",streamGraphData.toString());
+		    systemGraphData.getStreamGraphData().computeEigenvectorCentrality();
+		    Debug.out("4",systemGraphData.getStreamGraphData().toString());
 		    
 		    
 		    
@@ -94,14 +94,9 @@ public class MainProcess implements Constants {
 		}
 		// get the another errs
 		catch(Exception e) {
-			System.err.println("Other: " + e.getMessage());
+			System.err.println("Other error: " + e.getMessage());
 			e.printStackTrace();
 		}
-	}
-	
-	protected static void showConsoleList(SetQuerySparql list) {
-		System.out.println("\n=====================================================\n");
-		System.out.println(list);
 	}
 }
 	

@@ -2,10 +2,10 @@ package myClasses;
 
 import java.util.LinkedList;
 
-public class SetNodes {
+public class NodesSet {
 	private LinkedList<IdNode> nodes;
 	
-	public SetNodes() {
+	public NodesSet() {
 		this.nodes = new LinkedList<IdNode>();
 	}
 	
