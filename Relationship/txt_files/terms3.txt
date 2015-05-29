@@ -1,4 +1,5 @@
-Concept map, Mind map,
+Concept map, 
+Mind map,
 Argument map,
 Cognitive map,
 Conceptual graphs,
