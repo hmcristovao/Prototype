@@ -3,10 +3,10 @@ package myClasses;
 import java.util.LinkedList;
 import java.util.TreeMap;
 
-public class RankNodes {
+public class NodesRank {
 	private TreeMap<IdNode, Double> nodes;
 	
-	public RankNodes() {
+	public NodesRank() {
 		this.nodes = new TreeMap<IdNode, Double>();
 	}
 	

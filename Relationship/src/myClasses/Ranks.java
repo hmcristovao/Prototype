@@ -1,25 +1,25 @@
 package myClasses;
 
 public class Ranks {
-	private RankNodes betweenness;
-	private RankNodes closeness;
-	private RankNodes eingenvector;
+	private NodesRank betweenness;
+	private NodesRank closeness;
+	private NodesRank eingenvector;
 	
 	public Ranks() {
-		this.betweenness  = new RankNodes();
-		this.closeness    = new RankNodes();
-		this.eingenvector = new RankNodes();
+		this.betweenness  = new NodesRank();
+		this.closeness    = new NodesRank();
+		this.eingenvector = new NodesRank();
 	}
 
-	public RankNodes getBetweenness() {
+	public NodesRank getBetweenness() {
 		return this.betweenness;
 	}
 
-	public RankNodes getCloseness() {
+	public NodesRank getCloseness() {
 		return this.closeness;
 	}
 
-	public RankNodes getEingenvector() {
+	public NodesRank getEingenvector() {
 		return this.eingenvector;
 	}
 	

@@ -9,7 +9,7 @@ import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.project.api.ProjectController;
-import org.gephi.project.api.Workspace;
+//import org.gephi.project.api.Workspace;
 import org.gephi.statistics.plugin.GraphDistance;
 import org.openide.util.Lookup;
 
@@ -20,14 +20,11 @@ public class GephiGraphData {
 	private Graph gephiGraph;
 	
 	public GephiGraphData() {
-		
-		//ProjectController pc = Lookup.getDefault().lookup(ProjectController.class);
-		//pc.newProject();
-		//Workspace workspace = pc.getCurrentWorkspace();
-		
+		ProjectController projectController = Lookup.getDefault().lookup(ProjectController.class);
+		projectController.newProject();
+		//Workspace workspace = projectController.getCurrentWorkspace();
 		this.graphModel =  Lookup.getDefault().lookup(GraphController.class).getModel();
 		this.attributeModel = Lookup.getDefault().lookup(AttributeController.class).getModel();
-		
 		this.gephiGraph = this.graphModel.getGraph();
 	}
 	
