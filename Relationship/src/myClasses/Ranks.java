@@ -1,32 +1,30 @@
 package myClasses;
 
+import java.util.Arrays;
+
 public class Ranks {
-	private NodesRank betweenness;
-	private NodesRank closeness;
-	private NodesRank eingenvector;
+	private ConnectedComponentMeasures measures[];  // 0 position correspond to total network
+	private int current;
+	private int maxQuantity;
 	
-	public Ranks() {
-		this.betweenness  = new NodesRank();
-		this.closeness    = new NodesRank();
-		this.eingenvector = new NodesRank();
+	public Ranks(int maxQuantity) {
+		this.measures = new ConnectedComponentMeasures[maxQuantity];
 	}
-
-	public NodesRank getBetweenness() {
-		return this.betweenness;
+	
+	public void insert(ConnectedComponentMeasures connectedComponentMeasures) throws Exception {
+		if(this.current == this.maxQuantity)
+			throw new Exception("Quantity of nodes is larger than capacity");
+		measures[current] = connectedComponentMeasures;
+		this.current++;
 	}
-
-	public NodesRank getCloseness() {
-		return this.closeness;
-	}
-
-	public NodesRank getEingenvector() {
-		return this.eingenvector;
+	
+	public ConnectedComponentMeasures getConnectedComponentMeasures(int position) throws Exception {
+		if(position >= this.maxQuantity)
+			throw new Exception("Tried to read ConnectedComponentMeasures over the table");
+		return this.measures[position];
 	}
 	
 	public String toString() {
-		return  this.getBetweenness().toString() +
-				this.getCloseness().toString() +
-				this.getEingenvector().toString();
+		return  Arrays.toString(this.measures);
 	}
-
 }
