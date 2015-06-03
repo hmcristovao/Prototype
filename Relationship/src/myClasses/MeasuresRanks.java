@@ -1,6 +1,6 @@
 package myClasses;
 
-public class ConnectedComponentMeasures {
+public class MeasuresRanks {
 	private int connectedComponentNumber;  // 0 correspond total network
 	private NodesTable betweenness;
 	private NodesTable closeness;

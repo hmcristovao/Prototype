@@ -1,16 +1,6 @@
 // It is one raw of the table of nodes (NodesTable)
 package myClasses;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.graphstream.graph.Edge;
-import org.graphstream.graph.Graph;
-import org.graphstream.graph.Node;
-
 public class NodeData {
 	// operational data
 	private int arrayRowNumber;
@@ -21,7 +11,7 @@ public class NodeData {
 	private org.gephi.graph.api.Node gephiNode;
 	private boolean original;
 
-	// calculate data
+	// calculated data
 	private int candidateLevel;
 	private int partitioning;
 	private double betweenness;

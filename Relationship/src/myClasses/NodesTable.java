@@ -3,6 +3,12 @@ package myClasses;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import org.gephi.data.attributes.api.AttributeColumn;
+import org.gephi.data.attributes.api.AttributeModel;
+import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
+import org.gephi.statistics.plugin.GraphDistance;
+
 public class NodesTable {
 
 	private NodeData table[]; 
@@ -20,6 +26,21 @@ public class NodesTable {
 		this.maxQuantity = maxQuantity;
 	}
 
+	public void buildNodesTable(GraphModel graphModel, AttributeModel attributeModel) {
+		GraphDistance graphDistance = new GraphDistance();
+		graphDistance.setDirected(false);
+		graphDistance.setNormalized(true);
+		graphDistance.execute(graphModel, attributeModel);
+		
+		AttributeColumn attributeColumn = this.attributeModel.getNodeTable().getColumn(GraphDistance.CLOSENESS);
+		
+		// coloca o atributo no Stream ...
+		for(Node gephiNode: this.gephiGraph.getNodes()) {
+			Double closeness = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumn.getIndex());
+			System.out.println(closeness);
+		}	
+	}
+	
 	public void insert(NodeData nodeData) throws Exception {
 		if(this.current == this.maxQuantity)
 			throw new Exception("Quantity of nodes is larger than capacity");

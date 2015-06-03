@@ -3,28 +3,28 @@ package myClasses;
 import java.util.Arrays;
 
 public class Ranks {
-	private ConnectedComponentMeasures measures[];  // 0 position correspond to total network
+	private MeasuresRanks measuresRanksTable[];  // 0 position correspond to total network
 	private int current;
 	private int maxQuantity;
 	
 	public Ranks(int maxQuantity) {
-		this.measures = new ConnectedComponentMeasures[maxQuantity];
+		this.measuresRanksTable = new MeasuresRanks[maxQuantity];
 	}
 	
-	public void insert(ConnectedComponentMeasures connectedComponentMeasures) throws Exception {
+	public void insert(MeasuresRanks measuresRanks) throws Exception {
 		if(this.current == this.maxQuantity)
 			throw new Exception("Quantity of nodes is larger than capacity");
-		measures[current] = connectedComponentMeasures;
+		measuresRanksTable[current] = measuresRanks;
 		this.current++;
 	}
 	
-	public ConnectedComponentMeasures getConnectedComponentMeasures(int position) throws Exception {
+	public MeasuresRanks getConnectedComponentMeasures(int position) throws Exception {
 		if(position >= this.maxQuantity)
-			throw new Exception("Tried to read ConnectedComponentMeasures over the table");
-		return this.measures[position];
+			throw new Exception("Tried to read MeasuresRanks over the table");
+		return this.measuresRanksTable[position];
 	}
 	
 	public String toString() {
-		return  Arrays.toString(this.measures);
+		return  Arrays.toString(this.measuresRanksTable);
 	}
 }

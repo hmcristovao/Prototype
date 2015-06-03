@@ -43,21 +43,18 @@ public class MainProcess implements Constants {
 				JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 				currentGraph.addSink(sender);
 			}
-		    systemGraphData.buildGraph(originalSetQuerySparql);
+		    systemGraphData.buildSystemGraphData(originalSetQuerySparql);
 		    if(Constants.gephiVisualization) {
 				currentGraph.clearSinks();
 			}
 		    
-		    Debug.err("Computing betweenness and closeness centrality...");
-		    systemGraphData.computeBetweenessCloseness();
+		    Debug.err("Building ranks...");
+			systemGraphData.buildRanks();
 		    
-		    Debug.err("Computing eigenvector centrality...");
-		    systemGraphData.computeEigenvectorCentrality();
-		    Debug.out("4",systemGraphData.getStreamGraphData().toString());
-		    
-		    
-		    
-		    Debug.err("Closing...");
+		    Debug.err("Analysing graph data...");
+			systemGraphData.analyseGraphData();
+
+			Debug.err("Closing...");
 		    if(Constants.graphStreamVisualization) 
 				currentGraph.clear();
 			fileConsoleOut.close();
