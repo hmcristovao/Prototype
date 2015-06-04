@@ -9,35 +9,40 @@ import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.statistics.plugin.GraphDistance;
 
-public class NodesTable {
-
+public class NodesTableArray {
 	private NodeData table[]; 
 	private int current;
 	private int maxQuantity;
 	
-	public NodesTable(NodeData table[]) {
+	/*public NodesTableArray(NodeData table[]) {
 		this.table = table;
 		this.maxQuantity = table.length;
 		this.current = table.length;
 	}
-	public NodesTable(int maxQuantity) {
+	*/
+	
+	public NodesTableArray(int maxQuantity) {
 		this.table = new NodeData[maxQuantity];
 		this.current = 0;
 		this.maxQuantity = maxQuantity;
 	}
 
-	public void buildNodesTable(GraphModel graphModel, AttributeModel attributeModel) {
-		GraphDistance graphDistance = new GraphDistance();
-		graphDistance.setDirected(false);
-		graphDistance.setNormalized(true);
-		graphDistance.execute(graphModel, attributeModel);
+	//private static void buildBasicTable(NodesTableHash nodesTableHash) {
 		
-		AttributeColumn attributeColumn = this.attributeModel.getNodeTable().getColumn(GraphDistance.CLOSENESS);
-		
-		// coloca o atributo no Stream ...
-		for(Node gephiNode: this.gephiGraph.getNodes()) {
-			Double closeness = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumn.getIndex());
-			System.out.println(closeness);
+	//}
+	
+	public void buildNodesTable(GephiGraphData gephiGraphData) {
+
+		Double valueBetweenness, valueCloseness;
+		String nodeId;
+		// copy Betweenness to NodesTableArray
+		AttributeColumn attributeColumnBetweenness = gephiGraphData.getAttributeTable().getColumn(GraphDistance.BETWEENNESS);
+		AttributeColumn attributeColumnCloseness   = gephiGraphData.getAttributeTable().getColumn(GraphDistance.CLOSENESS);
+		for(Node gephiNode: gephiGraphData.getGephiGraph().getNodes()) {
+			nodeId = gephiNode.getNodeData().getId();
+			valueBetweenness = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnBetweenness.getIndex());
+			valueCloseness   = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnCloseness.getIndex());
+			this.addBetweennessCloseness(nodeId, valueBetweenness, valueCloseness);
 		}	
 	}
 	
@@ -53,41 +58,41 @@ public class NodesTable {
 		return this.table[position];
 	}
 	
-	public NodesTable sortBetwennness() {
+	public NodesTableArray sortBetwennness() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
 		Arrays.sort(newTable, new SortBetweenness());
-		return new NodesTable(newTable);
+		return new NodesTableArray(newTable);
 	}
-	public NodesTable sortBetwennness(int first) {
+	public NodesTableArray sortBetwennness(int first) {
 		if(first > this.maxQuantity)
 			first = this.maxQuantity;
 		NodeData newTable[] = Arrays.copyOf(this.table, first);
 		Arrays.sort(newTable, new SortBetweenness());
-		return new NodesTable(newTable);
+		return new NodesTableArray(newTable);
 	}
-	public NodesTable sortCloseness() {
+	public NodesTableArray sortCloseness() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
 		Arrays.sort(newTable, new SortCloseness());
-		return new NodesTable(newTable);
+		return new NodesTableArray(newTable);
 	}
-	public NodesTable sortCloseness(int first) {
+	public NodesTableArray sortCloseness(int first) {
 		if(first > this.maxQuantity)
 			first = this.maxQuantity;
 		NodeData newTable[] = Arrays.copyOf(this.table, first);
 		Arrays.sort(newTable, new SortCloseness());
-		return new NodesTable(newTable);
+		return new NodesTableArray(newTable);
 	}
-	public NodesTable sortEingenvector() {
+	public NodesTableArray sortEingenvector() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
 		Arrays.sort(newTable, new SortEingenvector());
-		return new NodesTable(newTable);
+		return new NodesTableArray(newTable);
 	}
-	public NodesTable sortEingenvector(int first) {
+	public NodesTableArray sortEingenvector(int first) {
 		if(first > this.maxQuantity)
 			first = this.maxQuantity;
 		NodeData newTable[] = Arrays.copyOf(this.table, first);
 		Arrays.sort(newTable, new SortEingenvector());
-		return new NodesTable(newTable);
+		return new NodesTableArray(newTable);
 	}
 	
 	public String toString() {

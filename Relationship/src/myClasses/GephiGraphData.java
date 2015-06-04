@@ -31,35 +31,33 @@ public class GephiGraphData {
 		this.gephiGraph = this.graphModel.getGraph();
 	}
 	
-	public Graph getGephiGraph() {
-		return this.gephiGraph;
+	public GraphModel getGraphModel() {
+		return this.graphModel;
+	}
+	public AttributeModel getAttributeModel() {
+		return this.attributeModel;
 	}
 	public AttributeTable getAttributeTable() {
 		return this.attributeTable;
+	}
+	public Graph getGephiGraph() {
+		return this.gephiGraph;
 	}
 	public void setAttributeTable(AttributeTable attributeTable) {
 		this.attributeTable = attributeTable;
 	}
 
-	// copy all graph from Stream to Gephi format
-	public void buildGephiGraphData(StreamGraphData streamGraphData) {
-		org.graphstream.graph.Graph streamGraph = streamGraphData.getStreamGraph();
-		for( org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
-			String idNode = streamNode.toString();
-			Node gephiNode = graphModel.factory().newNode(idNode);
-			this.gephiGraph.addNode(gephiNode);
-		}
-		for( org.graphstream.graph.Edge streamEdge : streamGraph.getEachEdge() ) {
-			String idNode0 = streamEdge.getNode0().toString();
-			String idNode1 = streamEdge.getNode1().toString();
-			Node gephiNode0 = this.gephiGraph.getNode(idNode0);
-			Node gephiNode1 = this.gephiGraph.getNode(idNode1);
-			Edge gephiEdge = graphModel.factory().newEdge(streamEdge.toString(), gephiNode0, gephiNode1, 1, true);
-			this.gephiGraph.addEdge(gephiEdge);
-		}
-		
+	public void buildGephiGraphTable() {
+		GraphDistance graphDistance = new GraphDistance();
+		graphDistance.setDirected(false);
+		graphDistance.setNormalized(true);
+		graphDistance.execute(this.graphModel, this.attributeModel);
+		this.attributeTable = this.attributeModel.getNodeTable();
+		//somente para extrair única coluna:
+		//AttributeColumn attributeColumn = attributeModel.getNodeTable().getColumn(GraphDistance.CLOSENESS);
 	}
-
+	
+	
 	// Don't used
 	// using gephi-toolkit 
 	public void computeClosenessCentrality() {

@@ -4,7 +4,7 @@ public interface Constants {
 	String nameFileConsoleOut = "txt_files\\consoleOut.txt";
 	String nameFileConsoleErr = "txt_files\\consoleErr.txt";
 
-	String nameFileInput = "txt_files\\terms.txt";
+	String nameFileInput = "txt_files\\terms5.txt";
 	
 	String nameFileQueryDefault = "txt_files\\query.txt";
 

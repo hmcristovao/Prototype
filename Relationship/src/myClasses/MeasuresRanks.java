@@ -2,9 +2,9 @@ package myClasses;
 
 public class MeasuresRanks {
 	private int connectedComponentNumber;  // 0 correspond total network
-	private NodesTable betweenness;
-	private NodesTable closeness;
-	private NodesTable eingenvector;
+	private NodesTableArray betweenness;
+	private NodesTableArray closeness;
+	private NodesTableArray eingenvector;
 	
 	public int getConnectedComponentNumber() {
 		return this.connectedComponentNumber;
@@ -12,22 +12,22 @@ public class MeasuresRanks {
 	public void setConnectedComponentNumber(int connectedComponentNumber) {
 		this.connectedComponentNumber = connectedComponentNumber;
 	}
-	public NodesTable getBetweenness() {
+	public NodesTableArray getBetweenness() {
 		return this.betweenness;
 	}
-	public void setBetweenness(NodesTable betweenness) {
+	public void setBetweenness(NodesTableArray betweenness) {
 		this.betweenness = betweenness;
 	}
-	public NodesTable getCloseness() {
+	public NodesTableArray getCloseness() {
 		return this.closeness;
 	}
-	public void setCloseness(NodesTable closeness) {
+	public void setCloseness(NodesTableArray closeness) {
 		this.closeness = closeness;
 	}
-	public NodesTable getEingenvector() {
+	public NodesTableArray getEingenvector() {
 		return this.eingenvector;
 	}
-	public void setEingenvector(NodesTable eingenvector) {
+	public void setEingenvector(NodesTableArray eingenvector) {
 		this.eingenvector = eingenvector;
 	}
 	public String toString() {

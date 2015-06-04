@@ -1,4 +1,4 @@
-// It is one raw of the table of nodes (NodesTable)
+// It is one raw of the table of nodes (NodesTableArray)
 package myClasses;
 
 public class NodeData {
