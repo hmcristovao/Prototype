@@ -23,6 +23,8 @@ public class StreamGraphData {
 				                    Constants.totalNodes,
 				                    Constants.totalEdges
 				                         );
+		this.added     = new QuantityNodesEdges();
+		this.duplicate = new QuantityNodesEdges();
 	}
 	
 	public Graph getStreamGraph() {
@@ -220,12 +222,14 @@ public class StreamGraphData {
 			str.append("\nImage: ");
 			str.append(node.getAttribute("image"));
 		}
+		/*
 		str.append("\nBetweenness centrality: ");
 		str.append(node.getAttribute("betweenness"));
 		str.append("\nCloseness centrality: ");
 		str.append(node.getAttribute("closeness"));
 		str.append("\nEingenvector centrality: ");
 		str.append(node.getAttribute("eigenvector"));
+		*/
 		return str.toString();
 	}
  
@@ -242,6 +246,7 @@ public class StreamGraphData {
 	
 	public String toString() {
 		return  this.toStringGraph() +
+				"\n--------------------" +
 				"\ntotalNodes (count)= " 	+ this.getTotalNodes() +
 				"\ntotalNodes (real) = " 	+ this.getStreamGraph().getNodeCount() +
 				"\ntotalEdges (count)= " 	+ this.getTotalEdges() + 

@@ -1,13 +1,11 @@
 package myClasses;
 
-import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.data.attributes.api.AttributeTable;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Node;
 import org.gephi.project.api.ProjectController;
 //import org.gephi.project.api.Workspace;
 import org.gephi.statistics.plugin.GraphDistance;
@@ -52,24 +50,12 @@ public class GephiGraphData {
 		graphDistance.setNormalized(true);
 		graphDistance.execute(this.graphModel, this.attributeModel);
 		this.attributeTable = this.attributeModel.getNodeTable();
-		//somente para extrair única coluna:
-		//AttributeColumn attributeColumn = attributeModel.getNodeTable().getColumn(GraphDistance.CLOSENESS);
 	}
 	
-	
-	// Don't used
-	// using gephi-toolkit 
-	public void computeClosenessCentrality() {
-		GraphDistance graphDistance = new GraphDistance();
-		graphDistance.setDirected(false);
-		graphDistance.setNormalized(true);
-		graphDistance.execute(this.graphModel, this.attributeModel);
-		
-		AttributeColumn attributeColumn = this.attributeModel.getNodeTable().getColumn(GraphDistance.CLOSENESS);
-		
-		for(Node gephiNode: this.gephiGraph.getNodes()) {
-			Double closeness = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumn.getIndex());
-			System.out.println(closeness);
-		}
+	public void filterDegree(int degree) {
+		// olhar código em:
+		// https://github.com/gephi/gephi/wiki/How-to-use-filters
+				
 	}
+
 }

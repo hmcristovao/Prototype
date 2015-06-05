@@ -16,24 +16,30 @@ public class MainProcess implements Constants {
 		try {
 			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
 			SystemGraphData systemGraphData = new SystemGraphData();
-
-			PrintStream fileConsoleOut = new PrintStream(Constants.nameFileConsoleOut);
-			//PrintStream fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
-			System.setOut(fileConsoleOut);
-			//System.setErr(fileConsoleErr);
+			PrintStream fileConsoleOut, fileConsoleErr;
+			
+			if(!Constants.outPrintConsole) {
+				fileConsoleOut = new PrintStream(Constants.nameFileConsoleOut);
+				System.setOut(fileConsoleOut);
+			}
+			if(!Constants.errPrintConsole) {
+				fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
+				System.setErr(fileConsoleErr);
+			}
 			
 			Debug.err("Parsing terms...");
 			parser = new Wrapterms(new FileInputStream(Constants.nameFileInput));
 			parser.start(originalSetQuerySparql);
+			
 			Debug.out("1",originalSetQuerySparql.toString());
 			
 			Debug.err("Assembling queries...");
 			originalSetQuerySparql.fillQuery();
-			Debug.out("2",originalSetQuerySparql.toString());
 			
 			Debug.err("Collecting RDFs...");
 			originalSetQuerySparql.fillRDFs();
-			Debug.out("3",originalSetQuerySparql.toString());
+			
+			Debug.out("2",originalSetQuerySparql.toString());
 			
 			Debug.err("Building graph...");
 			Graph currentGraph = systemGraphData.getStreamGraphData().getStreamGraph();
@@ -48,8 +54,19 @@ public class MainProcess implements Constants {
 				currentGraph.clearSinks();
 			}
 		    
-		    Debug.err("Building ranks...");
+		    Debug.err("Calculating measures of the whole network...");
+			systemGraphData.calculateMeasuresWholeNetwork();
+		    			
+		    Debug.err("Sorting measures of the whole network...");
+			systemGraphData.sortMeasuresWholeNetwork();
+			
+			Debug.err("Classifying connected component...");
+			systemGraphData.classifyConnectedComponent();
+		    
+			Debug.err("Calculating measures of each connected component and building ranks...");
 			systemGraphData.buildRanks();
+
+			Debug.out("3",systemGraphData.toString());
 		    
 		    Debug.err("Analysing graph data...");
 			systemGraphData.analyseGraphData();
@@ -57,8 +74,10 @@ public class MainProcess implements Constants {
 			Debug.err("Closing...");
 		    if(Constants.graphStreamVisualization) 
 				currentGraph.clear();
-			fileConsoleOut.close();
-			//fileConsoleErr.close();
+			if(!Constants.outPrintConsole)
+				fileConsoleOut.close();
+			if(!Constants.errPrintConsole)
+				fileConsoleErr.close();
 			Debug.err("Ok!");
 		}
 		catch(FileNotFoundException e) {

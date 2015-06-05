@@ -15,7 +15,7 @@ public class NodesTableHash {
 	}
 	
 	public NodeData get(String nodeId) {
-		return this.get(nodeId);
+		return this.table.get(nodeId);
 	}
 	public void put(String nodeId, NodeData nodeData) {
 		this.table.put(nodeId, nodeData);

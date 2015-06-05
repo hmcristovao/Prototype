@@ -3,23 +3,16 @@ package myClasses;
 import java.util.Arrays;
 import java.util.Comparator;
 
-import org.gephi.data.attributes.api.AttributeColumn;
-import org.gephi.data.attributes.api.AttributeModel;
-import org.gephi.graph.api.GraphModel;
-import org.gephi.graph.api.Node;
-import org.gephi.statistics.plugin.GraphDistance;
-
 public class NodesTableArray {
 	private NodeData table[]; 
 	private int current;
 	private int maxQuantity;
 	
-	/*public NodesTableArray(NodeData table[]) {
+	public NodesTableArray(NodeData table[]) {
 		this.table = table;
 		this.maxQuantity = table.length;
 		this.current = table.length;
 	}
-	*/
 	
 	public NodesTableArray(int maxQuantity) {
 		this.table = new NodeData[maxQuantity];
@@ -27,25 +20,6 @@ public class NodesTableArray {
 		this.maxQuantity = maxQuantity;
 	}
 
-	//private static void buildBasicTable(NodesTableHash nodesTableHash) {
-		
-	//}
-	
-	public void buildNodesTable(GephiGraphData gephiGraphData) {
-
-		Double valueBetweenness, valueCloseness;
-		String nodeId;
-		// copy Betweenness to NodesTableArray
-		AttributeColumn attributeColumnBetweenness = gephiGraphData.getAttributeTable().getColumn(GraphDistance.BETWEENNESS);
-		AttributeColumn attributeColumnCloseness   = gephiGraphData.getAttributeTable().getColumn(GraphDistance.CLOSENESS);
-		for(Node gephiNode: gephiGraphData.getGephiGraph().getNodes()) {
-			nodeId = gephiNode.getNodeData().getId();
-			valueBetweenness = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnBetweenness.getIndex());
-			valueCloseness   = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnCloseness.getIndex());
-			this.addBetweennessCloseness(nodeId, valueBetweenness, valueCloseness);
-		}	
-	}
-	
 	public void insert(NodeData nodeData) throws Exception {
 		if(this.current == this.maxQuantity)
 			throw new Exception("Quantity of nodes is larger than capacity");
@@ -96,7 +70,12 @@ public class NodesTableArray {
 	}
 	
 	public String toString() {
-		return  Arrays.toString(this.table);
+		StringBuffer str = new StringBuffer();
+		for(int i=0; i<this.current; i++) {
+			str.append(this.table[i].toString());
+			str.append("\n\n");
+		}
+		return  str.toString();
 	}
 }
 

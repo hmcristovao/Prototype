@@ -2,19 +2,26 @@
 package myClasses;
 
 public class NodeData {
-	// permanent data
+	// basic data
 	private String strIdNode;
 	private String shortName;
 	private org.graphstream.graph.Node streamNode;
 	private org.gephi.graph.api.Node gephiNode;
 	private boolean original;
 
+	// extra attributes
+	private String homepageAttribute;
+	private String abstractAttribute;
+	private String commentAttribute;
+	private String imageAttribute;
+		
 	// calculated data
-	private int candidateLevel;
-	private int partitioning;
+	private int connectedComponent; // 0 indicate the whole network
 	private double betweenness;
 	private double closeness;
 	private double eingenvector;
+	private int candidateLevel;
+	private int partitioning;
 	
 	// constructor to permanent data
 	public NodeData(String strIdNode, 
@@ -22,11 +29,15 @@ public class NodeData {
 					org.graphstream.graph.Node streamNode, 
 					org.gephi.graph.api.Node gephiNode,
 					boolean original) {
-		this.strIdNode      = strIdNode;
-		this.shortName      = shortName;
-		this.streamNode     = streamNode;
-		this.gephiNode      = gephiNode;
-		this.original       = original;
+		this.strIdNode         = strIdNode;
+		this.shortName         = shortName;
+		this.streamNode        = streamNode;
+		this.gephiNode         = gephiNode;
+		this.original          = original;
+		this.homepageAttribute = null;
+		this.abstractAttribute = null;
+		this.commentAttribute  = null;
+		this.imageAttribute    = null;
 	}
 	public NodeData(String strIdNode, 
 					String shortName, 
@@ -54,17 +65,36 @@ public class NodeData {
 		return this.original;
 	}
 
-	public int getCandidateLevel() {
-		return this.candidateLevel;
+	public String getHomepageAttribute() {
+		return this.homepageAttribute;
 	}
-	public void setCandidateLevel(int candidateLevel) {
-		this.candidateLevel = candidateLevel;
+	public void setHomepageAttribute(String homepageAttribute) {
+		this.homepageAttribute = homepageAttribute;
 	}
-	public int getPartitioning() {
-		return this.partitioning;
+	public String getAbstractAttribute() {
+		return this.abstractAttribute;
 	}
-	public void setPartitioning(int partitioning) {
-		this.partitioning = partitioning;
+	public void setAbstractAttribute(String abstractAttribute) {
+		this.abstractAttribute = abstractAttribute;
+	}
+	public String getCommentAttribute() {
+		return this.commentAttribute;
+	}
+	public void setCommentAttribute(String commentAttribute) {
+		this.commentAttribute = commentAttribute;
+	}
+	public String getImageAttribute() {
+		return this.imageAttribute;
+	}
+	public void setImageAttribute(String imageAttribute) {
+		this.imageAttribute = imageAttribute;
+	}
+
+	public double connectedComponent() {
+		return this.connectedComponent;
+	}
+	public void setConnectedComponent(int connectedComponent) {
+		this.connectedComponent = connectedComponent;
 	}
 	public double getBetweenness() {
 		return this.betweenness;
@@ -84,6 +114,18 @@ public class NodeData {
 	public void setEingenvector(double eingenvector) {
 		this.eingenvector = eingenvector;
 	}
+	public int getCandidateLevel() {
+		return this.candidateLevel;
+	}
+	public void setCandidateLevel(int candidateLevel) {
+		this.candidateLevel = candidateLevel;
+	}
+	public int getPartitioning() {
+		return this.partitioning;
+	}
+	public void setPartitioning(int partitioning) {
+		this.partitioning = partitioning;
+	}
 
 	public int compareTo(NodeData nodeData) {
 		return this.strIdNode.compareTo(nodeData.strIdNode);
@@ -94,10 +136,11 @@ public class NodeData {
 		return  "Id: " + this.getStrIdNode() +
 				"\nShort name: " + this.getShortName() +
 				"\nOriginal: " + this.isOriginal() +
-				"\nCandidate level: " + this.getCandidateLevel() +
-				"\nPartitioning: " + this.getPartitioning() +
+				"\nConnected component: " + this.connectedComponent +
 				"\nBetweenness: " + this.getBetweenness() +
 				"\nCloseness: " + this.getCloseness() +
-				"\nEingenvector: " + this.getEingenvector();
+				"\nEingenvector: " + this.getEingenvector() +
+				"\nCandidate level: " + this.getCandidateLevel() +
+				"\nPartitioning: " + this.getPartitioning();
 	}
 }

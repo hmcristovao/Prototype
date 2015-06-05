@@ -7,8 +7,11 @@ public class Ranks {
 	private int current;
 	private int maxQuantity;
 	
-	public Ranks(int maxQuantity) {
-		this.measuresRanksTable = new MeasuresRanks[maxQuantity];
+	public Ranks(int quantity) {
+		this.measuresRanksTable = new MeasuresRanks[quantity];
+		for(int i=0; i < quantity; i++){
+			this.measuresRanksTable[i] = new MeasuresRanks(i);
+		}
 	}
 	
 	public void insert(MeasuresRanks measuresRanks) throws Exception {
