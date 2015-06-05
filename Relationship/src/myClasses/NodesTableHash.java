@@ -1,13 +1,8 @@
 package myClasses;
 
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-
 import org.gephi.data.attributes.api.AttributeColumn;
-import org.gephi.data.attributes.api.AttributeModel;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.statistics.plugin.GraphDistance;
 

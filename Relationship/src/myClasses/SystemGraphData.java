@@ -1,15 +1,13 @@
 package myClasses;
 
-import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.graph.api.Edge;
-import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 
 public class SystemGraphData {
 
 	private StreamGraphData streamGraphData;
 	private GephiGraphData gephiGraphData;
-	//private arquivo GEXF ...
+	// private - file GEXF ...
 	private NodesTableHash  nodesTableHash;
 	private NodesTableArray nodesTableArray;
 	private Ranks ranks;
@@ -45,20 +43,30 @@ public class SystemGraphData {
 	}
 
 	// copy all graph from Stream to Gephi format
-	// build nodesTableHash and nodesTableArray
-	public void buildGephiGraphData_NodesTableHash_NodesTableArray() {
+	// also build nodesTableHash and nodesTableArray
+	public void buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
 		org.graphstream.graph.Graph streamGraph = streamGraphData.getStreamGraph();
-		// each node
+		this.nodesTableArray = new NodesTableArray(this.getStreamGraphData().getTotalNodes());
+		NodeData newNodeData = null;
+		// each node: add in graphData, nodesTableArray and nodesTableHash
 		for( org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
+			// add node in gephiGraphData
 			String idNode = streamNode.toString();
 			Node gephiNode = this.gephiGraphData.getGraphModel().factory().newNode(idNode);
 			this.gephiGraphData.getGephiGraph().addNode(gephiNode);
-			
-			
-			//... preencher aqui as duas table
-			
+			// create a new NodeData object
+			newNodeData = new NodeData(idNode, 
+					                   streamNode.getAttribute("shortname").toString(),
+					                   streamNode,
+					                   gephiNode,
+					                   (streamNode.getAttribute("original").toString().compareTo("true")==0 ? true : false)
+					                  );
+			// add node in nodesTableArray
+			this.nodesTableArray.insert(newNodeData);
+			// add node in nodesTableHash
+			this.nodesTableHash.put(idNode,  newNodeData);
 		}
-		// each edge
+		// each edge: add in graphData
 		for( org.graphstream.graph.Edge streamEdge : streamGraph.getEachEdge() ) {
 			String idNode0 = streamEdge.getNode0().toString();
 			String idNode1 = streamEdge.getNode1().toString();
@@ -69,7 +77,7 @@ public class SystemGraphData {
 		}		
 	}
 	
-	public void buildSystemGraphData(SetQuerySparql setQuerySparql) {
+	public void buildSystemGraphData(SetQuerySparql setQuerySparql) throws Exception {
 		Debug.err("Building Stream Graph Data...");
 		this.streamGraphData.buildStreamGraphData(setQuerySparql);
 		Debug.err("Building Gephi Graph Data...");

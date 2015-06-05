@@ -2,8 +2,6 @@
 package myClasses;
 
 public class NodeData {
-	// operational data
-	private int arrayRowNumber;
 	// permanent data
 	private String strIdNode;
 	private String shortName;
@@ -19,35 +17,26 @@ public class NodeData {
 	private double eingenvector;
 	
 	// constructor to permanent data
-	public NodeData(int arrayRowNumber,
-					String strIdNode, 
+	public NodeData(String strIdNode, 
 					String shortName, 
 					org.graphstream.graph.Node streamNode, 
 					org.gephi.graph.api.Node gephiNode,
 					boolean original) {
-		this.arrayRowNumber = arrayRowNumber; 
 		this.strIdNode      = strIdNode;
 		this.shortName      = shortName;
 		this.streamNode     = streamNode;
 		this.gephiNode      = gephiNode;
 		this.original       = original;
 	}
-	public NodeData(int arrayRowNumber,
-					String strIdNode, 
+	public NodeData(String strIdNode, 
 					String shortName, 
 					StreamGraphData streamGraphData, 
 					GephiGraphData gephiGraphData, 
 					boolean original) {
-		this(arrayRowNumber, strIdNode, shortName, 
+		this(strIdNode, shortName, 
 			 streamGraphData.getStreamGraph().getNode(strIdNode), 
 			 gephiGraphData.getGephiGraph().getNode(strIdNode), 
 			 original);
-	}
-	public int getNumberArray() {
-		return this.arrayRowNumber;
-	}
-	public void incnumberArray() {
-		this.arrayRowNumber++;
 	}
 	public String getStrIdNode() {
 		return this.strIdNode;
