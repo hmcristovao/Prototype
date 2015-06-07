@@ -7,7 +7,7 @@ public interface Constants {
 	String nameFileConsoleOut = "txt_files\\consoleOut.txt";
 	String nameFileConsoleErr = "txt_files\\consoleErr.txt";
 
-	String nameFileInput = "txt_files\\terms7.txt";
+	String nameFileInput = "txt_files\\terms5.txt";
 	
 	String nameFileQueryDefault = "txt_files\\query.txt";
 
@@ -20,7 +20,7 @@ public interface Constants {
 	String nameGraph = "Graph relationship";
 
 	boolean graphStreamVisualization = 	false;
-	boolean gephiVisualization = 		true;
+	boolean gephiVisualization = 		false;
 	String nameGephiWorkspace = 		"workspace0";
 
 	int totalNodes = 20000;

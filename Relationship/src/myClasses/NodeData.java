@@ -19,7 +19,7 @@ public class NodeData {
 	private int connectedComponent; // 0 indicate the whole network
 	private double betweenness;
 	private double closeness;
-	private double eingenvector;
+	private double eigenvector;
 	private int candidateLevel;
 	private int partitioning;
 	
@@ -108,11 +108,11 @@ public class NodeData {
 	public void setCloseness(double closeness) {
 		this.closeness = closeness;
 	}
-	public double getEingenvector() {
-		return this.eingenvector;
+	public double getEigenvector() {
+		return this.eigenvector;
 	}
-	public void setEingenvector(double eingenvector) {
-		this.eingenvector = eingenvector;
+	public void setEigenvector(double eigenvector) {
+		this.eigenvector = eigenvector;
 	}
 	public int getCandidateLevel() {
 		return this.candidateLevel;
@@ -139,7 +139,7 @@ public class NodeData {
 				"\nConnected component: " + this.connectedComponent +
 				"\nBetweenness: " + this.getBetweenness() +
 				"\nCloseness: " + this.getCloseness() +
-				"\nEingenvector: " + this.getEingenvector() +
+				"\nEigenvector: " + this.getEigenvector() +
 				"\nCandidate level: " + this.getCandidateLevel() +
 				"\nPartitioning: " + this.getPartitioning();
 	}

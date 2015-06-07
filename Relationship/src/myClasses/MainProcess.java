@@ -31,7 +31,7 @@ public class MainProcess implements Constants {
 			parser = new Wrapterms(new FileInputStream(Constants.nameFileInput));
 			parser.start(originalSetQuerySparql);
 			
-			Debug.out("1",originalSetQuerySparql.toString());
+			Debug.out("Debug 1",originalSetQuerySparql.toString());
 			
 			Debug.err("Assembling queries...");
 			originalSetQuerySparql.fillQuery();
@@ -39,7 +39,7 @@ public class MainProcess implements Constants {
 			Debug.err("Collecting RDFs...");
 			originalSetQuerySparql.fillRDFs();
 			
-			Debug.out("2",originalSetQuerySparql.toString());
+			Debug.out("Debug 2",originalSetQuerySparql.toString());
 			
 			Debug.err("Building graph...");
 			Graph currentGraph = systemGraphData.getStreamGraphData().getStreamGraph();
@@ -56,7 +56,7 @@ public class MainProcess implements Constants {
 		    
 		    Debug.err("Calculating measures of the whole network...");
 			systemGraphData.calculateMeasuresWholeNetwork();
-		    			
+		    
 		    Debug.err("Sorting measures of the whole network...");
 			systemGraphData.sortMeasuresWholeNetwork();
 			
@@ -66,7 +66,7 @@ public class MainProcess implements Constants {
 			Debug.err("Calculating measures of each connected component and building ranks...");
 			systemGraphData.buildRanks();
 
-			Debug.out("3",systemGraphData.toString());
+			Debug.out("Debug 3",systemGraphData.toString());
 		    
 		    Debug.err("Analysing graph data...");
 			systemGraphData.analyseGraphData();

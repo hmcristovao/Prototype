@@ -4,6 +4,7 @@ import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.statistics.plugin.ConnectedComponents;
+import org.gephi.statistics.plugin.EigenvectorCentrality;
 import org.gephi.statistics.plugin.GraphDistance;
 
 public class SystemGraphData {
@@ -17,7 +18,7 @@ public class SystemGraphData {
 	private Ranks ranks;
 	private NodesTableArray betweennessSortTable;
 	private NodesTableArray closenessSortTable;
-	private NodesTableArray eingenvectorSortTable;
+	private NodesTableArray eigenvectorSortTable;
 	
 	
 	public SystemGraphData() {
@@ -31,6 +32,9 @@ public class SystemGraphData {
 		this.nodesTableArray          = null;  // will be to fill after nodeTableHash filling
 		this.connectedComponentsCount = 0;
 		this.ranks                    = null;
+		this.betweennessSortTable     = null;
+		this.closenessSortTable       = null;
+		this.eigenvectorSortTable     = null;
 	}
 
 	public StreamGraphData getStreamGraphData() {
@@ -66,11 +70,11 @@ public class SystemGraphData {
 	public void setClosenessSortTable(NodesTableArray closenessSortTable) {
 		this.closenessSortTable = closenessSortTable;
 	}
-	public NodesTableArray getEingenvectorSortTable() {
-		return this.eingenvectorSortTable;
+	public NodesTableArray getEigenvectorSortTable() {
+		return this.eigenvectorSortTable;
 	}
-	public void setEingenvectorSortTable(NodesTableArray eingenvectorSortTable) {
-		this.eingenvectorSortTable = eingenvectorSortTable;
+	public void setEigenvectorSortTable(NodesTableArray eigenvectorSortTable) {
+		this.eigenvectorSortTable = eigenvectorSortTable;
 	}
 	
 	// copy all graph from StreamGraph format to GephiGraph format
@@ -128,28 +132,32 @@ public class SystemGraphData {
 	
 	// put results in NodesData set
 	public void calculateMeasuresWholeNetwork() {
+		// at firt, calculate the measures: betweenness, closeness and eigenvector
 		this.gephiGraphData.buildGephiGraphTable();
-		Double valueBetweenness, valueCloseness;
+		Double betweennessValue, closenessValue, eigenvectorValue;
 		String nodeId;
-		NodeData nodeData;
-		// copy Betweenness to NodesTableArray
+		NodeData nodeData;		
+		// copy Betweenness, Closeness and Eigenvector values to NodesTableArray 
 		AttributeColumn attributeColumnBetweenness = gephiGraphData.getAttributeTable().getColumn(GraphDistance.BETWEENNESS);
 		AttributeColumn attributeColumnCloseness   = gephiGraphData.getAttributeTable().getColumn(GraphDistance.CLOSENESS);
+		AttributeColumn attributeColumnEigenvector = gephiGraphData.getAttributeTable().getColumn(EigenvectorCentrality.EIGENVECTOR);
 		for(Node gephiNode: gephiGraphData.getGephiGraph().getNodes()) {
 			nodeId = gephiNode.getNodeData().getId();
-			valueBetweenness = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnBetweenness.getIndex());
-			valueCloseness   = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnCloseness.getIndex());
+			betweennessValue  = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnBetweenness.getIndex());
+			closenessValue    = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnCloseness.getIndex());
+			eigenvectorValue  = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnEigenvector.getIndex());
 			// put the values in NodeData by NodeTableHash
 			nodeData = this.nodesTableHash.get(nodeId);
-			nodeData.setBetweenness(valueBetweenness);
-			nodeData.setCloseness(valueCloseness);			
+			nodeData.setBetweenness(betweennessValue);
+			nodeData.setCloseness(closenessValue);
+			nodeData.setEigenvector(eigenvectorValue);
 		}	
 	}
 	
 	public void sortMeasuresWholeNetwork() {
-		this.betweennessSortTable  = this.nodesTableArray.sortBetwennness();
-		this.closenessSortTable    = this.nodesTableArray.sortCloseness();
-		this.eingenvectorSortTable = this.nodesTableArray.sortEingenvector(); 
+		this.betweennessSortTable = this.nodesTableArray.sortBetwennness();
+		this.closenessSortTable   = this.nodesTableArray.sortCloseness();
+		this.eigenvectorSortTable = this.nodesTableArray.sortEingenvector(); 
 	}
 	
 	
@@ -194,12 +202,12 @@ public class SystemGraphData {
 				"\nQuantity connected component: " + this.connectedComponentsCount +
 		        "\n\n=================================\nTable array: \n---------------------------------\n" + 
 				this.nodesTableArray.toString() +
-		        "\n\n=================================\nTable array (betwennness sorted):\n---------------------------------\n" + 
+		        "\n\n=================================\nTable array (betweenness sorted):\n---------------------------------\n" + 
 				this.betweennessSortTable.toString() +
 		        "\n\n=================================\nTable array (closeness sorted): \n---------------------------------\n" + 
 				this.closenessSortTable.toString() +
 		        "\n\n=================================\nTable array (eingenvector sorted): \n---------------------------------\n" + 
-				this.eingenvectorSortTable.toString();		
+				this.eigenvectorSortTable.toString();		
 	}
 
 

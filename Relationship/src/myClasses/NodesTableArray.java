@@ -58,14 +58,14 @@ public class NodesTableArray {
 	}
 	public NodesTableArray sortEingenvector() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
-		Arrays.sort(newTable, new SortEingenvector());
+		Arrays.sort(newTable, new SortEigenvector());
 		return new NodesTableArray(newTable);
 	}
 	public NodesTableArray sortEingenvector(int first) {
 		if(first > this.maxQuantity)
 			first = this.maxQuantity;
 		NodeData newTable[] = Arrays.copyOf(this.table, first);
-		Arrays.sort(newTable, new SortEingenvector());
+		Arrays.sort(newTable, new SortEigenvector());
 		return new NodesTableArray(newTable);
 	}
 	
@@ -81,16 +81,31 @@ public class NodesTableArray {
 
 class SortBetweenness implements Comparator<NodeData> {
 	public int compare(NodeData nodeData1, NodeData nodeData2) {
-		return (nodeData1.getBetweenness() > nodeData2.getBetweenness() ? -1 : 1);
+		if(nodeData1.getBetweenness() < nodeData2.getBetweenness())
+			return 1;
+		else if(nodeData1.getBetweenness() > nodeData2.getBetweenness())
+			return -1;
+		else
+			return 0;
 	}
 }
 class SortCloseness implements Comparator<NodeData> {
 	public int compare(NodeData nodeData1, NodeData nodeData2) {
-		return (nodeData1.getCloseness() > nodeData2.getCloseness() ? -1 : 1);
+		if(nodeData1.getCloseness() < nodeData2.getCloseness())
+			return 1;
+		else if(nodeData1.getCloseness() > nodeData2.getCloseness())
+			return -1;
+		else
+			return 0;
 	}
 }
-class SortEingenvector implements Comparator<NodeData> {
+class SortEigenvector implements Comparator<NodeData> {
 	public int compare(NodeData nodeData1, NodeData nodeData2) {
-		return (nodeData1.getEingenvector() > nodeData2.getEingenvector() ? -1 : 1);
+		if(nodeData1.getEigenvector() < nodeData2.getEigenvector())
+			return 1;
+		else if(nodeData1.getEigenvector() > nodeData2.getEigenvector())
+			return -1;
+		else
+			return 0;
 	}
 }

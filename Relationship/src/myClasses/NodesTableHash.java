@@ -27,8 +27,8 @@ public class NodesTableHash {
 	public void putCloseness(String nodeId, double valueCloseness) {
 		this.table.get(nodeId).setCloseness(valueCloseness);
 	}
-	public void putEingenvector(String nodeId, double valueEingenvector) {
-		this.table.get(nodeId).setEingenvector(valueEingenvector);
+	public void putEingenvector(String nodeId, double valueEigenvector) {
+		this.table.get(nodeId).setEigenvector(valueEigenvector);
 	}
 	
 	public void buildNodesTableHash(GephiGraphData gephiGraphData) {

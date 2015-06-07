@@ -7,6 +7,7 @@ import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
 import org.gephi.project.api.ProjectController;
+import org.gephi.statistics.plugin.EigenvectorCentrality;
 //import org.gephi.project.api.Workspace;
 import org.gephi.statistics.plugin.GraphDistance;
 import org.openide.util.Lookup;
@@ -44,11 +45,16 @@ public class GephiGraphData {
 		this.attributeTable = attributeTable;
 	}
 
+	// this metodo calculate the table with all measures: betweenness, closeness and eigenvector
 	public void buildGephiGraphTable() {
 		GraphDistance graphDistance = new GraphDistance();
 		graphDistance.setDirected(false);
 		graphDistance.setNormalized(true);
 		graphDistance.execute(this.graphModel, this.attributeModel);
+		
+		EigenvectorCentrality ec = new EigenvectorCentrality();
+		ec.execute(this.graphModel, this.attributeModel);
+
 		this.attributeTable = this.attributeModel.getNodeTable();
 	}
 	

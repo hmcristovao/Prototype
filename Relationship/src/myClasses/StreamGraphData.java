@@ -138,7 +138,7 @@ public class StreamGraphData {
 				node = this.streamGraph.addNode(objectRDF.getValue());
 				quantityNodesEdges.incNumNodes();
 				node.addAttribute("shortname", Concept.underlineToBlank(objectRDF.getShortName()));
-				node.addAttribute("original", (((NodeRDF)subjectRDF).getLevel() == Constants.Level.originalConcept) ? "true" : "false");
+				node.addAttribute("original", (((NodeRDF)objectRDF).getLevel() == Constants.Level.originalConcept) ? "true" : "false");
 				if(Constants.nodeLabel)
 					node.addAttribute("label", objectRDF.getShortName());
 				// if main node, put label 
