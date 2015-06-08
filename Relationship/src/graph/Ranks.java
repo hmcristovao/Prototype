@@ -1,4 +1,4 @@
-package myClasses;
+package graph;
 
 import java.util.Arrays;
 

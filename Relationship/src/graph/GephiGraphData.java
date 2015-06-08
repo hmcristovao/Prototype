@@ -1,4 +1,4 @@
-package myClasses;
+package graph;
 
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;

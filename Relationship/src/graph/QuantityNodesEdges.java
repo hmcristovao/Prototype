@@ -1,4 +1,4 @@
-package myClasses;
+package graph;
 
 public class QuantityNodesEdges {
 	private int numNodes;

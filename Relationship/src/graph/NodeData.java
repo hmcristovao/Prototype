@@ -1,5 +1,6 @@
 // It is one raw of the table of nodes (NodesTableArray)
-package myClasses;
+package graph;
+
 
 public class NodeData {
 	// basic data

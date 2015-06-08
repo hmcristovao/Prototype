@@ -1,4 +1,6 @@
-package myClasses;
+package graph;
+import main.Constants;
+
 import org.graphstream.algorithm.BetweennessCentrality;
 import org.graphstream.algorithm.measure.ClosenessCentrality;
 import org.graphstream.algorithm.measure.EigenvectorCentrality;
@@ -7,6 +9,14 @@ import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
+
+import rdf.ItemRDF;
+import rdf.ListRDF;
+import rdf.NodeRDF;
+import rdf.OneRDF;
+import rdf.QuerySparql;
+import rdf.SetQuerySparql;
+import user.Concept;
 
 public class StreamGraphData {
 	private Graph streamGraph;

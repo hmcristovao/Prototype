@@ -1,4 +1,4 @@
-package myClasses;
+package main;
 
 public interface Constants {
 	boolean outPrintConsole = false;
@@ -7,7 +7,7 @@ public interface Constants {
 	String nameFileConsoleOut = "txt_files\\consoleOut.txt";
 	String nameFileConsoleErr = "txt_files\\consoleErr.txt";
 
-	String nameFileInput = "txt_files\\terms5.txt";
+	String nameFileInput = "txt_files\\terms.txt";
 	
 	String nameFileQueryDefault = "txt_files\\query.txt";
 

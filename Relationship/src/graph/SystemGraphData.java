@@ -1,4 +1,6 @@
-package myClasses;
+package graph;
+
+import main.Debug;
 
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Edge;
@@ -6,6 +8,8 @@ import org.gephi.graph.api.Node;
 import org.gephi.statistics.plugin.ConnectedComponents;
 import org.gephi.statistics.plugin.EigenvectorCentrality;
 import org.gephi.statistics.plugin.GraphDistance;
+
+import rdf.SetQuerySparql;
 
 public class SystemGraphData {
 

@@ -1,7 +1,8 @@
-package myClasses;
+package graph;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Node;
 import org.gephi.statistics.plugin.GraphDistance;

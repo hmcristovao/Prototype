@@ -1,4 +1,4 @@
-package myClasses;
+package user;
 
 import basic.Token;
 

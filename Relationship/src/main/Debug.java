@@ -1,4 +1,4 @@
-package myClasses;
+package main;
 
 public class Debug {
 

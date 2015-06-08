@@ -1,4 +1,6 @@
-package myClasses;
+package rdf;
+
+import main.Constants;
 
 public class NodeRDF extends ItemRDF {
 	private Constants.Level level;   

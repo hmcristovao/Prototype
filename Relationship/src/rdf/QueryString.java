@@ -1,4 +1,6 @@
-package myClasses;
+package rdf;
+
+import user.Concept;
 
 public class QueryString {
 	

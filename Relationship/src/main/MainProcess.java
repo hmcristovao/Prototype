@@ -1,4 +1,6 @@
-package myClasses;
+package main;
+
+import graph.SystemGraphData;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -8,6 +10,7 @@ import java.io.PrintStream;
 import org.graphstream.graph.Graph;
 import org.graphstream.stream.gephi.JSONSender;
 
+import rdf.SetQuerySparql;
 import basic.*;
 
 public class MainProcess implements Constants {

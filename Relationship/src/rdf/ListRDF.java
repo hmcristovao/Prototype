@@ -1,4 +1,4 @@
-package myClasses;
+package rdf;
 
 import java.util.LinkedList;
 

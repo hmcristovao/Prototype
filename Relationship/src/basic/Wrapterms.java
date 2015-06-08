@@ -2,7 +2,9 @@
 package basic;
 
 import java.io.*;
-import myClasses.*;
+import main.*;
+import user.*;
+import rdf.*;
 
 public class Wrapterms implements WraptermsConstants {
    public static void main(String args[])  throws ParseException  {

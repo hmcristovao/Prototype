@@ -1,4 +1,4 @@
-package myClasses;
+package rdf;
 
 public class ItemRDF {
 	

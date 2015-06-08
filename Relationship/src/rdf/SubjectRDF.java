@@ -1,4 +1,4 @@
-package myClasses;
+package rdf;
 
 import com.hp.hpl.jena.rdf.model.Resource;
 

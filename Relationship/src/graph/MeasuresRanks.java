@@ -1,4 +1,5 @@
-package myClasses;
+package graph;
+
 
 public class MeasuresRanks {
 	private int connectedComponentNumber;  

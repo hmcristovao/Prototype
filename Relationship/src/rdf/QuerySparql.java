@@ -1,4 +1,6 @@
-    package myClasses;
+    package rdf;
+
+import user.Concept;
 
 import com.hp.hpl.jena.rdf.model.Model;
 

@@ -1,9 +1,12 @@
-package myClasses;
+package rdf;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
+
+import main.Constants;
+import user.Concept;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
