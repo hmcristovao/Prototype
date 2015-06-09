@@ -4,6 +4,7 @@ import main.Debug;
 
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.Node;
 import org.gephi.statistics.plugin.ConnectedComponents;
 import org.gephi.statistics.plugin.EigenvectorCentrality;
@@ -16,14 +17,13 @@ public class SystemGraphData {
 	private StreamGraphData streamGraphData;
 	private GephiGraphData gephiGraphData;
 	// private - file GEXF ...
-	private NodesTableHash  nodesTableHash;
+	private NodesTableHash  nodesTableHash;  // work like nodes index
 	private NodesTableArray nodesTableArray;
 	private int connectedComponentsCount;
 	private Ranks ranks;
 	private NodesTableArray betweennessSortTable;
 	private NodesTableArray closenessSortTable;
 	private NodesTableArray eigenvectorSortTable;
-	
 	
 	public SystemGraphData() {
 		this(new StreamGraphData(), new GephiGraphData());
@@ -164,34 +164,108 @@ public class SystemGraphData {
 		this.eigenvectorSortTable = this.nodesTableArray.sortEingenvector(); 
 	}
 	
-	
-	public void classifyConnectedComponent() {
+	// clasify connected components and create rank of MeasuresRanks objects
+	public void classifyConnectedComponent_buildSubNetworks() throws Exception {
 		ConnectedComponents connectedComponents = new ConnectedComponents();
 		connectedComponents.execute(this.gephiGraphData.getGraphModel(), this.gephiGraphData.getAttributeModel());
 		this.connectedComponentsCount = connectedComponents.getConnectedComponentsCount();
 		AttributeColumn attributeColumn = gephiGraphData.getAttributeModel().getNodeTable().getColumn(ConnectedComponents.WEAKLY);
+
+		// create a array of the MeasureRank (Ranks object), size = total number of the connect components
+		this.ranks = new Ranks(this.connectedComponentsCount);
+
 		String nodeId;
 		NodeData nodeData;
 		int connectedComponentNumber;
-		for(Node gephiNode: gephiGraphData.getGephiGraph().getNodes()) {
-			// get the number of connected component by Gephi
+		org.gephi.graph.api.Graph currentGephiGraph;
+			
+		for(Node gephiNode: this.gephiGraphData.getGephiGraph().getNodes()) {
+			// get the number of connected component from Gephi
 			nodeId = gephiNode.getNodeData().getId();
 			connectedComponentNumber = (Integer)gephiNode.getNodeData().getAttributes().getValue(attributeColumn.getIndex());
+			
 			// put the number of connected component in NodeData
 			nodeData = this.nodesTableHash.get(nodeId);
 			nodeData.setConnectedComponent(connectedComponentNumber);
-		}	
+			
+			// create a GephiNode object (from current Gephi node) and put it into the GephiGraphData object (belongs to MeasureRank object), by connected component number
+			Node newGephiNode = this.gephiGraphData.getGraphModel().factory().newNode(nodeId);
+			currentGephiGraph = ranks.getMeasuresRankTable(connectedComponentNumber).getGephiGraphData().getGephiGraph();
+			currentGephiGraph.addNode(newGephiNode);
+			
+			// for each edge belonged to gephiNode, copy it to currentGephiGraph
+			Edge edgesGephiNode[] = this.gephiGraphData.getGephiGraph().getEdges(gephiNode).toArray();
+			for(int i=0; i < edgesGephiNode.length; i++) {
+				// add edge into currentGephiGraph
+				currentGephiGraph.addEdge(edgesGephiNode[i]);
+			}
+		}			
+	}
+
+	public void calculateConnectedComponentRanksMeasures() throws Exception {
+		org.gephi.graph.api.Graph currentGephiGraph;
+		int connectedComponentNodesQuantity;
+		NodesTableArray newBasicTable;
+		NodeData nodeData;
+		// for each Gephi Graph belongs to Connected Component:
+		for(int i=0; i < this.ranks.getCount(); i++) {
+			currentGephiGraph = this.ranks.getMeasuresRankTable(i).getGephiGraphData().getGephiGraph();
+			connectedComponentNodesQuantity = currentGephiGraph.getNodeCount();
+			// create the Basic Table Array
+			newBasicTable = new NodesTableArray(connectedComponentNodesQuantity);
+			for(Node gephiNode: currentGephiGraph.getNodes()) {
+				nodeData = this.nodesTableHash.get(gephiNode.toString());
+				newBasicTable.insert(nodeData);
+			}	
+		}
 		
+		////
+		precisa de uma tabela hash para cada connected componente!!!!!
+		para viabilizar a procura dos nós para contruir os ranks
+		A tabela básica continua sendo necessária porque ela será usada para a ordenação
+		/////
+		
+		GephiGraphData currentGephiGraphData;
+		Double betweennessValue, closenessValue, eigenvectorValue;
+		String nodeId;
+		// for each Gephi Graph belongs to Connected Component calculate the measures:
+		for(int i=0; i < this.ranks.getCount(); i++) {
+			currentGephiGraphData = this.ranks.getMeasuresRankTable(i).getGephiGraphData();
+			currentGephiGraphData.buildGephiGraphTable();
+			// copy Betweenness, Closeness and Eigenvector values to NodesTableArray 
+			AttributeColumn attributeColumnBetweenness = gephiGraphData.getAttributeTable().getColumn(GraphDistance.BETWEENNESS);
+			AttributeColumn attributeColumnCloseness   = gephiGraphData.getAttributeTable().getColumn(GraphDistance.CLOSENESS);
+			AttributeColumn attributeColumnEigenvector = gephiGraphData.getAttributeTable().getColumn(EigenvectorCentrality.EIGENVECTOR);
+			for(Node gephiNode: currentGephiGraphData.getGephiGraph().getNodes()) {
+				nodeId = gephiNode.getNodeData().getId();
+				betweennessValue  = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnBetweenness.getIndex());
+				closenessValue    = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnCloseness.getIndex());
+				eigenvectorValue  = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnEigenvector.getIndex());
+				// put the values in NodeData by NodeTableHash
+				nodeData = this.nodesTableHash.get(nodeId);
+				nodeData.setBetweenness(betweennessValue);
+				nodeData.setCloseness(closenessValue);
+				nodeData.setEigenvector(eigenvectorValue);
+			}	
+		}
 	}
 	
-	public void buildRanks() {
-		this.ranks = new Ranks(this.connectedComponentsCount);
+	
+	public void sortMeasuresWholeNetwork() {
+		this.betweennessSortTable = this.nodesTableArray.sortBetwennness();
+		this.closenessSortTable   = this.nodesTableArray.sortCloseness();
+		this.eigenvectorSortTable = this.nodesTableArray.sortEingenvector(); 
+	}
+		// calcular as métricas para cada GephiGraph de cada component connected
+		
+		
+		// criar e ordenar cada rank de cada métrica , de cada connected component
+			
+	}
 
-		// percorrer cada nó e colocar numa nova instância de GephiGraph
-		// percorrer cada nó novamente e cada edge para colocar os edges na mesma instância de GephiGraph
-		
-        // calcular cada conj de métrica para cada GephiGraph
-		
+	public void sortConnectecComponentRanks() {
+
+		// para cada rank ordenar...
 				
 	}
 	

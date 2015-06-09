@@ -6,28 +6,32 @@ import java.util.Comparator;
 public class NodesTableArray {
 	private NodeData table[]; 
 	private int current;
-	private int maxQuantity;
+	private int count;
 	
 	public NodesTableArray(NodeData table[]) {
-		this.table = table;
-		this.maxQuantity = table.length;
+		this.table   = table;
+		this.count   = table.length;
 		this.current = table.length;
 	}
 	
 	public NodesTableArray(int maxQuantity) {
-		this.table = new NodeData[maxQuantity];
+		this.table   = new NodeData[maxQuantity];
 		this.current = 0;
-		this.maxQuantity = maxQuantity;
+		this.count   = maxQuantity;
 	}
 
+	public int getCount() {
+		return this.count;
+	}
+	
 	public void insert(NodeData nodeData) throws Exception {
-		if(this.current == this.maxQuantity)
+		if(this.current == this.count)
 			throw new Exception("Quantity of nodes is larger than capacity");
 		table[current] = nodeData;
 		this.current++;
 	}
 	public NodeData getNodeData(int position) throws Exception {
-		if(position >= this.maxQuantity)
+		if(position >= this.count)
 			throw new Exception("Tried to read NodeData over the table");
 		return this.table[position];
 	}
@@ -38,8 +42,8 @@ public class NodesTableArray {
 		return new NodesTableArray(newTable);
 	}
 	public NodesTableArray sortBetwennness(int first) {
-		if(first > this.maxQuantity)
-			first = this.maxQuantity;
+		if(first > this.count)
+			first = this.count;
 		NodeData newTable[] = Arrays.copyOf(this.table, first);
 		Arrays.sort(newTable, new SortBetweenness());
 		return new NodesTableArray(newTable);
@@ -50,8 +54,8 @@ public class NodesTableArray {
 		return new NodesTableArray(newTable);
 	}
 	public NodesTableArray sortCloseness(int first) {
-		if(first > this.maxQuantity)
-			first = this.maxQuantity;
+		if(first > this.count)
+			first = this.count;
 		NodeData newTable[] = Arrays.copyOf(this.table, first);
 		Arrays.sort(newTable, new SortCloseness());
 		return new NodesTableArray(newTable);
@@ -62,8 +66,8 @@ public class NodesTableArray {
 		return new NodesTableArray(newTable);
 	}
 	public NodesTableArray sortEingenvector(int first) {
-		if(first > this.maxQuantity)
-			first = this.maxQuantity;
+		if(first > this.count)
+			first = this.count;
 		NodeData newTable[] = Arrays.copyOf(this.table, first);
 		Arrays.sort(newTable, new SortEigenvector());
 		return new NodesTableArray(newTable);

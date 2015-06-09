@@ -63,11 +63,14 @@ public class MainProcess implements Constants {
 		    Debug.err("Sorting measures of the whole network...");
 			systemGraphData.sortMeasuresWholeNetwork();
 			
-			Debug.err("Classifying connected component...");
-			systemGraphData.classifyConnectedComponent();
+			Debug.err("Classifying connected component and build sub networks...");
+			systemGraphData.classifyConnectedComponent_buildSubNetworks();
 		    
-			Debug.err("Calculating measures of each connected component and building ranks...");
-			systemGraphData.buildRanks();
+			Debug.err("Calculating connected components rank measures...");
+			systemGraphData.calculateConnectedComponentRanksMeasures();
+
+			Debug.err("Sorting vonnected componets ranks...");
+			systemGraphData.sortConnectecComponentRanks();
 
 			Debug.out("Debug 3",systemGraphData.toString());
 		    
