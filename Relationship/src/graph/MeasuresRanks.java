@@ -4,10 +4,12 @@ package graph;
 public class MeasuresRanks {
 	private int connectedComponentNumber;  
 	private GephiGraphData gephiGraphData; 
-	private NodesTableArray basicTable; // without order, to be used in the building of the other tables 
+	private NodesTableArray basicTable; // without order, to be used in the building of the other tables
+	private int originalQuantity;
 	private NodesTableArray betweenness; 
 	private NodesTableArray closeness;
-	private NodesTableArray eingenvector;
+	private NodesTableArray eigenvector;
+	private NodesTableArray betweennessCloseness;
 	
 	public MeasuresRanks(int number) {
 		this.connectedComponentNumber = number;
@@ -15,7 +17,8 @@ public class MeasuresRanks {
 		this.basicTable               = null; // will be fill before to sort the ranks
 		this.betweenness              = null; // will be fill when happen the sorts to the ranks
 		this.closeness                = null;
-		this.eingenvector             = null;
+		this.eigenvector              = null;
+		this.betweennessCloseness     = null;
 	}
 	
 	public int getConnectedComponentNumber() {
@@ -36,6 +39,12 @@ public class MeasuresRanks {
 	public void setBasicTable(NodesTableArray basicTable) {
 		this.basicTable = basicTable;
 	}
+	public int getOriginalQuantity() {
+		return this.originalQuantity;
+	}
+	public void setOriginalQuantity(int originalQuantity) {
+		this.originalQuantity = originalQuantity;
+	}
 	public NodesTableArray getBetweenness() {
 		return this.betweenness;
 	}
@@ -48,18 +57,24 @@ public class MeasuresRanks {
 	public void setCloseness(NodesTableArray closeness) {
 		this.closeness = closeness;
 	}
-	public NodesTableArray getEingenvector() {
-		return this.eingenvector;
+	public NodesTableArray getEigenvector() {
+		return this.eigenvector;
 	}
-	public void setEingenvector(NodesTableArray eingenvector) {
-		this.eingenvector = eingenvector;
+	public void setEigenvector(NodesTableArray eigenvector) {
+		this.eigenvector = eigenvector;
 	}
-	
+	public NodesTableArray getBetweennessCloseness() {
+		return this.betweennessCloseness;
+	}
+	public void setBetweennessCloseness(NodesTableArray betweennessCloseness) {
+		this.betweennessCloseness = betweennessCloseness;
+	}
+
 	public String toString() {
 		return  "Component connected: " + this.getConnectedComponentNumber() +
 				"Betweenness: " + this.getBetweenness() +
 				"Closeness: " + this.getCloseness() +
-				"Eingenvector: " + this.getEingenvector();
+				"Eigenvector: " + this.getEigenvector();
 	}
 	
 }

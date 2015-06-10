@@ -31,4 +31,7 @@ public interface Constants {
 	boolean ignoreCaseConcept = false;
 
 	enum Level {originalConcept, commonConcept};
+	
+	// proporcion above total original concept
+	double proporcionBetweenness = 4;
 }

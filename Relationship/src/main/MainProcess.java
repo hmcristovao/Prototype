@@ -18,7 +18,7 @@ public class MainProcess implements Constants {
 	public static void head(Wrapterms parser) {
 		try {
 			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
-			SystemGraphData systemGraphData = new SystemGraphData();
+			
 			PrintStream fileConsoleOut, fileConsoleErr;
 			
 			if(!Constants.outPrintConsole) {
@@ -44,15 +44,27 @@ public class MainProcess implements Constants {
 			
 			Debug.out("Debug 2",originalSetQuerySparql.toString());
 			
-			Debug.err("Building graph...");
+			SystemGraphData systemGraphData = new SystemGraphData(originalSetQuerySparql.getTotalConcepts());
 			Graph currentGraph = systemGraphData.getStreamGraphData().getStreamGraph();
-			if(Constants.graphStreamVisualization) 
+			if(Constants.graphStreamVisualization) {
+				Debug.err("Connecting Stream Visualization...");
 				currentGraph.display(true);
+			}
 			if(Constants.gephiVisualization) {
+				Debug.err("Connecting with Gephi...");
 				JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 				currentGraph.addSink(sender);
 			}
-		    systemGraphData.buildSystemGraphData(originalSetQuerySparql);
+		    
+			Debug.err("Building Stream Graph Data...");
+			systemGraphData.getStreamGraphData().buildStreamGraphData(originalSetQuerySparql);
+			
+			Debug.err("Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array...");
+			systemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
+				
+			Debug.err("Building Gephi Graph Table...");
+			systemGraphData.getGephiGraphData().buildGephiGraphTable();
+			
 		    if(Constants.gephiVisualization) {
 				currentGraph.clearSinks();
 			}
@@ -63,13 +75,13 @@ public class MainProcess implements Constants {
 		    Debug.err("Sorting measures of the whole network...");
 			systemGraphData.sortMeasuresWholeNetwork();
 			
-			Debug.err("Classifying connected component and build sub networks...");
-			systemGraphData.classifyConnectedComponent_buildSubNetworks();
+			Debug.err("Classifying connected component and building sub graphs...");
+			systemGraphData.classifyConnectedComponent_BuildSubGraph();
 		    
-			Debug.err("Calculating connected components rank measures...");
-			systemGraphData.calculateConnectedComponentRanksMeasures();
+			Debug.err("Building sub-graphs tables belong to connected components...");
+			systemGraphData.buildBasicTableSubGraph();
 
-			Debug.err("Sorting vonnected componets ranks...");
+			Debug.err("Sorting connected componets ranks...");
 			systemGraphData.sortConnectecComponentRanks();
 
 			Debug.out("Debug 3",systemGraphData.toString());

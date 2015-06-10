@@ -36,6 +36,16 @@ public class NodesTableArray {
 		return this.table[position];
 	}
 	
+	public int calculateOriginalQuantity() {
+		int originalQuantity = 0;
+		for(int i=0; i<this.count; i++) {
+			if(this.table[i].isOriginal())
+			   originalQuantity++;
+		}
+		return originalQuantity;
+	}
+	
+	
 	public NodesTableArray sortBetwennness() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
 		Arrays.sort(newTable, new SortBetweenness());
@@ -60,7 +70,7 @@ public class NodesTableArray {
 		Arrays.sort(newTable, new SortCloseness());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortEingenvector() {
+	public NodesTableArray sortEigenvector() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
 		Arrays.sort(newTable, new SortEigenvector());
 		return new NodesTableArray(newTable);
@@ -72,6 +82,15 @@ public class NodesTableArray {
 		Arrays.sort(newTable, new SortEigenvector());
 		return new NodesTableArray(newTable);
 	}
+	public NodesTableArray sortBetweennessCloseness(int first) {
+		if(first > this.count)
+			first = this.count;
+		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
+		Arrays.sort(newTable, new SortBetweenness());
+		NodeData newNewTable[] = Arrays.copyOf(newTable, first);
+		return new NodesTableArray(newNewTable);
+	}
+
 	
 	public String toString() {
 		StringBuffer str = new StringBuffer();

@@ -1,7 +1,6 @@
 // It is one raw of the table of nodes (NodesTableArray)
 package graph;
 
-
 public class NodeData {
 	// basic data
 	private String strIdNode;
