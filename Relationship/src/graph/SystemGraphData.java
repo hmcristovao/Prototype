@@ -8,8 +8,6 @@ import org.gephi.statistics.plugin.ConnectedComponents;
 import org.gephi.statistics.plugin.EigenvectorCentrality;
 import org.gephi.statistics.plugin.GraphDistance;
 
-import rdf.SetQuerySparql;
-
 public class SystemGraphData {
 	private int originalQuantity;
 	private StreamGraphData streamGraphData;
@@ -166,7 +164,6 @@ public class SystemGraphData {
 
 		// create a array of the MeasureRank (Ranks object), size = total number of the connect components
 		this.ranks = new Ranks(this.connectedComponentsCount);
-
 		String nodeId;
 		NodeData nodeData;
 		int connectedComponentNumber;
@@ -248,8 +245,6 @@ public class SystemGraphData {
 	
 	public String toString() {
 		return  "Stream Graph Data: \n" + this.getStreamGraphData().toString() +
-				//this.getGephiGraphData().toString() +
-				//this.getRanks().toString() +
 				"\nQuantity connected component: " + this.connectedComponentsCount +
 		        "\n\n=================================\nTable array: \n---------------------------------\n" + 
 				this.nodesTableArray.toString() +
@@ -258,6 +253,7 @@ public class SystemGraphData {
 		        "\n\n=================================\nTable array (closeness sorted): \n---------------------------------\n" + 
 				this.closenessSortTable.toString() +
 		        "\n\n=================================\nTable array (eingenvector sorted): \n---------------------------------\n" + 
-				this.eigenvectorSortTable.toString();		
+				this.eigenvectorSortTable.toString() +		
+				this.getRanks().toString();
 	}
 }

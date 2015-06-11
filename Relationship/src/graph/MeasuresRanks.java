@@ -71,10 +71,14 @@ public class MeasuresRanks {
 	}
 
 	public String toString() {
-		return  "Component connected: " + this.getConnectedComponentNumber() +
-				"Betweenness: " + this.getBetweenness() +
-				"Closeness: " + this.getCloseness() +
-				"Eigenvector: " + this.getEigenvector();
+		return  "\n----------------- Sorted sub network ("+this.getConnectedComponentNumber()+
+				") ---------------\nBetweenness: \n\n" + this.getBetweenness() +
+				"\n----------------- Sorted sub network ("+this.getConnectedComponentNumber()+
+				") ---------------\nCloseness: \n\n" + this.getCloseness() +
+				"\n----------------- Sorted sub network ("+this.getConnectedComponentNumber()+
+				") ---------------\nEigenvector: \n\n" + this.getEigenvector()+
+				"\n----------------- Sorted sub network ("+this.getConnectedComponentNumber()+
+				") ---------------\nBetweenness+Closeness: \n\n" + this.getBetweennessCloseness();
 	}
 	
 }

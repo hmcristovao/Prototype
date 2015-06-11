@@ -12,6 +12,8 @@ public class Ranks {
 		for(int i=0; i < quantity; i++){
 			this.measuresRanksTable[i] = new MeasuresRanks(i);
 		}
+		this.count = quantity;
+		this.current = 0;
 	}
 	
 	public int getCount() {
@@ -32,6 +34,15 @@ public class Ranks {
 	}
 	
 	public String toString() {
-		return  Arrays.toString(this.measuresRanksTable);
+		StringBuffer str = new StringBuffer();
+		for(int i=0; i<this.count; i++) {
+			str.append("\n=================================================================");
+			str.append("\n=================================================================");
+			str.append("\nConnected component: "+i);
+			str.append("\n");
+			str.append(this.measuresRanksTable[i].toString());
+			str.append("\n\n");
+		}
+		return  str.toString();
 	}
 }
