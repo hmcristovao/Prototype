@@ -17,86 +17,92 @@ public class MainProcess implements Constants {
 	
 	public static void head(Wrapterms parser) {
 		try {
+			Debug.err("- Starting.");
+			PrintStream printStreamOut = null, printStreamErr = null;
+			if(Constants.outPrintConsole) 
+				printStreamOut = System.out;
+			else
+				printStreamOut = new PrintStream(Constants.nameFileConsoleOut);
+
+			if(Constants.errPrintConsole) 
+				printStreamErr = System.err;
+			else
+				printStreamErr = new PrintStream(Constants.nameFileConsoleErr);
+			System.setOut(printStreamOut);
+			System.setErr(printStreamErr);
+			
 			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
 			
-			PrintStream fileConsoleOut, fileConsoleErr;
-			
-			if(!Constants.outPrintConsole) {
-				fileConsoleOut = new PrintStream(Constants.nameFileConsoleOut);
-				System.setOut(fileConsoleOut);
-			}
-			if(!Constants.errPrintConsole) {
-				fileConsoleErr = new PrintStream(Constants.nameFileConsoleErr);
-				System.setErr(fileConsoleErr);
-			}
-			
-			Debug.err("Parsing terms...");
+			Debug.err("- Parsing terms.");
 			parser = new Wrapterms(new FileInputStream(Constants.nameFileInput));
 			parser.start(originalSetQuerySparql);
 			
 			Debug.out("Debug 1",originalSetQuerySparql.toString());
 			
-			Debug.err("Assembling queries...");
+			Debug.err("- Assembling queries.");
 			originalSetQuerySparql.fillQuery();
 			
-			Debug.err("Collecting RDFs...");
+			Debug.err("- Collecting RDFs.");
+			if(disableWarningLog4j) 
+				System.setErr(new PrintStream(Constants.nameFileConsoleWarn)); 
 			originalSetQuerySparql.fillRDFs();
+			if(disableWarningLog4j) 
+				System.setErr(printStreamErr); 
 			
 			Debug.out("Debug 2",originalSetQuerySparql.toString());
 			
 			SystemGraphData systemGraphData = new SystemGraphData(originalSetQuerySparql.getTotalConcepts());
 			Graph currentGraph = systemGraphData.getStreamGraphData().getStreamGraph();
 			if(Constants.graphStreamVisualization) {
-				Debug.err("Connecting Stream Visualization...");
+				Debug.err("- Connecting Stream Visualization.");
 				currentGraph.display(true);
 			}
 			if(Constants.gephiVisualization) {
-				Debug.err("Connecting with Gephi...");
+				Debug.err("- Connecting with Gephi.");
 				JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 				currentGraph.addSink(sender);
 			}
 		    
-			Debug.err("Building Stream Graph Data...");
+			Debug.err("- Building Stream Graph Data.");
 			systemGraphData.getStreamGraphData().buildStreamGraphData(originalSetQuerySparql);
 			
-			Debug.err("Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array...");
+			Debug.err("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array.");
 			systemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
 				
-			Debug.err("Building Gephi Graph Table...");
+			Debug.err("- Building Gephi Graph Table.");
 			systemGraphData.getGephiGraphData().buildGephiGraphTable();
 			
 		    if(Constants.gephiVisualization) {
 				currentGraph.clearSinks();
 			}
 		    
-		    Debug.err("Calculating measures of the whole network...");
+		    Debug.err("- Calculating measures of the whole network.");
 			systemGraphData.calculateMeasuresWholeNetwork();
 		    
-		    Debug.err("Sorting measures of the whole network...");
+		    Debug.err("- Sorting measures of the whole network.");
 			systemGraphData.sortMeasuresWholeNetwork();
 			
-			Debug.err("Classifying connected component and building sub graphs...");
+			Debug.err("- Classifying connected component and building sub graphs.");
 			systemGraphData.classifyConnectedComponent_BuildSubGraph();
 		    
-			Debug.err("Building sub-graphs tables belong to connected components...");
+			Debug.err("- Building sub-graphs tables belong to connected components.");
 			systemGraphData.buildBasicTableSubGraph();
 
-			Debug.err("Sorting connected componets ranks...");
+			Debug.err("- Sorting connected componets ranks.");
 			systemGraphData.sortConnectecComponentRanks();
 
 			Debug.out("Debug 3",systemGraphData.toString());
 		    
-		    Debug.err("Analysing graph data...");
+		    Debug.err("- Analysing graph data.");
 			systemGraphData.analyseGraphData();
 
-			Debug.err("Closing...");
+			Debug.err("- Closing.");
 		    if(Constants.graphStreamVisualization) 
 				currentGraph.clear();
-			if(!Constants.outPrintConsole)
-				fileConsoleOut.close();
-			if(!Constants.errPrintConsole)
-				fileConsoleErr.close();
-			Debug.err("Ok!");
+			
+			Debug.err("- Ok!");
+		    printStreamOut.close();
+		    printStreamErr.close();
 		}
 		catch(FileNotFoundException e) {
 			System.err.println("Error: file not found.");

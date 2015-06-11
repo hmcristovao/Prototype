@@ -1,7 +1,5 @@
 package graph;
 
-import java.util.Arrays;
-
 public class Ranks {
 	private MeasuresRanks measuresRanksTable[];  // 0 position correspond to total network
 	private int current;

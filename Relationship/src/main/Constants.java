@@ -3,11 +3,13 @@ package main;
 public interface Constants {
 	boolean outPrintConsole = false;
 	boolean errPrintConsole = true;
+	boolean disableWarningLog4j = true;
 	
-	String nameFileConsoleOut = "txt_files\\consoleOut.txt";
-	String nameFileConsoleErr = "txt_files\\consoleErr.txt";
+	String nameFileConsoleOut  = "txt_files\\consoleOut.txt";
+	String nameFileConsoleErr  = "txt_files\\consoleErr.txt";
+	String nameFileConsoleWarn = "txt_files\\consoleWarn.txt";
 
-	String nameFileInput = "txt_files\\terms3.txt";
+	String nameFileInput = "txt_files\\terms7.txt";
 	
 	String nameFileQueryDefault = "txt_files\\query.txt";
 
