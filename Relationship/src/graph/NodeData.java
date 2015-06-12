@@ -1,13 +1,15 @@
 // It is one raw of the table of nodes (NodesTableArray)
 package graph;
 
+import main.Constants;
+
 public class NodeData {
 	// basic data
 	private String strIdNode;
 	private String shortName;
 	private org.graphstream.graph.Node streamNode;
 	private org.gephi.graph.api.Node gephiNode;
-	private boolean original;
+	private Constants.Level status;
 
 	// extra attributes
 	private String homepageAttribute;
@@ -20,7 +22,6 @@ public class NodeData {
 	private double betweenness;
 	private double closeness;
 	private double eigenvector;
-	private int candidateLevel;
 	private int partitioning;
 	
 	// constructor to permanent data
@@ -28,12 +29,12 @@ public class NodeData {
 					String shortName, 
 					org.graphstream.graph.Node streamNode, 
 					org.gephi.graph.api.Node gephiNode,
-					boolean original) {
+					Constants.Level status) {
 		this.strIdNode         = strIdNode;
 		this.shortName         = shortName;
 		this.streamNode        = streamNode;
 		this.gephiNode         = gephiNode;
-		this.original          = original;
+		this.status	    	   = status;
 		this.homepageAttribute = null;
 		this.abstractAttribute = null;
 		this.commentAttribute  = null;
@@ -43,11 +44,11 @@ public class NodeData {
 					String shortName, 
 					StreamGraphData streamGraphData, 
 					GephiGraphData gephiGraphData, 
-					boolean original) {
+					Constants.Level status) {
 		this(strIdNode, shortName, 
 			 streamGraphData.getStreamGraph().getNode(strIdNode), 
 			 gephiGraphData.getGephiGraph().getNode(strIdNode), 
-			 original);
+			 status);
 	}
 	public String getStrIdNode() {
 		return this.strIdNode;
@@ -61,8 +62,23 @@ public class NodeData {
 	public org.gephi.graph.api.Node getGephiNode() {
 		return this.gephiNode;
 	}
-	public boolean isOriginal() {
-		return this.original;
+	public Constants.Level getStatus() {
+		return this.status;
+	}
+	public String getStrStatus() {
+		String str = null;
+		if(this.status == Constants.Level.commonConcept)
+			str = "common";
+		else if(this.status == Constants.Level.originalConcept)
+			str = "original";
+		else if(this.status == Constants.Level.selectedBetweennessClosenessConcept)
+			str = "selected by betweenness+closeness";
+		else if(this.status == Constants.Level.selectedBetweennessClosenessConcept)
+			str = "selected by eigenvector";
+		return str;
+	}
+	public void setStatus(Constants.Level status) {
+		this.status = status;
 	}
 
 	public String getHomepageAttribute() {
@@ -90,7 +106,7 @@ public class NodeData {
 		this.imageAttribute = imageAttribute;
 	}
 
-	public double connectedComponent() {
+	public double getConnectedComponent() {
 		return this.connectedComponent;
 	}
 	public void setConnectedComponent(int connectedComponent) {
@@ -114,12 +130,6 @@ public class NodeData {
 	public void setEigenvector(double eigenvector) {
 		this.eigenvector = eigenvector;
 	}
-	public int getCandidateLevel() {
-		return this.candidateLevel;
-	}
-	public void setCandidateLevel(int candidateLevel) {
-		this.candidateLevel = candidateLevel;
-	}
 	public int getPartitioning() {
 		return this.partitioning;
 	}
@@ -135,12 +145,11 @@ public class NodeData {
 	public String toString() {
 		return  "Id: " + this.getStrIdNode() +
 				"\nShort name: " + this.getShortName() +
-				"\nOriginal: " + this.isOriginal() +
-				"\nConnected component: " + this.connectedComponent +
+				"\nStatus: " + this.getStrStatus() +
+				"\nConnected component: " + this.getConnectedComponent() +
 				"\nBetweenness: " + this.getBetweenness() +
 				"\nCloseness: " + this.getCloseness() +
 				"\nEigenvector: " + this.getEigenvector() +
-				"\nCandidate level: " + this.getCandidateLevel() +
 				"\nPartitioning: " + this.getPartitioning();
 	}
 }

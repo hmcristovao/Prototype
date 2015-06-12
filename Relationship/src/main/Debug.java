@@ -31,8 +31,10 @@ public class Debug {
 		System.err.println(msg);
 	}
 	public static void err(double value) {
-		System.err.println("\n");
-		System.err.println(value);
+		System.err.println("\n" + value + "\n");
+	}
+	public static void err(String msg, double value) {
+		System.err.println("\n" + msg + ": " + value + "\n");
 	}
 		
 	

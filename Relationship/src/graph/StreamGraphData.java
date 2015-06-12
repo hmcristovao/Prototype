@@ -118,50 +118,56 @@ public class StreamGraphData {
 		Node node = null;
 		Edge edge = null;
 		try {
-			node = this.streamGraph.addNode(subjectRDF.getValue());
+			node = this.streamGraph.addNode(subjectRDF.getLongName());
 			quantityNodesEdges.incNumNodes();
 			node.addAttribute("shortname", Concept.underlineToBlank(subjectRDF.getShortName()));
-			node.addAttribute("original", (((NodeRDF)subjectRDF).getLevel() == Constants.Level.originalConcept) ? "true" : "false");
+			if(((NodeRDF)subjectRDF).getStatus() == Constants.Level.originalConcept)
+				node.addAttribute("original", "true");
+			else
+				node.addAttribute("original", "false");
 			if(Constants.nodeLabel)
 				node.addAttribute("label", subjectRDF.getShortName());
 			// if main node, put label
-			if(((NodeRDF)subjectRDF).getLevel() == Constants.Level.originalConcept) { 
+			if(((NodeRDF)subjectRDF).getStatus() == Constants.Level.originalConcept) { 
 				node.addAttribute("label", Concept.underlineToBlank(subjectRDF.getShortName()));
 			}		
 		}
 		catch(IdAlreadyInUseException e) {
 			// repeated node, do nothing
-			node = this.streamGraph.getNode(subjectRDF.getValue());
+			node = this.streamGraph.getNode(subjectRDF.getLongName());
 		}
 		// if predicate is known, transform it in attributes into node
-		if(predicateRDF.getValue().equals(Constants.addressBasic + "homepage"))
-			node.addAttribute("homepage", objectRDF.getValue());
-		else if(predicateRDF.getValue().equals(Constants.addressBasic + "comment"))
-			node.addAttribute("comment", objectRDF.getValue());
-		else if(predicateRDF.getValue().equals(Constants.addressBasic + "abstract"))
-			node.addAttribute("abstract", objectRDF.getValue());
-		else if(predicateRDF.getValue().equals(Constants.addressBasic + "image"))
-			node.addAttribute("image", objectRDF.getValue());
+		if(predicateRDF.getLongName().equals(Constants.addressBasic + "homepage"))
+			node.addAttribute("homepage", objectRDF.getLongName());
+		else if(predicateRDF.getLongName().equals(Constants.addressBasic + "comment"))
+			node.addAttribute("comment", objectRDF.getLongName());
+		else if(predicateRDF.getLongName().equals(Constants.addressBasic + "abstract"))
+			node.addAttribute("abstract", objectRDF.getLongName());
+		else if(predicateRDF.getLongName().equals(Constants.addressBasic + "image"))
+			node.addAttribute("image", objectRDF.getLongName());
         // insert common predicate (unknown)
 		else {
 			try {
-				node = this.streamGraph.addNode(objectRDF.getValue());
+				node = this.streamGraph.addNode(objectRDF.getLongName());
 				quantityNodesEdges.incNumNodes();
 				node.addAttribute("shortname", Concept.underlineToBlank(objectRDF.getShortName()));
-				node.addAttribute("original", (((NodeRDF)objectRDF).getLevel() == Constants.Level.originalConcept) ? "true" : "false");
+				if(((NodeRDF)objectRDF).getStatus() == Constants.Level.originalConcept)
+					node.addAttribute("original", "true");
+				else
+					node.addAttribute("original", "false");
 				if(Constants.nodeLabel)
 					node.addAttribute("label", objectRDF.getShortName());
 				// if main node, put label 
-				if(((NodeRDF)objectRDF).getLevel() == Constants.Level.originalConcept) { 
+				if(((NodeRDF)objectRDF).getStatus() == Constants.Level.originalConcept) { 
 					node.addAttribute("label", Concept.underlineToBlank(objectRDF.getShortName()));
 				}
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated node, do nothing
-				node = this.streamGraph.getNode(objectRDF.getValue());
+				node = this.streamGraph.getNode(objectRDF.getLongName());
 			}
 			try {
-				edge = this.streamGraph.addEdge(predicateRDF.getValue(), subjectRDF.getValue(), objectRDF.getValue(),true);
+				edge = this.streamGraph.addEdge(predicateRDF.getLongName(), subjectRDF.getLongName(), objectRDF.getLongName(),true);
 				quantityNodesEdges.incNumEdges();
 				if(Constants.edgeLabel)
 					edge.addAttribute("label", predicateRDF.getShortName());
@@ -169,7 +175,7 @@ public class StreamGraphData {
 			catch(IdAlreadyInUseException e) {
 				// repeated edge, insert a different element in the identifying string and try again
 				StreamGraphData.incModifier();
-				edge = this.streamGraph.addEdge(predicateRDF.getValue()+" - "+StreamGraphData.getStrModifier(), subjectRDF.getValue(), objectRDF.getValue(),true);
+				edge = this.streamGraph.addEdge(predicateRDF.getLongName()+" - "+StreamGraphData.getStrModifier(), subjectRDF.getLongName(), objectRDF.getLongName(),true);
 				quantityNodesEdges.incNumEdges();
 				if(Constants.edgeLabel)
 					// add modifier to differentiate each link into the graph

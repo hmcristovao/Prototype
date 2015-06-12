@@ -10,6 +10,13 @@ public class OneRDF {
 	private ItemRDF predicate;
 	private ItemRDF object;
 	
+	public OneRDF(Statement statement, ItemRDF subject, ItemRDF predicate, ItemRDF object) {
+		this.statement = statement;
+		this.subject   = subject;
+		this.predicate = predicate;
+		this.object    = object;
+	}
+
 	public ItemRDF getSubject() {
 		return this.subject;
 	}
@@ -23,13 +30,6 @@ public class OneRDF {
 		return this.statement;
 	}
 	
-	public OneRDF(Statement statement, ItemRDF subject, ItemRDF predicate, ItemRDF object) {
-		this.statement = statement;
-		this.subject   = subject;
-		this.predicate = predicate;
-		this.object    = object;
-	}
-
 	@Override
 	public String toString() {
 		return  "\nsubject = " + this.getSubject() + 

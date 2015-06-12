@@ -1,6 +1,9 @@
 package graph;
 
+import java.util.LinkedList;
+
 import main.*;
+
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
@@ -86,20 +89,21 @@ public class SystemGraphData {
 	public void buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
 		org.graphstream.graph.Graph streamGraph = streamGraphData.getStreamGraph();
 		this.nodesTableArray = new NodesTableArray(this.getStreamGraphData().getTotalNodes());
+		String idNode;
 		NodeData newNodeData = null;
+		Constants.Level status;
 		// each node: add in graphData, nodesTableArray and nodesTableHash
 		for( org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
 			// add node in gephiGraphData
-			String idNode = streamNode.toString();
+			idNode = streamNode.toString();
 			Node gephiNode = this.gephiGraphData.getGraphModel().factory().newNode(idNode);
 			this.gephiGraphData.getGephiGraph().addNode(gephiNode);
+			if(streamNode.getAttribute("original").toString().compareTo("true")==0)
+				status = Constants.Level.originalConcept;
+			else
+				status = Constants.Level.commonConcept;
 			// create a new NodeData object
-			newNodeData = new NodeData(idNode, 
-					                   streamNode.getAttribute("shortname").toString(),
-					                   streamNode,
-					                   gephiNode,
-					                   (streamNode.getAttribute("original").toString().compareTo("true")==0 ? true : false)
-					                  );
+			newNodeData = new NodeData(idNode, streamNode.getAttribute("shortname").toString(), streamNode, gephiNode, status);
 			// add attributes to new nodeData
 			if(streamNode.getAttribute("homepage") != null) 
 				newNodeData.setHomepageAttribute(streamNode.getAttribute("homepage").toString());
@@ -239,9 +243,96 @@ public class SystemGraphData {
 		}
 	}
 	
-	public void analyseGraphData() {
-		
+	
+	public void analyseGraphData() throws Exception {
+		// First part of selection
+		this.selectLargestNodesBetweennessCloseness();
+		// Second part of selection
+		this.selectLargestNodesEigenvector();
 	}
+
+	private void selectLargestNodesBetweennessCloseness() throws Exception {
+		// quantity of nodes to selection (about the quantity total of original nodes)
+		final double proporcion = 0.5;
+		// precision added to the calculation for rounding
+		final double precision = 0.5; 
+
+		// quantity total of nodes to change the status (all connected components)
+		int countTotalSelectNodes = (int)(this.originalQuantity * proporcion);
+		
+		int countConnectedComponentSelectNodes;
+		for(int i=0; i < this.connectedComponentsCount; i++) {
+			// calculate proportionate the quantity to each connected component group  
+			countConnectedComponentSelectNodes = (int)(((double)countTotalSelectNodes / (double)this.originalQuantity) * this.ranks.getMeasuresRankTable(i).getOriginalQuantity() + precision);
+			// mark the level of the firt nodes to new status, except original nodes
+			for(int j=0, k=0; k < countConnectedComponentSelectNodes; j++) {
+				// if it is not original node, it changes status
+				if(this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).getStatus() != Constants.Level.originalConcept) {
+					this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).setStatus(Constants.Level.selectedBetweennessClosenessConcept);
+					k++;
+				}
+			}	
+		}
+	}
+	
+	private void selectLargestNodesEigenvector() throws Exception {
+		// quantity of nodes to selection (about the quantity total of original nodes)
+		final double proporcion = 1.3;
+		// precision added to the calculation for rounding
+		final double precision = 0.5; 
+
+		// quantity total of nodes to change the status (all connected components)
+		int countTotalSelectNodes = (int)(this.originalQuantity * proporcion);
+		
+		int countConnectedComponentSelectNodes;
+		for(int i=0; i < this.connectedComponentsCount; i++) {
+			// calculate proportionate the quantity to each connected component group  
+			countConnectedComponentSelectNodes = (int)(((double)countTotalSelectNodes / (double)this.originalQuantity) * this.ranks.getMeasuresRankTable(i).getOriginalQuantity() + precision);
+			// mark the level of the firt nodes to new status, except original nodes
+			for(int j=0, k=0; k < countConnectedComponentSelectNodes; j++) {
+				// if it is not original node, it changes status
+				if(this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).getStatus() != Constants.Level.originalConcept) {
+					this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).setStatus(Constants.Level.selectedEigenvectorConcept);
+					k++;
+				}
+			}	
+		}
+	}
+	
+	public String reportSelectedNodes() throws Exception {
+		StringBuffer str = new StringBuffer();
+		LinkedList<String> listOriginalConcepts = null;
+		LinkedList<String> listNewConceptsBetweennessCloseness = null;
+		LinkedList<String> listNewConceptsEigenvector = null;
+		NodeData currentNodeData = null;
+		for(int i=0; i < this.connectedComponentsCount; i++) {
+			str.append("\n\n================================================");
+			str.append("\nConnected component number: ");
+			str.append(this.ranks.getMeasuresRankTable(i).getConnectedComponentNumber());
+			str.append("\n");
+			listOriginalConcepts = new LinkedList<String>();
+			listNewConceptsBetweennessCloseness = new LinkedList<String>();
+			listNewConceptsEigenvector = new LinkedList<String>();
+			for(int j=0; j < this.ranks.getMeasuresRankTable(i).getBasicTable().getCount(); j++) {
+				currentNodeData = this.ranks.getMeasuresRankTable(i).getBasicTable().getNodeData(j);
+				if(currentNodeData.getStatus() == Constants.Level.originalConcept) 
+					listOriginalConcepts.add(currentNodeData.getShortName());
+				else if(currentNodeData.getStatus() == Constants.Level.selectedBetweennessClosenessConcept)
+					listNewConceptsBetweennessCloseness.add(currentNodeData.getShortName());
+				else if(currentNodeData.getStatus() == Constants.Level.selectedEigenvectorConcept) 
+					listNewConceptsEigenvector.add(currentNodeData.getShortName());
+			}
+			str.append("\nOriginal concepts:\n ");
+			str.append(listOriginalConcepts.toString());
+			str.append("\n\nNew concepts (added by betweenness + closeness rank):\n ");
+			str.append(listNewConceptsBetweennessCloseness.toString());
+			str.append("\n\nNew concepts (added by eigenvector rank):\n ");
+			str.append(listNewConceptsEigenvector.toString());			
+			str.append("\n");
+		}
+		return str.toString();
+	}
+	
 	
 	public String toString() {
 		return  "Stream Graph Data: \n" + this.getStreamGraphData().toString() +

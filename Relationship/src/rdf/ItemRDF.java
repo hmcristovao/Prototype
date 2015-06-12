@@ -2,15 +2,15 @@ package rdf;
 
 public class ItemRDF {
 	
-	private String value;
+	private String longName;
 	private String shortName;
 	
-	public ItemRDF(String value) {
-		this.value = value;
-		this.shortName = ItemRDF.doShortName(value);
+	public ItemRDF(String longName) {
+		this.longName = longName;
+		this.shortName = ItemRDF.doShortName(longName);
 	}
-	public String getValue() {
-		return this.value;
+	public String getLongName() {
+		return this.longName;
 	}
 	public String getShortName() {
 		return this.shortName;
@@ -26,7 +26,7 @@ public class ItemRDF {
 	
 	@Override
 	public String toString() {
-		return this.getValue() + " (" + this.getShortName() + ")";
+		return this.getLongName() + " (" + this.getShortName() + ")";
 	}
 
 }

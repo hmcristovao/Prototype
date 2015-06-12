@@ -90,11 +90,14 @@ public class MainProcess implements Constants {
 
 			Debug.err("- Sorting connected componets ranks.");
 			systemGraphData.sortConnectecComponentRanks();
+ 
+		    Debug.err("- Analysing graph data and selecting candidate nodes.");
+			systemGraphData.analyseGraphData();
 
 			Debug.out("Debug 3",systemGraphData.toString());
-		    
-		    Debug.err("- Analysing graph data.");
-			systemGraphData.analyseGraphData();
+
+		    Debug.err("- Reporting selected nodes to new interation.");
+			Debug.out(systemGraphData.reportSelectedNodes());
 
 			Debug.err("- Closing.");
 		    if(Constants.graphStreamVisualization) 

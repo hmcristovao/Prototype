@@ -3,20 +3,18 @@ package rdf;
 import main.Constants;
 
 public class NodeRDF extends ItemRDF {
-	private Constants.Level level;   
-	// level can be:
-	// Contants.Level.originalConcept
-	// Constants.Level.commonConcept
+	private Constants.Level status;   
 	
 	public NodeRDF(String value, SetQuerySparql setQuerySparql) {
 		super(value);
-		this.level = this.qualifyLevel(setQuerySparql);
+		this.status = this.qualifyStatus(setQuerySparql);
 	}
-	public Constants.Level getLevel() {
-		return this.level;
+	public Constants.Level getStatus() {
+		return this.status;
 	}
 	
-	public Constants.Level qualifyLevel(SetQuerySparql setQuerySparql) {
+	// verify if the node belongs to original concepts list
+	private Constants.Level qualifyStatus(SetQuerySparql setQuerySparql) {
 		for(QuerySparql x: setQuerySparql.getList()) {
 			if(Constants.ignoreCaseConcept) {
 				if(this.getShortName().equalsIgnoreCase(x.getConcept().getUnderlineConcept())) 
@@ -28,6 +26,14 @@ public class NodeRDF extends ItemRDF {
 			}
 		}
 		return Constants.Level.commonConcept;
+	}
+	
+	public String toString() {
+		StringBuffer out = new StringBuffer();
+		out.append(super.toString());
+		if(this.status == Constants.Level.originalConcept) 
+			out.append(" - \"original concept\"");
+		return out.toString();
 	}
 
 }

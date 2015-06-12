@@ -3,6 +3,8 @@ package graph;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import main.*;
+
 public class NodesTableArray {
 	private NodeData table[]; 
 	private int current;
@@ -39,7 +41,7 @@ public class NodesTableArray {
 	public int calculateOriginalQuantity() {
 		int originalQuantity = 0;
 		for(int i=0; i<this.count; i++) {
-			if(this.table[i].isOriginal())
+			if(this.table[i].getStatus() == Constants.Level.originalConcept)
 			   originalQuantity++;
 		}
 		return originalQuantity;

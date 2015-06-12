@@ -9,7 +9,7 @@ public interface Constants {
 	String nameFileConsoleErr  = "txt_files\\consoleErr.txt";
 	String nameFileConsoleWarn = "txt_files\\consoleWarn.txt";
 
-	String nameFileInput = "txt_files\\terms7.txt";
+	String nameFileInput = "txt_files\\terms.txt";
 	
 	String nameFileQueryDefault = "txt_files\\query.txt";
 
@@ -32,8 +32,9 @@ public interface Constants {
 	boolean nodeLabel = 		true; // original concepts always have label
 	boolean ignoreCaseConcept = false;
 
-	enum Level {originalConcept, commonConcept};
+	enum Level {commonConcept, originalConcept, selectedBetweennessClosenessConcept, selectedEigenvectorConcept };
 	
 	// proporcion above total original concept
 	double proporcionBetweenness = 4;
+	
 }
