@@ -5,7 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 
-import main.Constants;
+import main.Config;
 import user.Concept;
 
 import com.hp.hpl.jena.query.Query;
@@ -64,7 +64,7 @@ public class SetQuerySparql {
 		return out.toString();
 	}
 	private StringBuffer readFileQueryDefault() throws IOException {
-		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(Constants.nameFileQueryDefault));
+		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(Config.nameFileQueryDefault));
 		StringBuffer queryDefault = new StringBuffer();
 		String linhaAux = null;
 	    while (true) {
@@ -120,7 +120,7 @@ public class SetQuerySparql {
 			querySparql = this.getList().get(i);
 			queryStr = querySparql.getQueryString().getQueryStrString();
 			query = QueryFactory.create(queryStr);
-			queryExecution = QueryExecutionFactory.sparqlService(Constants.serviceEndpoint,  query);
+			queryExecution = QueryExecutionFactory.sparqlService(Config.serviceEndpoint,  query);
 			model = queryExecution.execConstruct();
 			querySparql.setModel(model);
 			listRDF = querySparql.getListRDF();

@@ -1,7 +1,7 @@
 // It is one raw of the table of nodes (NodesTableArray)
 package graph;
 
-import main.Constants;
+import main.Config;
 
 public class NodeData {
 	// basic data
@@ -9,7 +9,7 @@ public class NodeData {
 	private String shortName;
 	private org.graphstream.graph.Node streamNode;
 	private org.gephi.graph.api.Node gephiNode;
-	private Constants.Level status;
+	private Config.Level status;
 
 	// extra attributes
 	private String homepageAttribute;
@@ -29,7 +29,7 @@ public class NodeData {
 					String shortName, 
 					org.graphstream.graph.Node streamNode, 
 					org.gephi.graph.api.Node gephiNode,
-					Constants.Level status) {
+					Config.Level status) {
 		this.strIdNode         = strIdNode;
 		this.shortName         = shortName;
 		this.streamNode        = streamNode;
@@ -44,7 +44,7 @@ public class NodeData {
 					String shortName, 
 					StreamGraphData streamGraphData, 
 					GephiGraphData gephiGraphData, 
-					Constants.Level status) {
+					Config.Level status) {
 		this(strIdNode, shortName, 
 			 streamGraphData.getStreamGraph().getNode(strIdNode), 
 			 gephiGraphData.getGephiGraph().getNode(strIdNode), 
@@ -62,22 +62,22 @@ public class NodeData {
 	public org.gephi.graph.api.Node getGephiNode() {
 		return this.gephiNode;
 	}
-	public Constants.Level getStatus() {
+	public Config.Level getStatus() {
 		return this.status;
 	}
 	public String getStrStatus() {
 		String str = null;
-		if(this.status == Constants.Level.commonConcept)
+		if(this.status == Config.Level.commonConcept)
 			str = "common";
-		else if(this.status == Constants.Level.originalConcept)
+		else if(this.status == Config.Level.originalConcept)
 			str = "original";
-		else if(this.status == Constants.Level.selectedBetweennessClosenessConcept)
+		else if(this.status == Config.Level.selectedBetweennessClosenessConcept)
 			str = "selected by betweenness+closeness";
-		else if(this.status == Constants.Level.selectedBetweennessClosenessConcept)
+		else if(this.status == Config.Level.selectedBetweennessClosenessConcept)
 			str = "selected by eigenvector";
 		return str;
 	}
-	public void setStatus(Constants.Level status) {
+	public void setStatus(Config.Level status) {
 		this.status = status;
 	}
 

@@ -91,7 +91,7 @@ public class SystemGraphData {
 		this.nodesTableArray = new NodesTableArray(this.getStreamGraphData().getTotalNodes());
 		String idNode;
 		NodeData newNodeData = null;
-		Constants.Level status;
+		Config.Level status;
 		// each node: add in graphData, nodesTableArray and nodesTableHash
 		for( org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
 			// add node in gephiGraphData
@@ -99,9 +99,9 @@ public class SystemGraphData {
 			Node gephiNode = this.gephiGraphData.getGraphModel().factory().newNode(idNode);
 			this.gephiGraphData.getGephiGraph().addNode(gephiNode);
 			if(streamNode.getAttribute("original").toString().compareTo("true")==0)
-				status = Constants.Level.originalConcept;
+				status = Config.Level.originalConcept;
 			else
-				status = Constants.Level.commonConcept;
+				status = Config.Level.commonConcept;
 			// create a new NodeData object
 			newNodeData = new NodeData(idNode, streamNode.getAttribute("shortname").toString(), streamNode, gephiNode, status);
 			// add attributes to new nodeData
@@ -237,13 +237,12 @@ public class SystemGraphData {
 			sortedNodesTableArray  = currentNodesTableArray.sortEigenvector();
 			this.ranks.getMeasuresRankTable(i).setEigenvector(sortedNodesTableArray);
 			
-			int filterQuantity = (int)(this.getOriginalQuantity() * Constants.proporcionBetweenness);
+			int filterQuantity = (int)(this.getOriginalQuantity() * Config.proporcionBetweenness);
 			sortedNodesTableArray  = currentNodesTableArray.sortBetweennessCloseness(filterQuantity);
 			this.ranks.getMeasuresRankTable(i).setBetweennessCloseness(sortedNodesTableArray);	
 		}
 	}
-	
-	
+		
 	public void analyseGraphData() throws Exception {
 		// First part of selection
 		this.selectLargestNodesBetweennessCloseness();
@@ -252,23 +251,23 @@ public class SystemGraphData {
 	}
 
 	private void selectLargestNodesBetweennessCloseness() throws Exception {
-		// quantity of nodes to selection (about the quantity total of original nodes)
-		final double proporcion = 0.5;
-		// precision added to the calculation for rounding
-		final double precision = 0.5; 
-
 		// quantity total of nodes to change the status (all connected components)
-		int countTotalSelectNodes = (int)(this.originalQuantity * proporcion);
-		
+		int countTotalSelectNodes = (int)(this.originalQuantity * Config.proporcionBetweennessCloseness);
 		int countConnectedComponentSelectNodes;
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			// calculate proportionate the quantity to each connected component group  
-			countConnectedComponentSelectNodes = (int)(((double)countTotalSelectNodes / (double)this.originalQuantity) * this.ranks.getMeasuresRankTable(i).getOriginalQuantity() + precision);
+			countConnectedComponentSelectNodes = 
+			(int)( ( (double)countTotalSelectNodes / (double)this.originalQuantity) * 
+					this.ranks.getMeasuresRankTable(i).getOriginalQuantity() + 
+			        Config.precisionBetweennessCloseness
+			      );
 			// mark the level of the firt nodes to new status, except original nodes
-			for(int j=0, k=0; k < countConnectedComponentSelectNodes; j++) {
-				// if it is not original node, it changes status
-				if(this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).getStatus() != Constants.Level.originalConcept) {
-					this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).setStatus(Constants.Level.selectedBetweennessClosenessConcept);
+			for(int j=0, k=0; k < countConnectedComponentSelectNodes &&
+					          j < this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getCount(); 
+				j++) {
+				// changes status only of common nodes
+				if(this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).getStatus() == Config.Level.commonConcept) {
+					this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).setStatus(Config.Level.selectedBetweennessClosenessConcept);
 					k++;
 				}
 			}	
@@ -276,23 +275,23 @@ public class SystemGraphData {
 	}
 	
 	private void selectLargestNodesEigenvector() throws Exception {
-		// quantity of nodes to selection (about the quantity total of original nodes)
-		final double proporcion = 1.3;
-		// precision added to the calculation for rounding
-		final double precision = 0.5; 
-
 		// quantity total of nodes to change the status (all connected components)
-		int countTotalSelectNodes = (int)(this.originalQuantity * proporcion);
-		
+		int countTotalSelectNodes = (int)(this.originalQuantity * Config.proporcionEigenvector);
 		int countConnectedComponentSelectNodes;
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			// calculate proportionate the quantity to each connected component group  
-			countConnectedComponentSelectNodes = (int)(((double)countTotalSelectNodes / (double)this.originalQuantity) * this.ranks.getMeasuresRankTable(i).getOriginalQuantity() + precision);
+			countConnectedComponentSelectNodes = 
+			(int)( ( (double)countTotalSelectNodes / (double)this.originalQuantity) * 
+					this.ranks.getMeasuresRankTable(i).getOriginalQuantity() + 
+			        Config.precisionEigenvector
+			      );
 			// mark the level of the firt nodes to new status, except original nodes
-			for(int j=0, k=0; k < countConnectedComponentSelectNodes; j++) {
-				// if it is not original node, it changes status
-				if(this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).getStatus() != Constants.Level.originalConcept) {
-					this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).setStatus(Constants.Level.selectedEigenvectorConcept);
+			for(int j=0, k=0; k < countConnectedComponentSelectNodes && 
+					          j < this.ranks.getMeasuresRankTable(i).getEigenvector().getCount();  
+				j++) {
+				// changes status only of common nodes
+				if(this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).getStatus() == Config.Level.commonConcept) {
+					this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).setStatus(Config.Level.selectedEigenvectorConcept);
 					k++;
 				}
 			}	
@@ -315,11 +314,11 @@ public class SystemGraphData {
 			listNewConceptsEigenvector = new LinkedList<String>();
 			for(int j=0; j < this.ranks.getMeasuresRankTable(i).getBasicTable().getCount(); j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getBasicTable().getNodeData(j);
-				if(currentNodeData.getStatus() == Constants.Level.originalConcept) 
+				if(currentNodeData.getStatus() == Config.Level.originalConcept) 
 					listOriginalConcepts.add(currentNodeData.getShortName());
-				else if(currentNodeData.getStatus() == Constants.Level.selectedBetweennessClosenessConcept)
+				else if(currentNodeData.getStatus() == Config.Level.selectedBetweennessClosenessConcept)
 					listNewConceptsBetweennessCloseness.add(currentNodeData.getShortName());
-				else if(currentNodeData.getStatus() == Constants.Level.selectedEigenvectorConcept) 
+				else if(currentNodeData.getStatus() == Config.Level.selectedEigenvectorConcept) 
 					listNewConceptsEigenvector.add(currentNodeData.getShortName());
 			}
 			str.append("\nOriginal concepts:\n ");

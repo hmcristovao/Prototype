@@ -13,28 +13,28 @@ import org.graphstream.stream.gephi.JSONSender;
 import rdf.SetQuerySparql;
 import basic.*;
 
-public class MainProcess implements Constants {
+public class MainProcess implements Config {
 	
 	public static void head(Wrapterms parser) {
 		try {
 			Debug.err("- Starting.");
 			PrintStream printStreamOut = null, printStreamErr = null;
-			if(Constants.outPrintConsole) 
+			if(Config.outPrintConsole) 
 				printStreamOut = System.out;
 			else
-				printStreamOut = new PrintStream(Constants.nameFileConsoleOut);
+				printStreamOut = new PrintStream(Config.nameFileConsoleOut);
 
-			if(Constants.errPrintConsole) 
+			if(Config.errPrintConsole) 
 				printStreamErr = System.err;
 			else
-				printStreamErr = new PrintStream(Constants.nameFileConsoleErr);
+				printStreamErr = new PrintStream(Config.nameFileConsoleErr);
 			System.setOut(printStreamOut);
 			System.setErr(printStreamErr);
 			
 			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
 			
 			Debug.err("- Parsing terms.");
-			parser = new Wrapterms(new FileInputStream(Constants.nameFileInput));
+			parser = new Wrapterms(new FileInputStream(Config.nameFileInput));
 			parser.start(originalSetQuerySparql);
 			
 			Debug.out("Debug 1",originalSetQuerySparql.toString());
@@ -44,7 +44,7 @@ public class MainProcess implements Constants {
 			
 			Debug.err("- Collecting RDFs.");
 			if(disableWarningLog4j) 
-				System.setErr(new PrintStream(Constants.nameFileConsoleWarn)); 
+				System.setErr(new PrintStream(Config.nameFileConsoleWarn)); 
 			originalSetQuerySparql.fillRDFs();
 			if(disableWarningLog4j) 
 				System.setErr(printStreamErr); 
@@ -53,13 +53,13 @@ public class MainProcess implements Constants {
 			
 			SystemGraphData systemGraphData = new SystemGraphData(originalSetQuerySparql.getTotalConcepts());
 			Graph currentGraph = systemGraphData.getStreamGraphData().getStreamGraph();
-			if(Constants.graphStreamVisualization) {
+			if(Config.graphStreamVisualization) {
 				Debug.err("- Connecting Stream Visualization.");
 				currentGraph.display(true);
 			}
-			if(Constants.gephiVisualization) {
+			if(Config.gephiVisualization) {
 				Debug.err("- Connecting with Gephi.");
-				JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
+				JSONSender sender = new JSONSender("localhost", 8080, Config.nameGephiWorkspace);
 				currentGraph.addSink(sender);
 			}
 		    
@@ -72,7 +72,7 @@ public class MainProcess implements Constants {
 			Debug.err("- Building Gephi Graph Table.");
 			systemGraphData.getGephiGraphData().buildGephiGraphTable();
 			
-		    if(Constants.gephiVisualization) {
+		    if(Config.gephiVisualization) {
 				currentGraph.clearSinks();
 			}
 		    
@@ -100,7 +100,7 @@ public class MainProcess implements Constants {
 			Debug.out(systemGraphData.reportSelectedNodes());
 
 			Debug.err("- Closing.");
-		    if(Constants.graphStreamVisualization) 
+		    if(Config.graphStreamVisualization) 
 				currentGraph.clear();
 			
 			Debug.err("- Ok!");

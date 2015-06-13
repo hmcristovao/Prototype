@@ -1,0 +1,3 @@
+Computer, 
+Programming language, Object-oriented programming,
+James Gosling, Dennis Ritchie
