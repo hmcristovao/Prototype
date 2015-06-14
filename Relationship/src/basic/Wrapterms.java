@@ -9,7 +9,7 @@ import rdf.*;
 public class Wrapterms implements WraptermsConstants {
    public static void main(String args[])  throws ParseException  {
       Wrapterms firstParser = null;
-          MainProcess.head(firstParser);
+          MainProcess.body(firstParser);
    }
 
 /* Grammar:

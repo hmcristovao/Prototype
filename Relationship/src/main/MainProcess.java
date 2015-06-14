@@ -13,11 +13,8 @@ import org.graphstream.stream.gephi.JSONSender;
 import rdf.SetQuerySparql;
 import basic.*;
 
-public class MainProcess implements Config {
-	
-	public WholeSystem wholeSystem = new WholeSystem();
-	
-	public static void head(Wrapterms parser) {
+public class MainProcess {	
+	public static void body(Wrapterms parser) {
 		try {
 			Debug.err("- Starting.");
 			PrintStream printStreamOut = null, printStreamErr = null;
@@ -33,79 +30,90 @@ public class MainProcess implements Config {
 			System.setOut(printStreamOut);
 			System.setErr(printStreamErr);
 			
-			wholeSystem
-			
-			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
-			
 			Debug.err("- Parsing terms.");
 			parser = new Wrapterms(new FileInputStream(Config.nameFileInput));
-			parser.start(originalSetQuerySparql);
 			
-			Debug.out("Debug 1",originalSetQuerySparql.toString());
+			WholeSystem wholeSystem = new WholeSystem();
+			wholeSystem.insertListSetQuerySparql(new SetQuerySparql());
+			parser.start(wholeSystem.getListSetQuerySparql().getFirst());
 			
-			Debug.err("- Assembling queries.");
-			originalSetQuerySparql.fillQuery();
+			boolean isContinue = false;
+			int interation = 0;
+			SetQuerySparql  currentSetQuerySparql;
+			SystemGraphData currentSystemGraphData;
+			Graph           currentGraph;
+			do {
+				currentSetQuerySparql = wholeSystem.getListSetQuerySparql().get(interation);
+				Debug.out("Debug 1 (Interaction "+interation+")", currentSetQuerySparql.toString());
+
+				Debug.err("- Assembling queries.");
+				currentSetQuerySparql.fillQuery();
+
+				Debug.err("- Collecting RDFs.");
+				if(Config.disableWarningLog4j) 
+					System.setErr(new PrintStream(Config.nameFileConsoleWarn)); 
+				currentSetQuerySparql.fillRDFs();
+				if(Config.disableWarningLog4j) 
+					System.setErr(printStreamErr); 
+
+				Debug.out("Debug 2 (Interaction "+interation+")",currentSetQuerySparql.toString());
+
+				wholeSystem.insertListSystemGraphData(new SystemGraphData(currentSetQuerySparql.getTotalConcepts()));
+				currentSystemGraphData = wholeSystem.getListSystemGraphData().get(interation);
+				currentGraph = currentSystemGraphData.getStreamGraphData().getStreamGraph();
+				if(Config.graphStreamVisualization) {
+					Debug.err("- Connecting Stream Visualization.");
+					currentGraph.display(true);
+				}
+				if(Config.gephiVisualization) {
+					Debug.err("- Connecting with Gephi.");
+					JSONSender sender = new JSONSender("localhost", 8080, Config.nameGephiWorkspace);
+					currentGraph.addSink(sender);
+				}
+
+				Debug.err("- Building Stream Graph Data.");
+				currentSystemGraphData.getStreamGraphData().buildStreamGraphData(currentSetQuerySparql);
+
+				Debug.err("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array.");
+				currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
+
+				Debug.err("- Building Gephi Graph Table.");
+				currentSystemGraphData.getGephiGraphData().buildGephiGraphTable();
+
+				if(Config.gephiVisualization) {
+					currentGraph.clearSinks();
+				}
+
+				Debug.err("- Calculating measures of the whole network.");
+				currentSystemGraphData.calculateMeasuresWholeNetwork();
+
+				Debug.err("- Sorting measures of the whole network.");
+				currentSystemGraphData.sortMeasuresWholeNetwork();
+
+				Debug.err("- Classifying connected component and building sub graphs.");
+				currentSystemGraphData.classifyConnectedComponent_BuildSubGraph();
+
+				Debug.err("- Building sub-graphs tables belong to connected components.");
+				currentSystemGraphData.buildBasicTableSubGraph();
+
+				Debug.err("- Sorting connected componets ranks.");
+				currentSystemGraphData.sortConnectecComponentRanks();
+
+				Debug.err("- Analysing graph data and selecting candidate nodes.");
+				currentSystemGraphData.analyseGraphData();
+
+				Debug.out("Debug 3 (Interaction "+interation+")",currentSystemGraphData.toString());
+
+				Debug.err("- Resuming selected nodes to new interation.");
+				currentSystemGraphData.resumeSelectedNodes(currentSetQuerySparql);
+
+				Debug.err("- Reporting selected nodes to new interation.");
+				Debug.out(currentSystemGraphData.reportSelectedNodes(currentSetQuerySparql));			
 			
-			Debug.err("- Collecting RDFs.");
-			if(disableWarningLog4j) 
-				System.setErr(new PrintStream(Config.nameFileConsoleWarn)); 
-			originalSetQuerySparql.fillRDFs();
-			if(disableWarningLog4j) 
-				System.setErr(printStreamErr); 
-			
-			Debug.out("Debug 2",originalSetQuerySparql.toString());
-			
-			SystemGraphData systemGraphData = new SystemGraphData(originalSetQuerySparql.getTotalConcepts());
-			Graph currentGraph = systemGraphData.getStreamGraphData().getStreamGraph();
-			if(Config.graphStreamVisualization) {
-				Debug.err("- Connecting Stream Visualization.");
-				currentGraph.display(true);
-			}
-			if(Config.gephiVisualization) {
-				Debug.err("- Connecting with Gephi.");
-				JSONSender sender = new JSONSender("localhost", 8080, Config.nameGephiWorkspace);
-				currentGraph.addSink(sender);
-			}
-		    
-			Debug.err("- Building Stream Graph Data.");
-			systemGraphData.getStreamGraphData().buildStreamGraphData(originalSetQuerySparql);
-			
-			Debug.err("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array.");
-			systemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
+				interation++;
 				
-			Debug.err("- Building Gephi Graph Table.");
-			systemGraphData.getGephiGraphData().buildGephiGraphTable();
-			
-		    if(Config.gephiVisualization) {
-				currentGraph.clearSinks();
-			}
-		    
-		    Debug.err("- Calculating measures of the whole network.");
-			systemGraphData.calculateMeasuresWholeNetwork();
-		    
-		    Debug.err("- Sorting measures of the whole network.");
-			systemGraphData.sortMeasuresWholeNetwork();
-			
-			Debug.err("- Classifying connected component and building sub graphs.");
-			systemGraphData.classifyConnectedComponent_BuildSubGraph();
-		    
-			Debug.err("- Building sub-graphs tables belong to connected components.");
-			systemGraphData.buildBasicTableSubGraph();
-
-			Debug.err("- Sorting connected componets ranks.");
-			systemGraphData.sortConnectecComponentRanks();
- 
-		    Debug.err("- Analysing graph data and selecting candidate nodes.");
-			systemGraphData.analyseGraphData();
-
-			Debug.out("Debug 3",systemGraphData.toString());
-
-		    Debug.err("- Resuming selected nodes to new interation.");
-			systemGraphData.resumeSelectedNodes(originalSetQuerySparql);
-
-		    Debug.err("- Reporting selected nodes to new interation.");
-			Debug.out(systemGraphData.reportSelectedNodes(originalSetQuerySparql));			
-			
+			} while(isContinue);
+				
 			Debug.err("- Closing.");
 		    if(Config.graphStreamVisualization) 
 				currentGraph.clear();

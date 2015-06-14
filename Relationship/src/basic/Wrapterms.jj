@@ -15,7 +15,7 @@ import rdf.*;
 public class Wrapterms {
    public static void main(String args[])  throws ParseException  {
       Wrapterms firstParser = null;
-	  MainProcess.head(firstParser);
+	  MainProcess.body(firstParser);
    }
 }
 PARSER_END(Wrapterms)
@@ -42,7 +42,7 @@ void element(SetQuerySparql originalSetQuerySparql) : {Token token; Concept conc
 {
 	token = < TERM >
     {		concept = new Concept(token);
-		originalSetQuerySparql.insert(concept);			
+		originalSetQuerySparql.insertQuerySparql(concept);			
     }
     ( < SEPARATORS > )*
 }
