@@ -5,11 +5,11 @@ public interface Config {
 	boolean errPrintConsole = true;
 	boolean disableWarningLog4j = true;
 	
-	String nameFileConsoleOut  = "log\\consoleOut.txt";
+	String nameFileConsoleOut  = "log\\consoleOut00.txt";
 	String nameFileConsoleErr  = "log\\consoleErr.txt";
 	String nameFileConsoleWarn = "log\\consoleWarn.txt";
 
-	String nameFileInput = "input\\terms02.txt";
+	String nameFileInput = "input\\terms00.txt";
 	
 	String nameFileQueryDefault = "query_model\\query.txt";
 
@@ -46,6 +46,9 @@ public interface Config {
 	double proporcionEigenvector = 1.3;
 	// precision added up to rounding
 	double precisionEigenvector = 0.5; 
+	// consider the adition of new concepts without "Category:" prefix
+	boolean additionNewConceptWithoutCategory = true;
+	
 
 	
 }

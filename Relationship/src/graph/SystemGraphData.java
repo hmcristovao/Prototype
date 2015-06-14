@@ -11,6 +11,9 @@ import org.gephi.statistics.plugin.ConnectedComponents;
 import org.gephi.statistics.plugin.EigenvectorCentrality;
 import org.gephi.statistics.plugin.GraphDistance;
 
+import rdf.SetQuerySparql;
+import user.Concept;
+
 public class SystemGraphData {
 	private int originalQuantity;
 	private StreamGraphData streamGraphData;
@@ -298,28 +301,51 @@ public class SystemGraphData {
 		}
 	}
 	
-	public String reportSelectedNodes() throws Exception {
+	public String reportSelectedNodes(SetQuerySparql setQuerySparql) throws Exception {
 		StringBuffer str = new StringBuffer();
-		LinkedList<String> listOriginalConcepts = null;
-		LinkedList<String> listNewConceptsBetweennessCloseness = null;
-		LinkedList<String> listNewConceptsEigenvector = null;
+		LinkedList<Concept> listOriginalConcepts = null;
+		LinkedList<Concept> listNewConceptsBetweennessCloseness = null;
+		LinkedList<Concept> listNewConceptsEigenvector = null;
 		NodeData currentNodeData = null;
+		Concept concept = null;
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			str.append("\n\n================================================");
 			str.append("\nConnected component number: ");
 			str.append(this.ranks.getMeasuresRankTable(i).getConnectedComponentNumber());
 			str.append("\n");
-			listOriginalConcepts = new LinkedList<String>();
-			listNewConceptsBetweennessCloseness = new LinkedList<String>();
-			listNewConceptsEigenvector = new LinkedList<String>();
+			listOriginalConcepts = new LinkedList<Concept>();
+			listNewConceptsBetweennessCloseness = new LinkedList<Concept>();
+			listNewConceptsEigenvector = new LinkedList<Concept>();
 			for(int j=0; j < this.ranks.getMeasuresRankTable(i).getBasicTable().getCount(); j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getBasicTable().getNodeData(j);
-				if(currentNodeData.getStatus() == Config.Level.originalConcept) 
-					listOriginalConcepts.add(currentNodeData.getShortName());
-				else if(currentNodeData.getStatus() == Config.Level.selectedBetweennessClosenessConcept)
-					listNewConceptsBetweennessCloseness.add(currentNodeData.getShortName());
-				else if(currentNodeData.getStatus() == Config.Level.selectedEigenvectorConcept) 
-					listNewConceptsEigenvector.add(currentNodeData.getShortName());
+				if(currentNodeData.getStatus() == Config.Level.originalConcept) { 
+					concept = new Concept(currentNodeData.getShortName());
+					listOriginalConcepts.add(concept);
+				}
+				else if(currentNodeData.getStatus() == Config.Level.selectedBetweennessClosenessConcept) {
+					concept = new Concept(currentNodeData.getShortName());
+					listNewConceptsBetweennessCloseness.add(concept);
+					setQuerySparql.insertNewConcept(concept);
+					if(Config.additionNewConceptWithoutCategory) {
+						if(concept.getIsCategory()) {
+							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()));
+							listNewConceptsBetweennessCloseness.add(concept);
+							setQuerySparql.insertNewConcept(concept);							
+						}
+					}
+				}
+				else if(currentNodeData.getStatus() == Config.Level.selectedEigenvectorConcept) {
+					concept = new Concept(currentNodeData.getShortName());
+					listNewConceptsEigenvector.add(concept);
+					setQuerySparql.insertNewConcept(concept);
+					if(Config.additionNewConceptWithoutCategory) {
+						if(concept.getIsCategory()) {
+							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()));
+							listNewConceptsBetweennessCloseness.add(concept);
+							setQuerySparql.insertNewConcept(concept);							
+						}
+					}
+				}
 			}
 			str.append("\nOriginal concepts:\n ");
 			str.append(listOriginalConcepts.toString());
@@ -327,11 +353,12 @@ public class SystemGraphData {
 			str.append(listNewConceptsBetweennessCloseness.toString());
 			str.append("\n\nNew concepts (added by eigenvector rank):\n ");
 			str.append(listNewConceptsEigenvector.toString());			
-			str.append("\n");
+			str.append("\n\n=================================================");
+			str.append("\nNew concepts: (whole network)\n");
+			str.append(setQuerySparql.getListNewConcepts());
 		}
 		return str.toString();
 	}
-	
 	
 	public String toString() {
 		return  "Stream Graph Data: \n" + this.getStreamGraphData().toString() +

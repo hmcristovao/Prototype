@@ -93,8 +93,8 @@ public class StreamGraphData {
 		ListRDF listRDF;
 		OneRDF oneRDF;
 		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
-		for(int i=0; i < setQuerySparql.getList().size(); i++) {
-			querySparql = setQuerySparql.getList().get(i);
+		for(int i=0; i < setQuerySparql.getListQuerySparql().size(); i++) {
+			querySparql = setQuerySparql.getListQuerySparql().get(i);
 			listRDF = querySparql.getListRDF();
 			for(int j=0; j < listRDF.size(); j++) {
 				// get RDF elements

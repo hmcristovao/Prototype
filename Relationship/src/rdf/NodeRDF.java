@@ -15,7 +15,7 @@ public class NodeRDF extends ItemRDF {
 	
 	// verify if the node belongs to original concepts list
 	private Config.Level qualifyStatus(SetQuerySparql setQuerySparql) {
-		for(QuerySparql x: setQuerySparql.getList()) {
+		for(QuerySparql x: setQuerySparql.getListQuerySparql()) {
 			if(Config.ignoreCaseConcept) {
 				if(this.getShortName().equalsIgnoreCase(x.getConcept().getUnderlineConcept())) 
 					return Config.Level.originalConcept;

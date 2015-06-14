@@ -97,8 +97,8 @@ public class MainProcess implements Config {
 			Debug.out("Debug 3",systemGraphData.toString());
 
 		    Debug.err("- Reporting selected nodes to new interation.");
-			Debug.out(systemGraphData.reportSelectedNodes());
-
+			Debug.out(systemGraphData.reportSelectedNodes(originalSetQuerySparql));
+			
 			Debug.err("- Closing.");
 		    if(Config.graphStreamVisualization) 
 				currentGraph.clear();

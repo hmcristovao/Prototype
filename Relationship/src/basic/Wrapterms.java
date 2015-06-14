@@ -36,7 +36,7 @@ element ->  < TERM > ( < SEPARATORS > )*
                                                        Token token; Concept concept;
     token = jj_consume_token(TERM);
                 concept = new Concept(token);
-                originalSetQuerySparql.insert(concept);
+                originalSetQuerySparql.insertQuerySparql(concept);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
