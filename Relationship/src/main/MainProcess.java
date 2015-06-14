@@ -15,6 +15,8 @@ import basic.*;
 
 public class MainProcess implements Config {
 	
+	public WholeSystem wholeSystem = new WholeSystem();
+	
 	public static void head(Wrapterms parser) {
 		try {
 			Debug.err("- Starting.");
@@ -30,6 +32,8 @@ public class MainProcess implements Config {
 				printStreamErr = new PrintStream(Config.nameFileConsoleErr);
 			System.setOut(printStreamOut);
 			System.setErr(printStreamErr);
+			
+			wholeSystem
 			
 			SetQuerySparql originalSetQuerySparql = new SetQuerySparql();
 			
@@ -96,8 +100,11 @@ public class MainProcess implements Config {
 
 			Debug.out("Debug 3",systemGraphData.toString());
 
+		    Debug.err("- Resuming selected nodes to new interation.");
+			systemGraphData.resumeSelectedNodes(originalSetQuerySparql);
+
 		    Debug.err("- Reporting selected nodes to new interation.");
-			Debug.out(systemGraphData.reportSelectedNodes(originalSetQuerySparql));
+			Debug.out(systemGraphData.reportSelectedNodes(originalSetQuerySparql));			
 			
 			Debug.err("- Closing.");
 		    if(Config.graphStreamVisualization) 

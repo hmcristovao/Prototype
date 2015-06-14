@@ -1,6 +1,6 @@
 package user;
 
-import main.Debug;
+import main.*;
 import basic.Token;
 
 public class Concept {
