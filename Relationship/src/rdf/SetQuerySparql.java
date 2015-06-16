@@ -58,14 +58,32 @@ public class SetQuerySparql {
 	public void insertQuerySparql(QuerySparql querySparql) {
 		this.listQuerySparql.add(querySparql);  
 	}
-	// create a object QuerySparql, fill it with concept, and insert it into listQuerySparql
+	// create a QuerySparql object, fill it with concept, and insert it into listQuerySparql
 	public void insertQuerySparql(Concept concept) {
 		QueryString auxQuery = new QueryString();
 		ListRDF auxListRDF = new ListRDF();
 		QuerySparql querySparql = new QuerySparql(concept, auxQuery, auxListRDF);
 		this.listQuerySparql.add(querySparql);  
 	}
-	
+	// fill listQuerySparql with a concept list
+	public void insertListConcept(LinkedList<Concept> listConcept) {
+		QueryString auxQuery;
+		ListRDF auxListRDF;
+		QuerySparql querySparql;
+		for(Concept concept : listConcept) { 
+			auxQuery = new QueryString();
+			auxListRDF = new ListRDF();
+			querySparql = new QuerySparql(concept, auxQuery, auxListRDF);
+			this.listQuerySparql.add(querySparql); 
+		}
+	}
+	// add all objects from old listQuerySparql
+	public void insertListQuerySparql(LinkedList<QuerySparql> listQuerySparql) {
+		for(QuerySparql querySparql : listQuerySparql) { 
+			this.listQuerySparql.add(querySparql); 
+		}
+	}
+		
 	// exceptional function, direct access to original concepts listQuerySparql
 	// return one concept short name per line
 	public String getOriginalConcepts() {

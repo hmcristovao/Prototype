@@ -264,7 +264,8 @@ public class SystemGraphData {
 			      );
 			// mark the level of the firt nodes to new status, except original nodes
 			for(int j=0, k=0; k < countConnectedComponentSelectNodes &&
-					          j < this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getCount(); 
+					          j < this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getCount() &&
+					          k < Config.maxBetweennessCloseness; 
 				j++) {
 				// changes status only of common nodes
 				if(this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).getStatus() == Config.Level.commonConcept) {
@@ -288,7 +289,8 @@ public class SystemGraphData {
 			      );
 			// mark the level of the firt nodes to new status, except original nodes
 			for(int j=0, k=0; k < countConnectedComponentSelectNodes && 
-					          j < this.ranks.getMeasuresRankTable(i).getEigenvector().getCount();  
+					          j < this.ranks.getMeasuresRankTable(i).getEigenvector().getCount() &&
+					          k < Config.maxEigenvector;  
 				j++) {
 				// changes status only of common nodes
 				if(this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).getStatus() == Config.Level.commonConcept) {
