@@ -4,19 +4,20 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - LOG AND PRINT 
     //
+	String  testNumber = "13"; 
 	boolean outPrintConsole = false;
 	boolean errPrintConsole = true;
 	boolean disableWarningLog4j = true;
 	
-	String nameFileConsoleOut  = "log\\consoleOut00.txt";
-	String nameFileConsoleErr  = "log\\consoleErr.txt";
-	String nameFileConsoleWarn = "log\\consoleWarn.txt";
+	String nameFileConsoleCompletOut  = "log\\consoleOutComplete"+Config.testNumber+".txt";
+	String nameFileConsoleShortOut    = "log\\consoleOutShort"+Config.testNumber+".txt";
+	String nameFileConsoleErr         = "log\\consoleErr.txt";
+	String nameFileConsoleWarn        = "log\\consoleWarn.txt";
 
 	// ============================================================================
 	// CONFIG - INPUT FILES 
     //
-	String nameFileInput = "input\\terms00.txt";
-	
+	String nameFileInput = "input\\terms"+Config.testNumber+".txt";
 	String nameFileQueryDefault = "query_model\\query.txt";
 
 	// ============================================================================
@@ -45,7 +46,9 @@ public interface Config {
 	boolean ignoreCaseConcept = false;
 
 	enum Level {commonConcept, originalConcept, selectedBetweennessClosenessConcept, selectedEigenvectorConcept };
-		
+	
+	String nameGEXFGraph = "graph\\graph"+Config.testNumber+".gext";
+	
 	// ============================================================================
 	// CONFIG - ANALYSIS 
     //
@@ -73,5 +76,9 @@ public interface Config {
 	int minIteration = 3;
 	int maxIteration = 4;
 	
+	// ============================================================================
+	// CONFIG - CONCEPT MAP 
+    //
+	String nameConceptMap = "conceptmap\\conceptmap"+Config.testNumber+".gext";
 
 }

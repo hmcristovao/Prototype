@@ -82,8 +82,8 @@ public class MeasuresRanks {
 	public void insertOriginalConcepts(Concept concept) {
 		this.originalConcepts.add(concept);
 	}
-	public void insertOriginalConcept(String stringNewConcept) {
-		Concept objectNewConcept = new Concept(stringNewConcept);
+ 	public void insertOriginalConcept(String stringNewConcept) { 
+		Concept objectNewConcept = new Concept(stringNewConcept, false);  // false: not cool
 		this.originalConcepts.add(objectNewConcept);
 	}
 	public LinkedList<Concept> getListOriginalConcepts() {
@@ -94,7 +94,7 @@ public class MeasuresRanks {
 		this.betweennessClosenessConcepts.add(concept);
 	}
 	public void insertBetweennessClosenessConcept(String stringNewConcept) {
-		Concept objectNewConcept = new Concept(stringNewConcept);
+		Concept objectNewConcept = new Concept(stringNewConcept, false);   // false: not cool
 		this.betweennessClosenessConcepts.add(objectNewConcept);
 	}
 	public LinkedList<Concept> getListBetweennessClosenessConcept() {
@@ -105,7 +105,7 @@ public class MeasuresRanks {
 		this.eigenvectorConcepts.add(concept);
 	}
 	public void insertEigenvectorConcept(String stringNewConcept) {
-		Concept objectNewConcept = new Concept(stringNewConcept);
+		Concept objectNewConcept = new Concept(stringNewConcept, false);   // false: not cool
 		this.eigenvectorConcepts.add(objectNewConcept);
 	}
 	public LinkedList<Concept> getListEigenvectorConcept() {

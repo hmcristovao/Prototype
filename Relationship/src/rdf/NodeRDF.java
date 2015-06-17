@@ -28,18 +28,6 @@ public class NodeRDF extends ItemRDF {
 		return Config.Level.commonConcept;
 	}
 	
-prob detectado:
-	os novos conceitos são lidos (pelo metodo acima) como originais.
-	Os antigos originais tem o RDF devidametne marcada (pois eles foram copiados)
-Solução:
-	modificar o método acima....acima talvez colocar um status no conceito para classifica-lo como 
-	original ou added 
-	
-	outro problema: colocar a pasta de log fora do projeto, está fincando muito grande
-	criar também a pasta para GDX ????
-	
-	
-	
 	public String toString() {
 		StringBuffer out = new StringBuffer();
 		out.append(super.toString());

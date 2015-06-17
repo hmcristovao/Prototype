@@ -312,24 +312,24 @@ public class SystemGraphData {
 					this.ranks.getMeasuresRankTable(i).insertOriginalConcept(currentNodeData.getShortName());
 				}
 				else if(currentNodeData.getStatus() == Config.Level.selectedBetweennessClosenessConcept) {
-					concept = new Concept(currentNodeData.getShortName());
+					concept = new Concept(currentNodeData.getShortName(), false);
 					this.ranks.getMeasuresRankTable(i).insertBetweennessClosenessConcept(concept);
 					setQuerySparql.insertNewConcept(concept);
 					if(Config.additionNewConceptWithoutCategory) {
 						if(concept.getIsCategory()) {
-							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()));
+							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()), false);
 							this.ranks.getMeasuresRankTable(i).insertBetweennessClosenessConcept(concept);
 							setQuerySparql.insertNewConcept(concept);							
 						}
 					}
 				}
 				else if(currentNodeData.getStatus() == Config.Level.selectedEigenvectorConcept) {
-					concept = new Concept(currentNodeData.getShortName());
+					concept = new Concept(currentNodeData.getShortName(), false);
 					this.ranks.getMeasuresRankTable(i).insertEigenvectorConcept(concept);
 					setQuerySparql.insertNewConcept(concept);
 					if(Config.additionNewConceptWithoutCategory) {
 						if(concept.getIsCategory()) {
-							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()));
+							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()), false);
 							this.ranks.getMeasuresRankTable(i).insertEigenvectorConcept(concept);
 							setQuerySparql.insertNewConcept(concept);							
 						}

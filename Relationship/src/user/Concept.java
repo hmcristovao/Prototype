@@ -4,25 +4,30 @@ import main.*;
 import basic.Token;
 
 public class Concept {
-	private String originalConcept;
+	private String basicConcept;
 	private String underlineConcept; // with underlines
 	private boolean isCategory;
+	private boolean isOriginal;
 	 
-	public Concept(String originalConcept) {
-		this.originalConcept  = originalConcept.trim();
-		this.underlineConcept = Concept.blankToUnderline(this.originalConcept);
-		this.isCategory       = Concept.verifyIfCategory(this.originalConcept);
-		if(Concept.verifyIfCategory(this.originalConcept)) 
+	public Concept(String originalConcept, boolean isOriginal) {
+		this.basicConcept     = originalConcept.trim();
+		this.isOriginal       = isOriginal;
+		this.underlineConcept = Concept.blankToUnderline(this.basicConcept);
+		this.isCategory       = Concept.verifyIfCategory(this.basicConcept);
+		if(Concept.verifyIfCategory(this.basicConcept)) 
 			this.isCategory = true;
 		else
 			this.isCategory = false;
 	}
 	public Concept(Token token) {
-		this(token.image);
+		this(token.image, true);
 	}
 		
-	public String getOriginalConcept() {
-		return this.originalConcept;
+	public String getBasicConcept() {
+		return this.basicConcept;
+	}
+	public boolean getIsOriginal() {
+		return this.isOriginal;
 	}
 	public String getUnderlineConcept() {
 		return this.underlineConcept;
@@ -52,6 +57,6 @@ public class Concept {
 
 	@Override
 	public String toString() {
-		return this.getOriginalConcept();
+		return this.getBasicConcept();
 	}
 }

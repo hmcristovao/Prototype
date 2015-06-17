@@ -36,16 +36,26 @@ public class SetQuerySparql {
 	public int getTotalConcepts() {
 		return this.listQuerySparql.size();
 	}
+	public int getTotalOriginalConcepts() {
+		int total = 0;
+		for(int i=0; i < this.listQuerySparql.size(); i++) {
+			if(this.listQuerySparql.get(i).getConcept().getIsOriginal())
+				total++;
+		}
+		return total;
+	}
 	public int getTotalRDFs() {
 		return this.totalRDF;
 	}
 	public void insertNewConcept(Concept concept) {
 		this.listNewConcepts.add(concept);
 	}
+	/*
 	public void insertNewConcept(String stringNewConcept) {
 		Concept objectNewConcept = new Concept(stringNewConcept);
 		this.listNewConcepts.add(objectNewConcept);
 	}
+	*/
 	public LinkedList<Concept> getListNewConcepts() {
 		return this.listNewConcepts;
 	}
