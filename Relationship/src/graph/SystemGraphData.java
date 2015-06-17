@@ -351,7 +351,7 @@ public class SystemGraphData {
 			str.append(this.ranks.getMeasuresRankTable(i).getListBetweennessClosenessConcept().toString());
 			str.append("\n\nNew concepts (added by eigenvector rank):\n ");
 			str.append(this.ranks.getMeasuresRankTable(i).getListEigenvectorConcept().toString());			
-			str.append("\n================================================================================\n");
+			str.append(Config.doubleLine);
 		}
 		str.append("\nNew concepts (whole network):\n");
 		str.append(setQuerySparql.getListNewConcepts());
@@ -359,18 +359,32 @@ public class SystemGraphData {
 		return str.toString();
 	}
 	
-	
 	public String toString() {
 		return  "Stream Graph Data: \n" + this.getStreamGraphData().toString() +
 				"\nQuantity connected component: " + this.connectedComponentsCount +
-		        "\n\n=================================\nTable array: \n---------------------------------\n" + 
+		        "\n"+Config.doubleLine+"Table array: "+Config.singleLine + 
 				this.nodesTableArray.toString() +
-		        "\n\n=================================\nTable array (betweenness sorted):\n---------------------------------\n" + 
+		        "\n"+Config.doubleLine+"Table array (betweenness sorted):"+Config.singleLine + 
 				this.betweennessSortTable.toString() +
-		        "\n\n=================================\nTable array (closeness sorted): \n---------------------------------\n" + 
+		        "\n"+Config.doubleLine+"Table array (closeness sorted): "+Config.singleLine + 
 				this.closenessSortTable.toString() +
-		        "\n\n=================================\nTable array (eingenvector sorted): \n---------------------------------\n" + 
+		        "\n"+Config.doubleLine+"Table array (eingenvector sorted): "+Config.singleLine + 
 				this.eigenvectorSortTable.toString() +		
 				this.getRanks().toString();
 	}
+	
+	public String toStringShort() {
+		return  "Stream Graph Data: \n" + this.getStreamGraphData().toStringShort() +
+				"\nQuantity connected component: " + this.connectedComponentsCount +
+		        "\n"+Config.doubleLine+"Table array (betweenness sorted):"+Config.singleLine + 
+				this.betweennessSortTable.toStringShort(Config.quantityNodes) +
+		        "\n"+Config.doubleLine+"Table array (closeness sorted): "+Config.singleLine + 
+				this.closenessSortTable.toStringShort(Config.quantityNodes) +
+		        "\n"+Config.doubleLine+"Table array (eingenvector sorted): "+Config.singleLine + 
+				this.eigenvectorSortTable.toStringShort(Config.quantityNodes) +		
+				this.getRanks().toStringShort(Config.quantityNodes);
+	}
+	
+	
+	
 }

@@ -1,3 +1,5 @@
+// v2.0 - restruture in the log files and report
+
 package main;
 
 import graph.SystemGraphData;
@@ -5,7 +7,6 @@ import graph.SystemGraphData;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.PrintStream;
 
 import org.graphstream.graph.Graph;
 import org.graphstream.stream.gephi.JSONSender;
@@ -15,7 +16,6 @@ import basic.*;
 
 public class MainProcess {	
 	public static WholeSystem wholeSystem = new WholeSystem();
-	public static PrintStream printStreamOut = null, printStreamCompleteOut = null, printStreamShortOut = null, printStreamErr = null;
 	public static String report;
 	public static boolean isContinue = false;
 	public static int iteration = 1;
@@ -23,24 +23,22 @@ public class MainProcess {
 	public static SystemGraphData currentSystemGraphData;
 	public static Graph           currentGraph;
 	public static SetQuerySparql  newSetQuerySparql;
-	
+		
 	public static void body(Wrapterms parser) {
 		try {
-			Log.err("- Starting.");
-			MainProcess.configPrintStream();
-			Log.err("- Parsing terms.");
+			Log.console("- Starting.");
+			Log.init();	
+			Log.console("- Parsing terms.");
 			parser = new Wrapterms(new FileInputStream(Config.nameFileInput));
 			wholeSystem.insertListSetQuerySparql(new SetQuerySparql());
 			parser.start(wholeSystem.getListSetQuerySparql().getFirst());
 			do {
 				currentSetQuerySparql = wholeSystem.getListSetQuerySparql().get(iteration-1);
-				Log.err("- Assembling queries (iteration "+iteration+").");
+				Log.console("- Assembling queries (iteration "+iteration+").");
 				currentSetQuerySparql.fillQuery();
-				Log.err("- Collecting RDFs (iteration "+iteration+").");
-				if(Config.disableWarningLog4j) System.setErr(new PrintStream(Config.nameFileConsoleWarn)); 
+				Log.console("- Collecting RDFs (iteration "+iteration+").");
 				currentSetQuerySparql.fillRDFs();
-				if(Config.disableWarningLog4j) System.setErr(printStreamErr); 
-
+				
 				// if it is second iteration so forth, copy all objects of the last iteration
 				if(iteration >= 2)
 					currentSetQuerySparql.insertListQuerySparql(wholeSystem.getListSetQuerySparql().get(iteration-2).getListQuerySparql());
@@ -49,60 +47,62 @@ public class MainProcess {
 				currentSystemGraphData = wholeSystem.getListSystemGraphData().get(iteration-1);
 				currentGraph = currentSystemGraphData.getStreamGraphData().getStreamGraph();
 				if(Config.graphStreamVisualization) {
-					Log.err("- Connecting Stream Visualization (iteration "+iteration+").");
+					Log.console("- Connecting Stream Visualization (iteration "+iteration+").");
 					currentGraph.display(true);
 				}
 				if(Config.gephiVisualization) {
-					Log.err("- Connecting with Gephi (iteration "+iteration+").");
+					Log.console("- Connecting with Gephi (iteration "+iteration+").");
 					JSONSender sender = new JSONSender("localhost", 8080, Config.nameGephiWorkspace);
 					currentGraph.addSink(sender);
 				}
 
-				Log.err("- Building Stream Graph Data (iteration "+iteration+").");
+				Log.console("- Building Stream Graph Data (iteration "+iteration+").");
 				currentSystemGraphData.getStreamGraphData().buildStreamGraphData(currentSetQuerySparql);
 
-				Log.err("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array (iteration "+iteration+").");
+				Log.console("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array (iteration "+iteration+").");
 				currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
 
-				Log.err("- Building Gephi Graph Table (iteration "+iteration+").");
+				Log.console("- Building Gephi Graph Table (iteration "+iteration+").");
 				currentSystemGraphData.getGephiGraphData().buildGephiGraphTable();
 
 				if(Config.gephiVisualization)  currentGraph.clearSinks();
 
-				Log.err("- Calculating measures of the whole network (iteration "+iteration+").");
+				Log.console("- Calculating measures of the whole network (iteration "+iteration+").");
 				currentSystemGraphData.calculateMeasuresWholeNetwork();
 
-				Log.err("- Sorting measures of the whole network (iteration "+iteration+").");
+				Log.console("- Sorting measures of the whole network (iteration "+iteration+").");
 				currentSystemGraphData.sortMeasuresWholeNetwork();
 
-				Log.err("- Classifying connected component and building sub graphs (iteration "+iteration+").");
+				Log.console("- Classifying connected component and building sub graphs (iteration "+iteration+").");
 				currentSystemGraphData.classifyConnectedComponent_BuildSubGraph();
 
-				Log.err("- Building sub-graphs tables belong to connected components (iteration "+iteration+").");
+				Log.console("- Building sub-graphs tables belong to connected components (iteration "+iteration+").");
 				currentSystemGraphData.buildBasicTableSubGraph();
 
-				Log.err("- Sorting connected componets ranks (iteration "+iteration+").");
+				Log.console("- Sorting connected componets ranks (iteration "+iteration+").");
 				currentSystemGraphData.sortConnectecComponentRanks();
 
-				Log.err("- Analysing graph data and selecting candidate nodes (iteration "+iteration+").");
+				Log.console("- Analysing graph data and selecting candidate nodes (iteration "+iteration+").");
 				currentSystemGraphData.analyseGraphData();
 
-				Log.err("- Resuming selected nodes to new interation (iteration "+iteration+")"
+				Log.console("- Resuming selected nodes to new interation (iteration "+iteration+")"
 						+ " - Connected conponent: "+currentSystemGraphData.getConnectedComponentsCount()+".");
 				currentSystemGraphData.resumeSelectedNodes(currentSetQuerySparql);
 
-				Log.err("- Reporting selected nodes to new interation (iteration "+iteration+")+"
+				Log.console("- Reporting selected nodes to new interation (iteration "+iteration+")+"
 						+ " - Quantity new concepts/original concepts: "
 						+ currentSetQuerySparql.getListNewConcepts().size()+"/"
 						+ currentSetQuerySparql.getLinkedListOriginalConcepts().size());
 				
-				Log.out(printStreamCompleteOut, "Iteration "+iteration);
-				Log.out(printStreamShortOut,    "Iteration "+iteration);
-				Log.out(printStreamCompleteOut, currentSystemGraphData.toString());
-				//Log.out(printStreamShortOut,    currentSystemGraphData.toStringShort());
+				Log.outFileCompleteReport("Iteration "+iteration);
+				Log.outFileShortReport("Iteration "+iteration);
+				Log.outFileCompleteReport(currentSetQuerySparql.toString());
+				Log.outFileShortReport(currentSetQuerySparql.toStringShort());
+				Log.outFileCompleteReport(currentSystemGraphData.toString());
+				Log.outFileShortReport(currentSystemGraphData.toStringShort());
 				report = currentSystemGraphData.reportSelectedNodes(currentSetQuerySparql);			
-				Log.out(printStreamCompleteOut, report);
-				Log.out(printStreamShortOut,    report);
+				Log.outFileCompleteReport(report);
+				Log.outFileShortReport(report);
 				
 				// conditionals to continue the iteration
 				// verify the iteration limit				
@@ -126,13 +126,11 @@ public class MainProcess {
 				iteration++;
 			} while(isContinue);
 				
-			Log.err("- Closing.");
+			Log.console("- Closing.");
 		    if(Config.graphStreamVisualization) 
 				currentGraph.clear();
-			
-			Log.err("- Ok!");
-		    printStreamOut.close();
-		    printStreamErr.close();
+			Log.close();
+			Log.console("- Ok!");
 		}
 		catch(FileNotFoundException e) {
 			System.err.println("Error: file not found.");
@@ -160,21 +158,5 @@ public class MainProcess {
 			e.printStackTrace();
 		}
 	}
-	
-	public static void configPrintStream() throws Exception {
-		if(Config.outPrintConsole) 
-			printStreamOut = System.out;
-		else {
-			printStreamCompleteOut = new PrintStream(Config.nameFileConsoleCompletOut);
-			printStreamShortOut    = new PrintStream(Config.nameFileConsoleCompletOut);				
-		}
-		if(Config.errPrintConsole) 
-			printStreamErr = System.err;
-		else
-			printStreamErr = new PrintStream(Config.nameFileConsoleErr);
-		System.setOut(printStreamOut);
-		System.setErr(printStreamErr);
-	}
-
 }
 	

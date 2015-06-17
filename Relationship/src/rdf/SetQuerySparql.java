@@ -197,7 +197,20 @@ public class SetQuerySparql {
 		    queryExecution.close();
 		}
 	}
-	
+
+	public String toStringShort() {
+		StringBuffer out = new StringBuffer();
+		int n = 1;
+		for(QuerySparql x: this.listQuerySparql) {
+			out.append("\nConcept number ");
+			out.append(n++);
+			out.append(": ");
+			out.append(x.toStringShort());
+			out.append("\n");
+		}
+		return out.toString();
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer out = new StringBuffer();

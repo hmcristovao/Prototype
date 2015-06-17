@@ -260,6 +260,14 @@ public class StreamGraphData {
 		return str.toString();
 	}
 	
+	public String toStringShort() {
+		return  "\ntotalNodes (count)= " 	+ this.getTotalNodes() +
+				"\ntotalNodes (real) = " 	+ this.getStreamGraph().getNodeCount() +
+				"\ntotalEdges (count)= " 	+ this.getTotalEdges() + 
+				"\ntotalNodesDuplicate = " 	+ this.getTotalNodesDuplicate() +
+				"\ntotalEdgesDuplicate = " 	+ this.getTotalEdgesDuplicate();
+	}
+	
 	public String toString() {
 		return  this.toStringGraph() +
 				"\n--------------------" +

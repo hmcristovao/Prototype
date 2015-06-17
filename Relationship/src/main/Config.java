@@ -4,15 +4,13 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - LOG AND PRINT 
     //
-	String  testNumber = "13"; 
-	boolean outPrintConsole = false;
-	boolean errPrintConsole = true;
-	boolean disableWarningLog4j = true;
+	String  testNumber = "14"; 
 	
-	String nameFileConsoleCompletOut  = "log\\consoleOutComplete"+Config.testNumber+".txt";
-	String nameFileConsoleShortOut    = "log\\consoleOutShort"+Config.testNumber+".txt";
-	String nameFileConsoleErr         = "log\\consoleErr.txt";
-	String nameFileConsoleWarn        = "log\\consoleWarn.txt";
+	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
+	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
+	String nameFileConsoleError  = "log\\consoleErr.txt";
+	String doubleLine = "\n=============================================================================================\n";
+	String singleLine = "\n---------------------------------------------------------------------------------------------\n";
 
 	// ============================================================================
 	// CONFIG - INPUT FILES 
@@ -23,8 +21,8 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RDFs 
     //
-	String serviceEndpoint = 	"http://dbpedia.org/sparql";
-	String serviceEndpoint2 = 	"http://lod.openlinksw.com/sparql/";
+	String serviceEndpoint  = "http://dbpedia.org/sparql";
+	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
 
 	String addressBasic = "http://relationship/";
 	String addressImage = "http://http://commons.wikimedia.org/wiki/File:";
@@ -52,6 +50,10 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - ANALYSIS 
     //
+	// range of the quantity of iterations
+	int minIteration = 2;
+	int maxIteration = 2;
+	
 	// proporcion above total original concept
 	double proporcionBetweenness = 4;
 
@@ -72,10 +74,12 @@ public interface Config {
 	// make the duplication of concept: from with "Category:" to without one
 	boolean additionNewConceptWithoutCategory = true;
 	
-	// range of the quantity of iterations
-	int minIteration = 3;
-	int maxIteration = 4;
-	
+	// ============================================================================
+	// CONFIG - REPORT 
+    //
+	// quantity of nodes to show in short report
+	int quantityNodes = 5;
+
 	// ============================================================================
 	// CONFIG - CONCEPT MAP 
     //

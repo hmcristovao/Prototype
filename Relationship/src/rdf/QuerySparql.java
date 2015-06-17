@@ -47,11 +47,15 @@ public class QuerySparql {
 		return this.listRDF.size();
 	}
 	
+	public String toStringShort() {
+		return  this.getConcept().toStringShort();
+	}
+
 	@Override
 	public String toString() {
-		return  "concept = " + this.getConcept() + 
-				"\nquery = \n" + this.getQueryString() + 
-				"\nlistRDF = \n" + this.getListRDF();
+		return  this.getConcept().toString() + 
+				"\n\nQuery = \n" + this.getQueryString() + 
+				"\nRDF list = \n" + this.getListRDF();
 	}
 
 	

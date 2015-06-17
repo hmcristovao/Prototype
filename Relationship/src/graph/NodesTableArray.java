@@ -93,6 +93,14 @@ public class NodesTableArray {
 		return new NodesTableArray(newNewTable);
 	}
 
+	public String toStringShort(int quantityNodes) {
+		StringBuffer str = new StringBuffer();
+		for(int i=0; i<quantityNodes && i<this.current; i++) {
+			str.append(this.table[i].toString());
+			str.append("\n\n");
+		}
+		return  str.toString();
+	}
 	
 	public String toString() {
 		StringBuffer str = new StringBuffer();
@@ -100,7 +108,7 @@ public class NodesTableArray {
 			str.append(this.table[i].toString());
 			str.append("\n\n");
 		}
-		return  str.toString();
+		return str.toString();
 	}
 }
 

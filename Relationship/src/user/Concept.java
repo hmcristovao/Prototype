@@ -55,8 +55,21 @@ public class Concept {
 		return str.substring(9);
 	}
 
+	public String toStringShort() {
+		if(this.isOriginal)
+		   return this.basicConcept + " (original)";
+		else
+			return this.basicConcept;
+	}
+
 	@Override
 	public String toString() {
-		return this.getBasicConcept();
+		String out = this.basicConcept;
+		out += " / " + this.underlineConcept;
+		if(this.isOriginal)
+		   out += " - (original)";
+		if(this.isCategory)
+			out += " - (category)";
+		return out;
 	}
 }
