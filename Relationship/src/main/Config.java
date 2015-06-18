@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - LOG AND PRINT 
     //
-	String  testNumber = "14"; 
+	String  testNumber = "00"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
@@ -43,7 +43,7 @@ public interface Config {
 	boolean nodeLabel = 		true; // original concepts always have label
 	boolean ignoreCaseConcept = false;
 
-	enum Level {commonConcept, originalConcept, selectedBetweennessClosenessConcept, selectedEigenvectorConcept };
+	enum Status {commonConcept, originalConcept, selectedBetweennessClosenessConcept, selectedEigenvectorConcept };
 	
 	String nameGEXFGraph = "graph\\graph"+Config.testNumber+".gext";
 	

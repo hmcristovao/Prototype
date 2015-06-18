@@ -41,7 +41,7 @@ public class NodesTableArray {
 	public int calculateOriginalQuantity() {
 		int originalQuantity = 0;
 		for(int i=0; i<this.count; i++) {
-			if(this.table[i].getStatus() == Config.Level.originalConcept)
+			if(this.table[i].getStatus() == Config.Status.originalConcept)
 			   originalQuantity++;
 		}
 		return originalQuantity;

@@ -9,7 +9,7 @@ public class NodeData {
 	private String shortName;
 	private org.graphstream.graph.Node streamNode;
 	private org.gephi.graph.api.Node gephiNode;
-	private Config.Level status;
+	private Config.Status status;
 
 	// extra attributes
 	private String homepageAttribute;
@@ -29,7 +29,7 @@ public class NodeData {
 					String shortName, 
 					org.graphstream.graph.Node streamNode, 
 					org.gephi.graph.api.Node gephiNode,
-					Config.Level status) {
+					Config.Status status) {
 		this.strIdNode         = strIdNode;
 		this.shortName         = shortName;
 		this.streamNode        = streamNode;
@@ -44,7 +44,7 @@ public class NodeData {
 					String shortName, 
 					StreamGraphData streamGraphData, 
 					GephiGraphData gephiGraphData, 
-					Config.Level status) {
+					Config.Status status) {
 		this(strIdNode, shortName, 
 			 streamGraphData.getStreamGraph().getNode(strIdNode), 
 			 gephiGraphData.getGephiGraph().getNode(strIdNode), 
@@ -62,22 +62,22 @@ public class NodeData {
 	public org.gephi.graph.api.Node getGephiNode() {
 		return this.gephiNode;
 	}
-	public Config.Level getStatus() {
+	public Config.Status getStatus() {
 		return this.status;
 	}
 	public String getStrStatus() {
 		String str = null;
-		if(this.status == Config.Level.commonConcept)
+		if(this.status == Config.Status.commonConcept)
 			str = "common";
-		else if(this.status == Config.Level.originalConcept)
+		else if(this.status == Config.Status.originalConcept)
 			str = "original";
-		else if(this.status == Config.Level.selectedBetweennessClosenessConcept)
+		else if(this.status == Config.Status.selectedBetweennessClosenessConcept)
 			str = "selected by betweenness+closeness";
-		else if(this.status == Config.Level.selectedBetweennessClosenessConcept)
+		else if(this.status == Config.Status.selectedBetweennessClosenessConcept)
 			str = "selected by eigenvector";
 		return str;
 	}
-	public void setStatus(Config.Level status) {
+	public void setStatus(Config.Status status) {
 		this.status = status;
 	}
 

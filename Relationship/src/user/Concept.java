@@ -7,11 +7,11 @@ public class Concept {
 	private String basicConcept;
 	private String underlineConcept; // with underlines
 	private boolean isCategory;
-	private boolean isOriginal;
+	private Config.Status status;
 	 
-	public Concept(String originalConcept, boolean isOriginal) {
+	public Concept(String originalConcept, Config.Status status) {
 		this.basicConcept     = originalConcept.trim();
-		this.isOriginal       = isOriginal;
+		this.status           = status;
 		this.underlineConcept = Concept.blankToUnderline(this.basicConcept);
 		this.isCategory       = Concept.verifyIfCategory(this.basicConcept);
 		if(Concept.verifyIfCategory(this.basicConcept)) 
@@ -20,14 +20,17 @@ public class Concept {
 			this.isCategory = false;
 	}
 	public Concept(Token token) {
-		this(token.image, true);
+		this(token.image, Config.Status.originalConcept);
 	}
 		
 	public String getBasicConcept() {
 		return this.basicConcept;
 	}
-	public boolean getIsOriginal() {
-		return this.isOriginal;
+	public Config.Status getStatus() {
+		return this.status;
+	}
+	public boolean isOriginal() {
+		return this.status == Config.Status.originalConcept;
 	}
 	public String getUnderlineConcept() {
 		return this.underlineConcept;
@@ -56,10 +59,20 @@ public class Concept {
 	}
 
 	public String toStringShort() {
-		if(this.isOriginal)
-		   return this.basicConcept + " (original)";
-		else
-			return this.basicConcept;
+		return this.basicConcept + " ("+Concept.statusToString(this.status)+")";
+	}
+	
+	public static String statusToString(Config.Status status) {
+		if(status == Config.Status.commonConcept)
+			return "common";
+		else if(status == Config.Status.originalConcept)
+			return "original";
+		else if(status == Config.Status.selectedBetweennessClosenessConcept)
+			return "betweenness+closeness";
+		else if(status == Config.Status.selectedEigenvectorConcept)
+			return "eigenvector";
+		else 
+			return "";
 	}
 	
 	@Override

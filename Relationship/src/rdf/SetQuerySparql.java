@@ -23,7 +23,7 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 public class SetQuerySparql {
 	private LinkedList<QuerySparql> listQuerySparql;
 	private int totalRDF;
-	private ListConcept listNewConcepts;  // will be fill after
+	private ListConcept listNewConcepts;  
 
 	public SetQuerySparql() {
 		this.listQuerySparql = new LinkedList<QuerySparql>();
@@ -37,26 +37,13 @@ public class SetQuerySparql {
 	public int getTotalConcepts() {
 		return this.listQuerySparql.size();
 	}
-	public int getTotalOriginalConcepts() {
-		int total = 0;
-		for(int i=0; i < this.listQuerySparql.size(); i++) {
-			if(this.listQuerySparql.get(i).getConcept().getIsOriginal())
-				total++;
-		}
-		return total;
-	}
 	public int getTotalRDFs() {
 		return this.totalRDF;
 	}
 	public void insertNewConcept(Concept concept) {
 		this.listNewConcepts.add(concept);
 	}
-	/*
-	public void insertNewConcept(String stringNewConcept) {
-		Concept objectNewConcept = new Concept(stringNewConcept);
-		this.listNewConcepts.add(objectNewConcept);
-	}
-	*/
+
 	public ListConcept getListNewConcepts() {
 		return this.listNewConcepts;
 	}
@@ -95,9 +82,9 @@ public class SetQuerySparql {
 		}
 	}
 		
-	// exceptional function, direct access to original concepts listQuerySparql
+	// exceptional function, direct access to current concepts listQuerySparql
 	// return one concept short name per line
-	public String getOriginalConcepts() {
+	public String getCurrentConcepts() {
 		StringBuffer out = new StringBuffer();
 		for(QuerySparql x: this.listQuerySparql) {
 			out.append(x.getConcept().toString());
@@ -106,9 +93,9 @@ public class SetQuerySparql {
 		return out.toString();
 	}
 	// exceptional function, direct access to original concepts listQuerySparql
-	// return one object LinkedList containing all original concepts short name 
-	public LinkedList<Concept> getLinkedListOriginalConcepts() {
-		LinkedList<Concept> list = new LinkedList<Concept>();
+	// return one object LinkedList containing all current concepts short name 
+	public ListConcept getListCurrentConcepts() {
+		ListConcept list = new ListConcept();
 		for(QuerySparql x: this.listQuerySparql) 		
 			list.add(x.getConcept());
 		return list;
@@ -187,7 +174,7 @@ public class SetQuerySparql {
 				// create complete registerRDF 
 				subjectRDF   = new SubjectRDF(subject.toString(), subject, this);
 				predicateRDF = new PredicateRDF(predicate.toString(), predicate);
-				objectRDF    = new ObjectRDF(object.toString(), object, this);
+				objectRDF    = new ObjectRDF(object.toString(), object);
 				oneRDF       = new OneRDF(statement, subjectRDF, predicateRDF, objectRDF);
 				
 				// insert complete item into listQuerySparql of the RDFs

@@ -1,4 +1,4 @@
-// v2.1 - fix problem about mark original concepts. It is not working.
+// v2.1b - fix problem about concept status. It is not working.
 
 package main;
 
@@ -44,7 +44,7 @@ public class MainProcess {
 				if(iteration >= 2)
 					currentSetQuerySparql.insertListQuerySparql(wholeSystem.getListSetQuerySparql().get(iteration-2).getListQuerySparql());
 				
-				wholeSystem.insertListSystemGraphData(new SystemGraphData(currentSetQuerySparql.getTotalOriginalConcepts()));
+				wholeSystem.insertListSystemGraphData(new SystemGraphData());
 				currentSystemGraphData = wholeSystem.getListSystemGraphData().get(iteration-1);
 				currentGraph = currentSystemGraphData.getStreamGraphData().getStreamGraph();
 				if(Config.graphStreamVisualization) {
@@ -91,9 +91,9 @@ public class MainProcess {
 				currentSystemGraphData.resumeSelectedNodes(currentSetQuerySparql);
 
 				Log.console("- Reporting selected nodes to new interation (iteration "+iteration+")+"
-						+ " - Quantity new concepts/original concepts: "
+						+ " - Quantity new concepts/old concepts: "
 						+ currentSetQuerySparql.getListNewConcepts().size()+"/"
-						+ currentSetQuerySparql.getLinkedListOriginalConcepts().size());
+						+ currentSetQuerySparql.getListCurrentConcepts().size());
 				
 				Log.outFileCompleteReport("Iteration "+iteration);
 				Log.outFileShortReport("Iteration "+iteration);
@@ -101,7 +101,7 @@ public class MainProcess {
 				Log.outFileShortReport(currentSetQuerySparql.toStringShort());
 				Log.outFileCompleteReport(currentSystemGraphData.toString());
 				Log.outFileShortReport(currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
-				report = currentSystemGraphData.reportSelectedNodes(currentSetQuerySparql);			
+				report = currentSystemGraphData.reportSelectedNodes(currentSetQuerySparql, iteration);			
 				Log.outFileCompleteReport(report);
 				Log.outFileShortReport(report);
 				

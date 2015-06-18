@@ -1,6 +1,7 @@
 package graph;
 
 import main.Config;
+import main.WholeSystem;
 import user.Concept;
 import user.ListConcept;
 
@@ -8,13 +9,13 @@ public class MeasuresRanks {
 	private int connectedComponentNumber;  
 	private GephiGraphData gephiGraphData; 
 	private NodesTableArray basicTable; // without order, to be used in the building of the other tables
-	private int originalQuantity;
 	private NodesTableArray betweenness; 
 	private NodesTableArray closeness;
 	private NodesTableArray eigenvector;
 	private NodesTableArray betweennessCloseness;
 	
 	private ListConcept originalConcepts;
+	private ListConcept currentConcepts;
 	private ListConcept betweennessClosenessConcepts;
 	private ListConcept eigenvectorConcepts;
 	
@@ -27,6 +28,7 @@ public class MeasuresRanks {
 		this.eigenvector                  = null;
 		this.betweennessCloseness     	  = null;
 		this.originalConcepts             = new ListConcept();
+		this.currentConcepts              = new ListConcept();
 		this.betweennessClosenessConcepts = new ListConcept();
 		this.eigenvectorConcepts          = new ListConcept();	
 	}
@@ -48,12 +50,6 @@ public class MeasuresRanks {
 	}
 	public void setBasicTable(NodesTableArray basicTable) {
 		this.basicTable = basicTable;
-	}
-	public int getOriginalQuantity() {
-		return this.originalQuantity;
-	}
-	public void setOriginalQuantity(int originalQuantity) {
-		this.originalQuantity = originalQuantity;
 	}
 	public NodesTableArray getBetweenness() {
 		return this.betweenness;
@@ -84,11 +80,23 @@ public class MeasuresRanks {
 		this.originalConcepts.add(concept);
 	}
  	public void insertOriginalConcept(String stringNewConcept) { 
-		Concept objectNewConcept = new Concept(stringNewConcept, false);  // false: not cool
+		Concept objectNewConcept = new Concept(stringNewConcept, true);  
 		this.originalConcepts.add(objectNewConcept);
 	}
 	public ListConcept getListOriginalConcepts() {
 		return this.originalConcepts;
+	}
+
+	public void insertCurrentConcepts(Concept concept) {
+		this.currentConcepts.add(concept);
+	}
+ 	public void insertCurrentConcept(String stringNewConcept) {
+ 		boolean isOriginalConcept = WholeSystem.isOriginalConcept(stringNewConcept);
+		Concept objectNewConcept = new Concept(stringNewConcept, isOriginalConcept);  
+		this.currentConcepts.add(objectNewConcept);
+	}
+	public ListConcept getListCurrentConcepts() {
+		return this.currentConcepts;
 	}
 
 	public void insertBetweennessClosenessConcept(Concept concept) {
@@ -114,7 +122,7 @@ public class MeasuresRanks {
 	}
 
 	public String toStringShort(int connectedComponentNumber, int quantityNodes) {
-		return  "\n"+Config.doubleLine+"Table array (betweenness sorted) - Connected component number: "
+		return  Config.doubleLine+"Table array (betweenness sorted) - Connected component number: "
 				+ connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
 				+ this.getBetweenness().toStringShort(quantityNodes) 
 		        + "\n"+Config.doubleLine+"Table array (closeness sorted) - Connected component number: "
@@ -129,7 +137,7 @@ public class MeasuresRanks {
 	}
 
 	public String toString(int connectedComponentNumber) {
-		return  "\n"+Config.doubleLine+"Table array (betweenness sorted) - Connected component number: "
+		return  Config.doubleLine+"Table array (betweenness sorted) - Connected component number: "
 				+ connectedComponentNumber + Config.singleLine  
 				+ this.getBetweenness().toString() 
 		        + "\n"+Config.doubleLine+"Table array (closeness sorted) - Connected component number: "

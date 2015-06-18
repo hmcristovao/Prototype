@@ -121,14 +121,14 @@ public class StreamGraphData {
 			node = this.streamGraph.addNode(subjectRDF.getLongName());
 			quantityNodesEdges.incNumNodes();
 			node.addAttribute("shortname", Concept.underlineToBlank(subjectRDF.getShortName()));
-			if(((NodeRDF)subjectRDF).getStatus() == Config.Level.originalConcept)
-				node.addAttribute("original", "true");
+			if(((NodeRDF)subjectRDF).getStatus() == Config.Status.originalConcept)
+				node.addAttribute("status", "true");
 			else
-				node.addAttribute("original", "false");
+				node.addAttribute("status", "false");
 			if(Config.nodeLabel)
 				node.addAttribute("label", subjectRDF.getShortName());
 			// if main node, put label
-			if(((NodeRDF)subjectRDF).getStatus() == Config.Level.originalConcept) { 
+			if(((NodeRDF)subjectRDF).getStatus() == Config.Status.originalConcept) { 
 				node.addAttribute("label", Concept.underlineToBlank(subjectRDF.getShortName()));
 			}		
 		}
@@ -151,14 +151,14 @@ public class StreamGraphData {
 				node = this.streamGraph.addNode(objectRDF.getLongName());
 				quantityNodesEdges.incNumNodes();
 				node.addAttribute("shortname", Concept.underlineToBlank(objectRDF.getShortName()));
-				if(((NodeRDF)objectRDF).getStatus() == Config.Level.originalConcept)
+				if(((NodeRDF)objectRDF).getStatus() == Config.Status.originalConcept)
 					node.addAttribute("original", "true");
 				else
 					node.addAttribute("original", "false");
 				if(Config.nodeLabel)
 					node.addAttribute("label", objectRDF.getShortName());
 				// if main node, put label 
-				if(((NodeRDF)objectRDF).getStatus() == Config.Level.originalConcept) { 
+				if(((NodeRDF)objectRDF).getStatus() == Config.Status.originalConcept) { 
 					node.addAttribute("label", Concept.underlineToBlank(objectRDF.getShortName()));
 				}
 			}
@@ -210,14 +210,18 @@ public class StreamGraphData {
 		StringBuffer str = new StringBuffer();
 		str.append("\nID: ");
 		str.append(node.toString());
-		str.append("\nShort name: ");
+		str.append(" - Short name: ");
 		str.append(node.getAttribute("shortname"));
-		str.append("\nDegree: ");
+		if(node.getAttribute("original").toString().equals("true")) {
+			str.append("   (original)");
+		}
+		str.append("\n[Degree: ");
 		str.append(node.getDegree());
-		str.append("\nIn degree: ");
+		str.append("] [In degree: ");
 		str.append(node.getInDegree());
-		str.append("\nOutDegree: ");
+		str.append("] [OutDegree: ");
 		str.append(node.getOutDegree());
+		str.append("]");
 		if(node.getAttribute("label") != null) {
 			str.append("\nLabel: ");
 			str.append(node.getAttribute("label"));
@@ -261,9 +265,9 @@ public class StreamGraphData {
 	}
 	
 	public String toStringShort() {
-		return  "\nTotal Nodes (counted):  " + this.getTotalNodes() +
-				"\nTotal Nodes (real):     " + this.getStreamGraph().getNodeCount() +
-				"\nTotal Edges (counted):  " + this.getTotalEdges() + 
+		return  "\nTotal nodes (counted):  " + this.getTotalNodes() +
+				"\nTotal nodes (real):     " + this.getStreamGraph().getNodeCount() +
+				"\nTotal edges (counted):  " + this.getTotalEdges() + 
 				"\nTotal duplicated nodes: " + this.getTotalNodesDuplicate() +
 				"\nTotal duplicated edges: " + this.getTotalEdgesDuplicate();
 	}

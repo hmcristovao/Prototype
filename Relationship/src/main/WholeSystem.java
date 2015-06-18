@@ -15,9 +15,10 @@ public class WholeSystem {
 	private ConceptMap conceptMap;
 	
 	public WholeSystem() {
-		this.listSetQuerySparql  = new LinkedList<SetQuerySparql>();
-		this.listSystemGraphData = new LinkedList<SystemGraphData>();
-		this.conceptMap          = new ConceptMap();
+		WholeSystem.originalConcepts = new ListConcept(); 
+		this.listSetQuerySparql      = new LinkedList<SetQuerySparql>();
+		this.listSystemGraphData     = new LinkedList<SystemGraphData>();
+		this.conceptMap              = new ConceptMap();
 	}
 
 	public static ListConcept getOriginalConcepts() {
