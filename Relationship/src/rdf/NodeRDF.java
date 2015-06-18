@@ -1,13 +1,14 @@
 package rdf;
 
 import main.Config;
+import main.WholeSystem;
 
 public class NodeRDF extends ItemRDF {
 	private Config.Level status;   
 	
-	public NodeRDF(String value, SetQuerySparql setQuerySparql) {
+	public NodeRDF(String value) {
 		super(value);
-		this.status = this.qualifyStatus(setQuerySparql);
+		this.status = WholeSystem.isOriginalConcept(this.getShortName());
 	}
 	public Config.Level getStatus() {
 		return this.status;

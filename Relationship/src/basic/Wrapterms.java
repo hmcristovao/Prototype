@@ -37,6 +37,8 @@ element ->  < TERM > ( < SEPARATORS > )*
     token = jj_consume_token(TERM);
                 concept = new Concept(token);
                 originalSetQuerySparql.insertQuerySparql(concept);
+                // copy the concept to static attribute in root class:
+                WholeSystem.getOriginalConcepts().add(concept);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {

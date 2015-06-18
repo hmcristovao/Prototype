@@ -1,4 +1,4 @@
-// v2.0 - restruture in the log files and report
+// v2.1 - fix problem about mark original concepts. It is not working.
 
 package main;
 
@@ -34,6 +34,7 @@ public class MainProcess {
 			parser.start(wholeSystem.getListSetQuerySparql().getFirst());
 			do {
 				currentSetQuerySparql = wholeSystem.getListSetQuerySparql().get(iteration-1);
+				Log.console("*** Iteration "+iteration+" ***");
 				Log.console("- Assembling queries (iteration "+iteration+").");
 				currentSetQuerySparql.fillQuery();
 				Log.console("- Collecting RDFs (iteration "+iteration+").");
@@ -99,7 +100,7 @@ public class MainProcess {
 				Log.outFileCompleteReport(currentSetQuerySparql.toString());
 				Log.outFileShortReport(currentSetQuerySparql.toStringShort());
 				Log.outFileCompleteReport(currentSystemGraphData.toString());
-				Log.outFileShortReport(currentSystemGraphData.toStringShort());
+				Log.outFileShortReport(currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
 				report = currentSystemGraphData.reportSelectedNodes(currentSetQuerySparql);			
 				Log.outFileCompleteReport(report);
 				Log.outFileShortReport(report);
@@ -120,7 +121,7 @@ public class MainProcess {
 				// preparation to a new iteration
 				isContinue = true;
 				newSetQuerySparql = new SetQuerySparql();
-				// copy new concepts
+				// copy new selected concepts
 				newSetQuerySparql.insertListConcept(currentSetQuerySparql.getListNewConcepts());
 				wholeSystem.insertListSetQuerySparql(newSetQuerySparql);
 				iteration++;

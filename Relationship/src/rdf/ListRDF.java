@@ -19,7 +19,7 @@ public class ListRDF {
 		return this.list.size();
 	}
 	
-	public void insert(OneRDF item) {
+	public void add(OneRDF item) {
 		this.list.add(item);  
 	}
 	@Override

@@ -78,7 +78,7 @@ public interface Config {
 	// CONFIG - REPORT 
     //
 	// quantity of nodes to show in short report
-	int quantityNodes = 5;
+	int quantityNodesShortReport = 5;
 
 	// ============================================================================
 	// CONFIG - CONCEPT MAP 

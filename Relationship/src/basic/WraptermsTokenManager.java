@@ -9,7 +9,7 @@ import rdf.*;
 public class WraptermsTokenManager implements WraptermsConstants
 {
 
-  /** Log output. */
+  /** Debug output. */
   public  java.io.PrintStream debugStream = System.out;
   /** Set debug output. */
   public  void setDebugStream(java.io.PrintStream ds) { debugStream = ds; }

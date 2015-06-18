@@ -42,7 +42,9 @@ void element(SetQuerySparql originalSetQuerySparql) : {Token token; Concept conc
 {
 	token = < TERM >
     {		concept = new Concept(token);
-		originalSetQuerySparql.insertQuerySparql(concept);			
+		originalSetQuerySparql.insertQuerySparql(concept);
+		// copy the concept to static attribute in root class:
+		WholeSystem.getOriginalConcepts().add(concept);			
     }
     ( < SEPARATORS > )*
 }

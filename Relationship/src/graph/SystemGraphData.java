@@ -345,7 +345,7 @@ public class SystemGraphData {
 			str.append("Connected component number: ");
 			str.append(this.ranks.getMeasuresRankTable(i).getConnectedComponentNumber());
 			str.append("\n");
-			str.append("\nOriginal concepts:\n ");
+			str.append("\nOriginal concepts:\n");
 			str.append(this.ranks.getMeasuresRankTable(i).getListOriginalConcepts().toString());
 			str.append("\n\nNew concepts (added by betweenness + closeness rank):\n ");
 			str.append(this.ranks.getMeasuresRankTable(i).getListBetweennessClosenessConcept().toString());
@@ -373,16 +373,19 @@ public class SystemGraphData {
 				this.getRanks().toString();
 	}
 	
-	public String toStringShort() {
+	public String toStringShort(int quantityNodes) {
 		return  "Stream Graph Data: \n" + this.getStreamGraphData().toStringShort() +
 				"\nQuantity connected component: " + this.connectedComponentsCount +
-		        "\n"+Config.doubleLine+"Table array (betweenness sorted):"+Config.singleLine + 
-				this.betweennessSortTable.toStringShort(Config.quantityNodes) +
-		        "\n"+Config.doubleLine+"Table array (closeness sorted): "+Config.singleLine + 
-				this.closenessSortTable.toStringShort(Config.quantityNodes) +
-		        "\n"+Config.doubleLine+"Table array (eingenvector sorted): "+Config.singleLine + 
-				this.eigenvectorSortTable.toStringShort(Config.quantityNodes) +		
-				this.getRanks().toStringShort(Config.quantityNodes);
+		        "\n"+Config.doubleLine+"Table array - Betweenness sorted - (only the first "+quantityNodes+" nodes)"+
+				Config.singleLine + 
+				this.betweennessSortTable.toStringShort(quantityNodes) +
+		        "\n"+Config.doubleLine+"Table array - Closeness sorted - (only the first "+quantityNodes+" nodes)"+
+				Config.singleLine + 
+				this.closenessSortTable.toStringShort(quantityNodes) +
+		        "\n"+Config.doubleLine+"Table array - Eingenvector sorted - (only the first "+quantityNodes+" nodes)"+
+				Config.singleLine + 
+				this.eigenvectorSortTable.toStringShort(quantityNodes) +		
+				this.getRanks().toStringShort(quantityNodes);
 	}
 	
 	

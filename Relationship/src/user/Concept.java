@@ -61,7 +61,24 @@ public class Concept {
 		else
 			return this.basicConcept;
 	}
-
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Concept))
+			return false;
+		Concept other = (Concept) obj;
+		if (basicConcept == null) {
+			if (other.basicConcept != null)
+				return false;
+		} else if (!basicConcept.equals(other.basicConcept))
+			return false;
+		return true;
+	}
+	
 	@Override
 	public String toString() {
 		String out = this.basicConcept;

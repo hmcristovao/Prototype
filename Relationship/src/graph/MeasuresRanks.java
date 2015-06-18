@@ -1,9 +1,8 @@
 package graph;
 
-import java.util.LinkedList;
-
 import main.Config;
 import user.Concept;
+import user.ListConcept;
 
 public class MeasuresRanks {
 	private int connectedComponentNumber;  
@@ -15,9 +14,9 @@ public class MeasuresRanks {
 	private NodesTableArray eigenvector;
 	private NodesTableArray betweennessCloseness;
 	
-	private LinkedList<Concept> originalConcepts;
-	private LinkedList<Concept> betweennessClosenessConcepts;
-	private LinkedList<Concept> eigenvectorConcepts;
+	private ListConcept originalConcepts;
+	private ListConcept betweennessClosenessConcepts;
+	private ListConcept eigenvectorConcepts;
 	
 	public MeasuresRanks(int number) {
 		this.connectedComponentNumber     = number;
@@ -27,9 +26,9 @@ public class MeasuresRanks {
 		this.closeness                    = null;
 		this.eigenvector                  = null;
 		this.betweennessCloseness     	  = null;
-		this.originalConcepts             = new LinkedList<Concept>();
-		this.betweennessClosenessConcepts = new LinkedList<Concept>();
-		this.eigenvectorConcepts          = new LinkedList<Concept>();	
+		this.originalConcepts             = new ListConcept();
+		this.betweennessClosenessConcepts = new ListConcept();
+		this.eigenvectorConcepts          = new ListConcept();	
 	}
 	
 	public int getConnectedComponentNumber() {
@@ -88,7 +87,7 @@ public class MeasuresRanks {
 		Concept objectNewConcept = new Concept(stringNewConcept, false);  // false: not cool
 		this.originalConcepts.add(objectNewConcept);
 	}
-	public LinkedList<Concept> getListOriginalConcepts() {
+	public ListConcept getListOriginalConcepts() {
 		return this.originalConcepts;
 	}
 
@@ -99,7 +98,7 @@ public class MeasuresRanks {
 		Concept objectNewConcept = new Concept(stringNewConcept, false);   // false: not cool
 		this.betweennessClosenessConcepts.add(objectNewConcept);
 	}
-	public LinkedList<Concept> getListBetweennessClosenessConcept() {
+	public ListConcept getListBetweennessClosenessConcept() {
 		return this.betweennessClosenessConcepts;
 	}
 
@@ -110,7 +109,7 @@ public class MeasuresRanks {
 		Concept objectNewConcept = new Concept(stringNewConcept, false);   // false: not cool
 		this.eigenvectorConcepts.add(objectNewConcept);
 	}
-	public LinkedList<Concept> getListEigenvectorConcept() {
+	public ListConcept getListEigenvectorConcept() {
 		return this.eigenvectorConcepts;
 	}
 

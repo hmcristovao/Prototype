@@ -261,20 +261,16 @@ public class StreamGraphData {
 	}
 	
 	public String toStringShort() {
-		return  "\ntotalNodes (count)= " 	+ this.getTotalNodes() +
-				"\ntotalNodes (real) = " 	+ this.getStreamGraph().getNodeCount() +
-				"\ntotalEdges (count)= " 	+ this.getTotalEdges() + 
-				"\ntotalNodesDuplicate = " 	+ this.getTotalNodesDuplicate() +
-				"\ntotalEdgesDuplicate = " 	+ this.getTotalEdgesDuplicate();
+		return  "\nTotal Nodes (counted):  " + this.getTotalNodes() +
+				"\nTotal Nodes (real):     " + this.getStreamGraph().getNodeCount() +
+				"\nTotal Edges (counted):  " + this.getTotalEdges() + 
+				"\nTotal duplicated nodes: " + this.getTotalNodesDuplicate() +
+				"\nTotal duplicated edges: " + this.getTotalEdgesDuplicate();
 	}
 	
 	public String toString() {
 		return  this.toStringGraph() +
-				"\n--------------------" +
-				"\ntotalNodes (count)= " 	+ this.getTotalNodes() +
-				"\ntotalNodes (real) = " 	+ this.getStreamGraph().getNodeCount() +
-				"\ntotalEdges (count)= " 	+ this.getTotalEdges() + 
-				"\ntotalNodesDuplicate = " 	+ this.getTotalNodesDuplicate() +
-				"\ntotalEdgesDuplicate = " 	+ this.getTotalEdgesDuplicate();
+				Config.singleLine +
+				this.toStringShort();
 	}
 }

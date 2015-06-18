@@ -7,6 +7,7 @@ import java.util.LinkedList;
 
 import main.Config;
 import user.Concept;
+import user.ListConcept;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -22,12 +23,12 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 public class SetQuerySparql {
 	private LinkedList<QuerySparql> listQuerySparql;
 	private int totalRDF;
-	private LinkedList<Concept> listNewConcepts;  // will be fill after
+	private ListConcept listNewConcepts;  // will be fill after
 
 	public SetQuerySparql() {
 		this.listQuerySparql = new LinkedList<QuerySparql>();
 		this.totalRDF  = 0;
-		this.listNewConcepts = new LinkedList<Concept>();
+		this.listNewConcepts = new ListConcept();
 	}
 	
 	public LinkedList<QuerySparql> getListQuerySparql() {
@@ -56,7 +57,7 @@ public class SetQuerySparql {
 		this.listNewConcepts.add(objectNewConcept);
 	}
 	*/
-	public LinkedList<Concept> getListNewConcepts() {
+	public ListConcept getListNewConcepts() {
 		return this.listNewConcepts;
 	}
 	public void incTotalRDFs() {
@@ -76,11 +77,11 @@ public class SetQuerySparql {
 		this.listQuerySparql.add(querySparql);  
 	}
 	// fill listQuerySparql with a concept list
-	public void insertListConcept(LinkedList<Concept> listConcept) {
+	public void insertListConcept(ListConcept listConcept) {
 		QueryString auxQuery;
 		ListRDF auxListRDF;
 		QuerySparql querySparql;
-		for(Concept concept : listConcept) { 
+		for(Concept concept : listConcept.getList()) { 
 			auxQuery = new QueryString();
 			auxListRDF = new ListRDF();
 			querySparql = new QuerySparql(concept, auxQuery, auxListRDF);
