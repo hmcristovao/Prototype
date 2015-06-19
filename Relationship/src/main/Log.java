@@ -51,14 +51,36 @@ public class Log {
 		System.out.print(Config.singleLine);
 	}
 	public static void console(String msg) {
-		System.out.println(msg);
+		System.out.print(msg);
 	}
 	public static void console(double value) {
-		System.out.println("\n" + value + "\n");
+		System.out.print("\n" + value + "\n");
 	}
 	public static void console(String msg, double value) {
-		System.out.println("\n" + msg + ": " + value + "\n");
+		System.out.print("\n" + msg + ": " + value + "\n");
 	}
-		
-	
+	public static void consoleln(String msg, String value) {
+		Log.console(msg, value);
+		System.out.print("\n");
+	}
+	public static void consoleln(boolean bool) {
+		Log.console(bool);
+		System.out.print("\n");
+	}
+	public static void consoleln(String msg, long value) {
+		Log.console(msg, value);
+		System.out.print("\n");
+	}
+	public static void consoleln(String msg) {
+		Log.console(msg);
+		System.out.print("\n");
+	}
+	public static void consoleln(double value) {
+		Log.console(value);
+		System.out.print("\n");
+	}
+	public static void consoleln(String msg, double value) {
+		Log.console(msg, value);
+		System.out.print("\n");
+	}		
 }

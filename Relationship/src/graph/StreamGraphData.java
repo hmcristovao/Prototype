@@ -89,10 +89,11 @@ public class StreamGraphData {
 		StreamGraphData.modifier++;
 	}
 	
-	public void buildStreamGraphData(SetQuerySparql setQuerySparql) {
+	public int buildStreamGraphData(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
 		OneRDF oneRDF;
+		int n = 0;
 		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
 		for(int i=0; i < setQuerySparql.getListQuerySparql().size(); i++) {
 			querySparql = setQuerySparql.getListQuerySparql().get(i);
@@ -107,8 +108,10 @@ public class StreamGraphData {
 				this.incTotalEdges(quantityNodesEdges.getNumEdges());
 				this.incTotalNodesDuplicate(2 - quantityNodesEdges.getNumNodes());
 				this.incTotalEdgesDuplicate(1 - quantityNodesEdges.getNumEdges());
+				n += quantityNodesEdges.getNumNodes();
 			}
 		}
+		return n;
 	}
 
 	private void insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 

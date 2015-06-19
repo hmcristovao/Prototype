@@ -1,4 +1,4 @@
-// v2.1c - fix problem about concept status. It is not working.
+// v2.2 - new log. Working!
 
 package main;
 
@@ -26,19 +26,24 @@ public class MainProcess {
 		
 	public static void body(Wrapterms parser) {
 		try {
-			Log.console("- Starting.");
+			Log.consoleln("- Starting.");
 			Log.init();	
-			Log.console("- Parsing terms.");
+			Log.consoleln("- Parsing terms.");
 			parser = new Wrapterms(new FileInputStream(Config.nameFileInput));
 			wholeSystem.insertListSetQuerySparql(new SetQuerySparql());
 			parser.start(wholeSystem.getListSetQuerySparql().getFirst());
+			int n;
 			do {
 				currentSetQuerySparql = wholeSystem.getListSetQuerySparql().get(iteration-1);
-				Log.console("*** Iteration "+iteration+" ***");
-				Log.console("- Assembling queries (iteration "+iteration+").");
-				currentSetQuerySparql.fillQuery();
-				Log.console("- Collecting RDFs (iteration "+iteration+").");
-				currentSetQuerySparql.fillRDFs();
+				Log.consoleln("*** Iteration "+iteration+" ***");
+				
+				Log.console("- Assembling queries (iteration "+iteration+")");
+				n = currentSetQuerySparql.fillQuery();
+				Log.consoleln(" - "+n+" querys assembled.");
+				
+				Log.console("- Collecting RDFs (iteration "+iteration+")");
+				n = currentSetQuerySparql.fillRDFs();
+				Log.consoleln(" - "+n+" new RDFs triples collected.");
 				
 				// if it is second iteration so forth, copy all objects of the last iteration
 				if(iteration >= 2)
@@ -48,52 +53,53 @@ public class MainProcess {
 				currentSystemGraphData = wholeSystem.getListSystemGraphData().get(iteration-1);
 				currentGraph = currentSystemGraphData.getStreamGraphData().getStreamGraph();
 				if(Config.graphStreamVisualization) {
-					Log.console("- Connecting Stream Visualization (iteration "+iteration+").");
+					Log.consoleln("- Connecting Stream Visualization (iteration "+iteration+").");
 					currentGraph.display(true);
 				}
 				if(Config.gephiVisualization) {
-					Log.console("- Connecting with Gephi (iteration "+iteration+").");
+					Log.consoleln("- Connecting with Gephi (iteration "+iteration+").");
 					JSONSender sender = new JSONSender("localhost", 8080, Config.nameGephiWorkspace);
 					currentGraph.addSink(sender);
 				}
 
 				Log.console("- Building Stream Graph Data (iteration "+iteration+").");
-				currentSystemGraphData.getStreamGraphData().buildStreamGraphData(currentSetQuerySparql);
-
-				Log.console("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array (iteration "+iteration+").");
+				n = currentSystemGraphData.getStreamGraphData().buildStreamGraphData(currentSetQuerySparql);
+				Log.consoleln(" - "+n+" nodes in the graph.");
+				
+				Log.consoleln("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array (iteration "+iteration+").");
 				currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
 
-				Log.console("- Building Gephi Graph Table (iteration "+iteration+").");
+				Log.consoleln("- Building Gephi Graph Table (iteration "+iteration+").");
 				currentSystemGraphData.getGephiGraphData().buildGephiGraphTable();
 
 				if(Config.gephiVisualization)  currentGraph.clearSinks();
 
-				Log.console("- Calculating measures of the whole network (iteration "+iteration+").");
+				Log.consoleln("- Calculating measures of the whole network (iteration "+iteration+").");
 				currentSystemGraphData.calculateMeasuresWholeNetwork();
 
-				Log.console("- Sorting measures of the whole network (iteration "+iteration+").");
+				Log.consoleln("- Sorting measures of the whole network (iteration "+iteration+").");
 				currentSystemGraphData.sortMeasuresWholeNetwork();
 
-				Log.console("- Classifying connected component and building sub graphs (iteration "+iteration+").");
+				Log.consoleln("- Classifying connected component and building sub graphs (iteration "+iteration+").");
 				currentSystemGraphData.classifyConnectedComponent_BuildSubGraph();
 
-				Log.console("- Building sub-graphs tables belong to connected components (iteration "+iteration+").");
+				Log.consoleln("- Building sub-graphs tables belong to connected components (iteration "+iteration+").");
 				currentSystemGraphData.buildBasicTableSubGraph();
 
-				Log.console("- Sorting connected componets ranks (iteration "+iteration+").");
+				Log.consoleln("- Sorting connected componets ranks (iteration "+iteration+").");
 				currentSystemGraphData.sortConnectecComponentRanks();
 
-				Log.console("- Selecting current concepts (iteration "+iteration+").");
+				Log.consoleln("- Selecting current concepts (iteration "+iteration+").");
 				currentSystemGraphData.resumeCurrentConcepts();
 
-				Log.console("- Analysing graph data and selecting candidate nodes (iteration "+iteration+").");
+				Log.consoleln("- Analysing graph data and selecting candidate nodes (iteration "+iteration+").");
 				currentSystemGraphData.analyseGraphData();
 
-				Log.console("- Resuming selected nodes to new interation (iteration "+iteration+")"
+				Log.consoleln("- Resuming selected nodes to new interation (iteration "+iteration+")"
 						+ " - Connected conponent: "+currentSystemGraphData.getConnectedComponentsCount()+".");
 				currentSystemGraphData.resumeSelectedNodes(currentSetQuerySparql);
 
-				Log.console("- Reporting selected nodes to new interation (iteration "+iteration+")+"
+				Log.consoleln("- Reporting selected nodes to new interation (iteration "+iteration+")+"
 						+ " - Quantity new concepts/old concepts: "
 						+ currentSetQuerySparql.getListNewConcepts().size()+"/"
 						+ currentSetQuerySparql.getListCurrentConcepts().size());
@@ -122,6 +128,7 @@ public class MainProcess {
 					break;
 				
 				// preparation to a new iteration
+				Log.consoleln("- Preparing data to new iteration.");
 				isContinue = true;
 				newSetQuerySparql = new SetQuerySparql();
 				// copy new selected concepts

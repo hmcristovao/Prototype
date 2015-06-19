@@ -348,9 +348,8 @@ public class SystemGraphData {
 			str.append(this.ranks.getMeasuresRankTable(i).getConnectedComponentNumber());
 			str.append("   (iteration ");
 			str.append(iteration);
-			str.append(")\n\nCurrent concepts:\n");
-			str.append(this.ranks.getMeasuresRankTable(i).getListCurrentConcepts().toString());
-			str.append("---\n");
+			str.append(")\n\nOriginal concepts:\n");
+			// str.append(this.ranks.getMeasuresRankTable(i).getListCurrentConcepts().toString()); - I can not show this
 			str.append(this.ranks.getMeasuresRankTable(i).getListOriginalConcepts().toString());
 			str.append("\nNew concepts added from betweenness + closeness rank:\n");
 			str.append(this.ranks.getMeasuresRankTable(i).getListBetweennessClosenessConcept().toString());

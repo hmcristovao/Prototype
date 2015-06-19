@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - LOG AND PRINT 
     //
-	String  testNumber = "07"; 
+	String  testNumber = "16"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
@@ -52,7 +52,7 @@ public interface Config {
     //
 	// range of the quantity of iterations
 	int minIteration = 2;
-	int maxIteration = 2;
+	int maxIteration = 3;
 	
 	// proporcion above total original concept
 	double proporcionBetweenness = 4;

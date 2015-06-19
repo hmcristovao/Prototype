@@ -130,20 +130,23 @@ public class SetQuerySparql {
 		return newQueryDefault;
 	}
 	
-	public void fillQuery() throws IOException {	
+	public int fillQuery() throws IOException {	
 	    StringBuffer queryDefault = this.readFileQueryDefault();
 	    StringBuffer newQueryDefault = null;
 	    String newConcept = null;
 	    QueryString queryString = null;
+	    int n = 0;
 		for(QuerySparql x: this.getListQuerySparql()) {
 			newConcept = x.getConcept().getUnderlineConcept();
 			newQueryDefault = this.replaceQueryDefault(queryDefault, newConcept);
 			queryString = new QueryString(newQueryDefault);
 			x.setQuery(queryString);
+			n++;
 		}
+		return n;
 	}
 	
-	public void fillRDFs() throws Exception {
+	public int fillRDFs() throws Exception {
 		QuerySparql querySparql;
 		String queryStr;
 		Query query;
@@ -159,6 +162,7 @@ public class SetQuerySparql {
 		ItemRDF subjectRDF;
 		ItemRDF predicateRDF;
 		ItemRDF objectRDF;
+		int n = 0;
 		for(int i=0; i < this.getListQuerySparql().size(); i++) {
 			querySparql = this.getListQuerySparql().get(i);
 			queryStr = querySparql.getQueryString().getQueryStrString();
@@ -184,11 +188,13 @@ public class SetQuerySparql {
 				
 				// insert complete item into listQuerySparql of the RDFs
 				listRDF.getList().add(oneRDF);
+				n++;
 				
 				this.incTotalRDFs();
 			}
 		    queryExecution.close();
 		}
+		return n;
 	}
 	
 	// consider basicConcept without underline character
