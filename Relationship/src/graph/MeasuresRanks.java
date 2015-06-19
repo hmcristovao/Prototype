@@ -1,7 +1,6 @@
 package graph;
 
 import main.Config;
-import main.WholeSystem;
 import user.Concept;
 import user.ListConcept;
 
@@ -79,8 +78,8 @@ public class MeasuresRanks {
 	public void insertOriginalConcepts(Concept concept) {
 		this.originalConcepts.add(concept);
 	}
- 	public void insertOriginalConcept(String stringNewConcept) { 
-		Concept objectNewConcept = new Concept(stringNewConcept, true);  
+ 	public void insertOriginalConcept(NodeData nodeData) { 
+		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
 		this.originalConcepts.add(objectNewConcept);
 	}
 	public ListConcept getListOriginalConcepts() {
@@ -90,9 +89,8 @@ public class MeasuresRanks {
 	public void insertCurrentConcepts(Concept concept) {
 		this.currentConcepts.add(concept);
 	}
- 	public void insertCurrentConcept(String stringNewConcept) {
- 		boolean isOriginalConcept = WholeSystem.isOriginalConcept(stringNewConcept);
-		Concept objectNewConcept = new Concept(stringNewConcept, isOriginalConcept);  
+ 	public void insertCurrentConcept(NodeData nodeData) {
+		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
 		this.currentConcepts.add(objectNewConcept);
 	}
 	public ListConcept getListCurrentConcepts() {
@@ -102,8 +100,8 @@ public class MeasuresRanks {
 	public void insertBetweennessClosenessConcept(Concept concept) {
 		this.betweennessClosenessConcepts.add(concept);
 	}
-	public void insertBetweennessClosenessConcept(String stringNewConcept) {
-		Concept objectNewConcept = new Concept(stringNewConcept, false);   // false: not cool
+	public void insertBetweennessClosenessConcept(NodeData nodeData) {
+		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
 		this.betweennessClosenessConcepts.add(objectNewConcept);
 	}
 	public ListConcept getListBetweennessClosenessConcept() {
@@ -113,8 +111,8 @@ public class MeasuresRanks {
 	public void insertEigenvectorConcept(Concept concept) {
 		this.eigenvectorConcepts.add(concept);
 	}
-	public void insertEigenvectorConcept(String stringNewConcept) {
-		Concept objectNewConcept = new Concept(stringNewConcept, false);   // false: not cool
+	public void insertEigenvectorConcept(NodeData nodeData) {
+		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
 		this.eigenvectorConcepts.add(objectNewConcept);
 	}
 	public ListConcept getListEigenvectorConcept() {

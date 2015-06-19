@@ -7,10 +7,14 @@ import main.WholeSystem;
 public class NodeRDF extends ItemRDF {
 	private Config.Status status;   
 	
-	public NodeRDF(String value) {
+	public NodeRDF(String value, SetQuerySparql setQuerySparql) {
 		super(value);
-		if(WholeSystem.isOriginalConcept(Concept.underlineToBlank(this.getShortName())))
+		String shortNameWithoutUnderline = Concept.underlineToBlank(this.getShortName());
+		if(WholeSystem.isOriginalConcept(shortNameWithoutUnderline))
 			this.status = Config.Status.originalConcept;
+		// if is it not original, then verify if node RDF is current concept:
+		else if(setQuerySparql.isCurrentConcept(shortNameWithoutUnderline))
+			this.status =  Config.Status.selected; 
 		else
 			this.status = Config.Status.commonConcept;
 	}
@@ -19,11 +23,7 @@ public class NodeRDF extends ItemRDF {
 	}
 	
 	public String toString() {
-		StringBuffer out = new StringBuffer();
-		out.append(super.toString());
-		if(this.status == Config.Status.originalConcept) 
-			out.append(" - \"original concept\"");
-		return out.toString();
+		return super.toString() + " - (" + Concept.statusToString(this.status) + ")";
 	}
 
 }

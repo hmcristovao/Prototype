@@ -1,4 +1,4 @@
-// v2.1b - fix problem about concept status. It is not working.
+// v2.1c - fix problem about concept status. It is not working.
 
 package main;
 
@@ -82,6 +82,9 @@ public class MainProcess {
 
 				Log.console("- Sorting connected componets ranks (iteration "+iteration+").");
 				currentSystemGraphData.sortConnectecComponentRanks();
+
+				Log.console("- Selecting current concepts (iteration "+iteration+").");
+				currentSystemGraphData.resumeCurrentConcepts();
 
 				Log.console("- Analysing graph data and selecting candidate nodes (iteration "+iteration+").");
 				currentSystemGraphData.analyseGraphData();

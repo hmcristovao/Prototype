@@ -71,8 +71,24 @@ public class Concept {
 			return "betweenness+closeness";
 		else if(status == Config.Status.selectedEigenvectorConcept)
 			return "eigenvector";
+		else if(status == Config.Status.selected)
+			return "selected";
 		else 
 			return "";
+	}
+	public static Config.Status stringToStatus(String str) {
+		if(str.equals("common"))
+			return Config.Status.commonConcept;
+		else if(str.equals("original"))
+			return Config.Status.originalConcept;
+		else if(str.equals("betweenness+closeness"))
+			return Config.Status.selectedBetweennessClosenessConcept;
+		else if(str.equals("eigenvector"))
+			return Config.Status.commonConcept;
+		else if(str.equals("selected"))
+			return Config.Status.selected;
+		else 
+			return Config.Status.noStatus;
 	}
 	
 	@Override
@@ -94,10 +110,8 @@ public class Concept {
 	
 	@Override
 	public String toString() {
-		String out = this.basicConcept;
-		out += " / " + this.underlineConcept;
-		if(this.isOriginal)
-		   out += " - (original)";
+		String out = this.underlineConcept;
+		out += " / " + this.toStringShort();
 		if(this.isCategory)
 			out += " - (category)";
 		return out;

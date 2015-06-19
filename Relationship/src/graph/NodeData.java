@@ -1,6 +1,7 @@
 // It is one raw of the table of nodes (NodesTableArray)
 package graph;
 
+import user.Concept;
 import main.Config;
 
 public class NodeData {
@@ -64,18 +65,6 @@ public class NodeData {
 	}
 	public Config.Status getStatus() {
 		return this.status;
-	}
-	public String getStrStatus() {
-		String str = null;
-		if(this.status == Config.Status.commonConcept)
-			str = "common";
-		else if(this.status == Config.Status.originalConcept)
-			str = "original";
-		else if(this.status == Config.Status.selectedBetweennessClosenessConcept)
-			str = "selected by betweenness+closeness";
-		else if(this.status == Config.Status.selectedBetweennessClosenessConcept)
-			str = "selected by eigenvector";
-		return str;
 	}
 	public void setStatus(Config.Status status) {
 		this.status = status;
@@ -145,7 +134,7 @@ public class NodeData {
 	public String toString() {
 		return  "Id: " + this.getStrIdNode() +
 				"\nShort name: " + this.getShortName() +
-				"\nStatus: " + this.getStrStatus() +
+				"\nStatus: " + Concept.statusToString(this.status) +
 				"\nConnected component: " + this.getConnectedComponent() +
 				"\nBetweenness: " + this.getBetweenness() +
 				"\nCloseness: " + this.getCloseness() +

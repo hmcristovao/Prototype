@@ -94,10 +94,7 @@ public class SystemGraphData {
 			idNode = streamNode.toString();
 			Node gephiNode = this.gephiGraphData.getGraphModel().factory().newNode(idNode);
 			this.gephiGraphData.getGephiGraph().addNode(gephiNode);
-			if(streamNode.getAttribute("original").toString().compareTo("true")==0)
-				status = Config.Status.originalConcept;
-			else
-				status = Config.Status.commonConcept;
+			status = Concept.stringToStatus(streamNode.getAttribute("status").toString());
 			// create a new NodeData object
 			newNodeData = new NodeData(idNode, streamNode.getAttribute("shortname").toString(), streamNode, gephiNode, status);
 			// add attributes to new nodeData
@@ -114,7 +111,7 @@ public class SystemGraphData {
 			// add node (the same) in nodesTableHash
 			this.nodesTableHash.put(idNode,  newNodeData);
 		}
-		// each edge: add in graphData
+		// each edge: add in gephiGraphData
 		for( org.graphstream.graph.Edge streamEdge : streamGraph.getEachEdge() ) {
 			String idNode0 = streamEdge.getNode0().toString();
 			String idNode1 = streamEdge.getNode1().toString();
@@ -292,40 +289,48 @@ public class SystemGraphData {
 			}	
 		}
 	}
-	
-	// store new concepts into ranks table, in each connected component
-	public void resumeSelectedNodes(SetQuerySparql setQuerySparql) throws Exception {
+
+	// store current concepts into new concept table, in each connected component
+	public void resumeCurrentConcepts() throws Exception {
 		NodeData currentNodeData = null;
-		Concept concept = null;
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			for(int j=0; j < this.ranks.getMeasuresRankTable(i).getBasicTable().getCount(); j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getBasicTable().getNodeData(j);
 				if(currentNodeData.getStatus() != Config.Status.commonConcept) {
-					this.ranks.getMeasuresRankTable(i).insertCurrentConcept(currentNodeData.getShortName());
+					this.ranks.getMeasuresRankTable(i).insertCurrentConcept(currentNodeData);
 				}
-				else if(currentNodeData.getStatus() == Config.Status.originalConcept) { 
-					this.ranks.getMeasuresRankTable(i).insertOriginalConcept(currentNodeData.getShortName());
+				if(currentNodeData.getStatus() == Config.Status.originalConcept) { 
+					this.ranks.getMeasuresRankTable(i).insertOriginalConcept(currentNodeData);
 				}
+			}
+		}
+	}
+
+	// store new concepts into ranks table, in each connected component
+	public void resumeSelectedNodes(SetQuerySparql setQuerySparql) throws Exception {
+		NodeData currentNodeData = null;
+		Concept concept;
+		for(int i=0; i < this.connectedComponentsCount; i++) {
+			for(int j=0; j < this.ranks.getMeasuresRankTable(i).getBasicTable().getCount(); j++) {
+				currentNodeData = this.ranks.getMeasuresRankTable(i).getBasicTable().getNodeData(j);
 				
 				if(currentNodeData.getStatus() == Config.Status.selectedBetweennessClosenessConcept) {
-					concept = new Concept(currentNodeData.getShortName(), false);
-					this.ranks.getMeasuresRankTable(i).insertBetweennessClosenessConcept(concept);
-					setQuerySparql.insertNewConcept(concept);
+					this.ranks.getMeasuresRankTable(i).insertBetweennessClosenessConcept(currentNodeData);
+					setQuerySparql.insertNewConcept(currentNodeData);
 					if(Config.additionNewConceptWithoutCategory) {
-						if(concept.getIsCategory()) {
-							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()), false);
+						if(Concept.verifyIfCategory(currentNodeData.getShortName())) {
+							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()),currentNodeData.getStatus());
 							this.ranks.getMeasuresRankTable(i).insertBetweennessClosenessConcept(concept);
 							setQuerySparql.insertNewConcept(concept);							
 						}
 					}
 				}
 				else if(currentNodeData.getStatus() == Config.Status.selectedEigenvectorConcept) {
-					concept = new Concept(currentNodeData.getShortName(), false);
-					this.ranks.getMeasuresRankTable(i).insertEigenvectorConcept(concept);
-					setQuerySparql.insertNewConcept(concept);
+					this.ranks.getMeasuresRankTable(i).insertEigenvectorConcept(currentNodeData);
+					setQuerySparql.insertNewConcept(currentNodeData);
 					if(Config.additionNewConceptWithoutCategory) {
-						if(concept.getIsCategory()) {
-							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()), false);
+						if(Concept.verifyIfCategory(currentNodeData.getShortName())) {
+							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()),currentNodeData.getStatus());
 							this.ranks.getMeasuresRankTable(i).insertEigenvectorConcept(concept);
 							setQuerySparql.insertNewConcept(concept);							
 						}
@@ -334,6 +339,7 @@ public class SystemGraphData {
 			}
 		}
 	}
+	
 	
 	public String reportSelectedNodes(SetQuerySparql setQuerySparql, int iteration) throws Exception {
 		StringBuffer str = new StringBuffer();
@@ -344,6 +350,8 @@ public class SystemGraphData {
 			str.append(iteration);
 			str.append(")\n\nCurrent concepts:\n");
 			str.append(this.ranks.getMeasuresRankTable(i).getListCurrentConcepts().toString());
+			str.append("---\n");
+			str.append(this.ranks.getMeasuresRankTable(i).getListOriginalConcepts().toString());
 			str.append("\nNew concepts added from betweenness + closeness rank:\n");
 			str.append(this.ranks.getMeasuresRankTable(i).getListBetweennessClosenessConcept().toString());
 			str.append("\nNew concepts added from eigenvector rank:\n");

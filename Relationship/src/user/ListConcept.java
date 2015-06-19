@@ -22,11 +22,12 @@ public class ListConcept {
 	@Override
 	public String toString() {
 		StringBuffer str = new StringBuffer();
-		for(Concept x : this.list) {
-			str.append("- ");
-			str.append(x.toStringShort());
-			str.append("\n");
-		}
+		if(this.list != null)
+    		for(Concept x : this.list) {
+	    		str.append("- ");
+    			str.append(x.toStringShort());
+	    		str.append("\n");
+		    }
 		return str.toString();
 	}
 }

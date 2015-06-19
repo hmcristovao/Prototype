@@ -1,5 +1,7 @@
 package rdf;
 
+import graph.NodeData;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -42,6 +44,9 @@ public class SetQuerySparql {
 	}
 	public void insertNewConcept(Concept concept) {
 		this.listNewConcepts.add(concept);
+	}
+	public void insertNewConcept(NodeData nodeData) {
+		this.listNewConcepts.add(new Concept(nodeData.getShortName(), nodeData.getStatus()));
 	}
 
 	public ListConcept getListNewConcepts() {
@@ -174,7 +179,7 @@ public class SetQuerySparql {
 				// create complete registerRDF 
 				subjectRDF   = new SubjectRDF(subject.toString(), subject, this);
 				predicateRDF = new PredicateRDF(predicate.toString(), predicate);
-				objectRDF    = new ObjectRDF(object.toString(), object);
+				objectRDF    = new ObjectRDF(object.toString(), object, this);
 				oneRDF       = new OneRDF(statement, subjectRDF, predicateRDF, objectRDF);
 				
 				// insert complete item into listQuerySparql of the RDFs
@@ -185,7 +190,16 @@ public class SetQuerySparql {
 		    queryExecution.close();
 		}
 	}
-
+	
+	// consider basicConcept without underline character
+	public boolean isCurrentConcept(String basicConcept) {
+		for(QuerySparql x : this.getListQuerySparql()) {
+			if(x.getConcept().equals(basicConcept))
+				return true;
+		}
+		return false;
+	}
+	
 	public String toStringShort() {
 		StringBuffer out = new StringBuffer();
 		int n = 1;

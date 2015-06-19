@@ -1,5 +1,6 @@
  package graph;
 import main.Config;
+import main.Log;
 
 import org.graphstream.algorithm.BetweennessCentrality;
 import org.graphstream.algorithm.measure.ClosenessCentrality;
@@ -117,14 +118,13 @@ public class StreamGraphData {
 		ItemRDF objectRDF    = oneRDF.getObject();
 		Node node = null;
 		Edge edge = null;
+		String strStatus;
 		try {
 			node = this.streamGraph.addNode(subjectRDF.getLongName());
 			quantityNodesEdges.incNumNodes();
 			node.addAttribute("shortname", Concept.underlineToBlank(subjectRDF.getShortName()));
-			if(((NodeRDF)subjectRDF).getStatus() == Config.Status.originalConcept)
-				node.addAttribute("status", "true");
-			else
-				node.addAttribute("status", "false");
+			strStatus = Concept.statusToString(((NodeRDF)subjectRDF).getStatus());
+			node.addAttribute("status", strStatus);
 			if(Config.nodeLabel)
 				node.addAttribute("label", subjectRDF.getShortName());
 			// if main node, put label
@@ -151,10 +151,8 @@ public class StreamGraphData {
 				node = this.streamGraph.addNode(objectRDF.getLongName());
 				quantityNodesEdges.incNumNodes();
 				node.addAttribute("shortname", Concept.underlineToBlank(objectRDF.getShortName()));
-				if(((NodeRDF)objectRDF).getStatus() == Config.Status.originalConcept)
-					node.addAttribute("original", "true");
-				else
-					node.addAttribute("original", "false");
+				strStatus = Concept.statusToString(((NodeRDF)objectRDF).getStatus());
+				node.addAttribute("status", strStatus);
 				if(Config.nodeLabel)
 					node.addAttribute("label", objectRDF.getShortName());
 				// if main node, put label 
@@ -212,9 +210,8 @@ public class StreamGraphData {
 		str.append(node.toString());
 		str.append(" - Short name: ");
 		str.append(node.getAttribute("shortname"));
-		if(node.getAttribute("original").toString().equals("true")) {
-			str.append("   (original)");
-		}
+		str.append(" - ");
+		str.append(node.getAttribute("status").toString());
 		str.append("\n[Degree: ");
 		str.append(node.getDegree());
 		str.append("] [In degree: ");
