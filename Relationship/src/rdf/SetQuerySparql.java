@@ -1,7 +1,5 @@
 package rdf;
 
-import graph.NodeData;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,7 +7,7 @@ import java.util.LinkedList;
 
 import main.Config;
 import user.Concept;
-import user.ListConcept;
+import user.GroupConcept;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecution;
@@ -25,12 +23,10 @@ import com.hp.hpl.jena.rdf.model.StmtIterator;
 public class SetQuerySparql {
 	private LinkedList<QuerySparql> listQuerySparql;
 	private int totalRDF;
-	private ListConcept listNewConcepts;  
 
 	public SetQuerySparql() {
 		this.listQuerySparql = new LinkedList<QuerySparql>();
 		this.totalRDF  = 0;
-		this.listNewConcepts = new ListConcept();
 	}
 	
 	public LinkedList<QuerySparql> getListQuerySparql() {
@@ -41,16 +37,6 @@ public class SetQuerySparql {
 	}
 	public int getTotalRDFs() {
 		return this.totalRDF;
-	}
-	public void insertNewConcept(Concept concept) {
-		this.listNewConcepts.add(concept);
-	}
-	public void insertNewConcept(NodeData nodeData) {
-		this.listNewConcepts.add(new Concept(nodeData.getShortName(), nodeData.getStatus()));
-	}
-
-	public ListConcept getListNewConcepts() {
-		return this.listNewConcepts;
 	}
 	public void incTotalRDFs() {
 		this.totalRDF++;
@@ -69,11 +55,11 @@ public class SetQuerySparql {
 		this.listQuerySparql.add(querySparql);  
 	}
 	// fill listQuerySparql with a concept list
-	public void insertListConcept(ListConcept listConcept) {
+	public void insertListConcept(GroupConcept groupConcept) {
 		QueryString auxQuery;
 		ListRDF auxListRDF;
 		QuerySparql querySparql;
-		for(Concept concept : listConcept.getList()) { 
+		for(Concept concept : groupConcept.getList()) { 
 			auxQuery = new QueryString();
 			auxListRDF = new ListRDF();
 			querySparql = new QuerySparql(concept, auxQuery, auxListRDF);
@@ -99,8 +85,8 @@ public class SetQuerySparql {
 	}
 	// exceptional function, direct access to original concepts listQuerySparql
 	// return one object LinkedList containing all current concepts short name 
-	public ListConcept getListCurrentConcepts() {
-		ListConcept list = new ListConcept();
+	public GroupConcept getListCurrentConcepts() {
+		GroupConcept list = new GroupConcept();
 		for(QuerySparql x: this.listQuerySparql) 		
 			list.add(x.getConcept());
 		return list;
@@ -181,9 +167,9 @@ public class SetQuerySparql {
 				object    = statement.getObject();
 				
 				// create complete registerRDF 
-				subjectRDF   = new SubjectRDF(subject.toString(), subject, this);
+				subjectRDF   = new SubjectRDF(subject.toString(), subject);
 				predicateRDF = new PredicateRDF(predicate.toString(), predicate);
-				objectRDF    = new ObjectRDF(object.toString(), object, this);
+				objectRDF    = new ObjectRDF(object.toString(), object);
 				oneRDF       = new OneRDF(statement, subjectRDF, predicateRDF, objectRDF);
 				
 				// insert complete item into listQuerySparql of the RDFs

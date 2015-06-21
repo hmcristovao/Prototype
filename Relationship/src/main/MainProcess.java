@@ -1,7 +1,8 @@
-// v2.2 - new log. Working!
+// v2.3 - restruture register of the Group of Concepts
 
 package main;
 
+import graph.QuantityNodesEdges;
 import graph.SystemGraphData;
 
 import java.io.FileInputStream;
@@ -18,7 +19,7 @@ public class MainProcess {
 	public static WholeSystem wholeSystem = new WholeSystem();
 	public static String report;
 	public static boolean isContinue = false;
-	public static int iteration = 1;
+	public static int iteration = 0;
 	public static SetQuerySparql  currentSetQuerySparql;
 	public static SystemGraphData currentSystemGraphData;
 	public static Graph           currentGraph;
@@ -33,8 +34,9 @@ public class MainProcess {
 			wholeSystem.insertListSetQuerySparql(new SetQuerySparql());
 			parser.start(wholeSystem.getListSetQuerySparql().getFirst());
 			int n;
+			QuantityNodesEdges quantityNodesEdges = null;
 			do {
-				currentSetQuerySparql = wholeSystem.getListSetQuerySparql().get(iteration-1);
+				currentSetQuerySparql = wholeSystem.getListSetQuerySparql().get(iteration);
 				Log.consoleln("*** Iteration "+iteration+" ***");
 				
 				Log.console("- Assembling queries (iteration "+iteration+")");
@@ -44,14 +46,10 @@ public class MainProcess {
 				Log.console("- Collecting RDFs (iteration "+iteration+")");
 				n = currentSetQuerySparql.fillRDFs();
 				Log.consoleln(" - "+n+" new RDFs triples collected.");
-				
-				// if it is second iteration so forth, copy all objects of the last iteration
-				if(iteration >= 2)
-					currentSetQuerySparql.insertListQuerySparql(wholeSystem.getListSetQuerySparql().get(iteration-2).getListQuerySparql());
-				
+								
 				wholeSystem.insertListSystemGraphData(new SystemGraphData());
-				currentSystemGraphData = wholeSystem.getListSystemGraphData().get(iteration-1);
-				currentGraph = currentSystemGraphData.getStreamGraphData().getStreamGraph();
+				currentSystemGraphData = wholeSystem.getListSystemGraphData().get(iteration);
+				currentGraph = WholeSystem.getStreamGraphData().getStreamGraph();
 				if(Config.graphStreamVisualization) {
 					Log.consoleln("- Connecting Stream Visualization (iteration "+iteration+").");
 					currentGraph.display(true);
@@ -62,12 +60,17 @@ public class MainProcess {
 					currentGraph.addSink(sender);
 				}
 
-				Log.console("- Building Stream Graph Data (iteration "+iteration+").");
-				n = currentSystemGraphData.getStreamGraphData().buildStreamGraphData(currentSetQuerySparql);
-				Log.consoleln(" - "+n+" nodes in the graph.");
+				Log.console("- Building Stream Graph Data (iteration "+iteration+")");
+				quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData(currentSetQuerySparql);
+				Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" new nodes, "+quantityNodesEdges.getNumEdges()+" new edges in the visualization graph.");
 				
-				Log.consoleln("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array (iteration "+iteration+").");
-				currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
+				// if it is second iteration so forth, copy all objects of the last iteration
+				if(iteration >= 1)
+					currentSetQuerySparql.insertListQuerySparql(wholeSystem.getListSetQuerySparql().get(iteration-1).getListQuerySparql());
+				
+				Log.console("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array (iteration "+iteration+")");
+				quantityNodesEdges = currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
+				Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" nodes, "+quantityNodesEdges.getNumEdges()+" edges in the graph structure.");
 
 				Log.consoleln("- Building Gephi Graph Table (iteration "+iteration+").");
 				currentSystemGraphData.getGephiGraphData().buildGephiGraphTable();
@@ -106,25 +109,31 @@ public class MainProcess {
 				
 				Log.outFileCompleteReport("Iteration "+iteration);
 				Log.outFileShortReport("Iteration "+iteration);
+
 				Log.outFileCompleteReport(currentSetQuerySparql.toString());
 				Log.outFileShortReport(currentSetQuerySparql.toStringShort());
+				
+				Log.outFileCompleteReport(WholeSystem.getStreamGraphData().toString());
+				Log.outFileShortReport(WholeSystem.getStreamGraphData().toStringShort());
+				
 				Log.outFileCompleteReport(currentSystemGraphData.toString());
 				Log.outFileShortReport(currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
+				
 				report = currentSystemGraphData.reportSelectedNodes(currentSetQuerySparql, iteration);			
 				Log.outFileCompleteReport(report);
 				Log.outFileShortReport(report);
 				
 				// conditionals to continue the iteration
 				// verify the iteration limit				
-				if(iteration == Config.maxIteration) {
+				if(iteration >= Config.maxIteration) {
 					break;
 				}
 				// at least x iterations are necessary
-				else if(iteration <= Config.minIteration) {
+				else if(iteration < Config.minIteration) {
 					;
 				}
-				// checks if there are still more than one connected components 
-				else if(currentSystemGraphData.getRanks().getCount() == 1)
+				// checks if there is only one connected component 
+				else if(currentSystemGraphData.getRanks().getCount() <= 1)
 					break;
 				
 				// preparation to a new iteration
@@ -137,11 +146,11 @@ public class MainProcess {
 				iteration++;
 			} while(isContinue);
 				
-			Log.console("- Closing.");
+			Log.consoleln("- Closing.");
 		    if(Config.graphStreamVisualization) 
 				currentGraph.clear();
 			Log.close();
-			Log.console("- Ok!");
+			Log.consoleln("- Ok!");
 		}
 		catch(FileNotFoundException e) {
 			System.err.println("Error: file not found.");

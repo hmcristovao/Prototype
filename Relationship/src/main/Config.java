@@ -32,15 +32,16 @@ public interface Config {
     //
 	String nameGraph = "Graph relationship";
 
-	boolean graphStreamVisualization = 	false;
 	boolean gephiVisualization = 		false;
 	String nameGephiWorkspace = 		"workspace0";
+
+	boolean graphStreamVisualization = 	false;
 
 	int totalNodes = 50000;
 	int totalEdges = 50000;
 
 	boolean edgeLabel = 		true;
-	boolean nodeLabel = 		true; // original concepts always have label
+	boolean nodeLabel = 		false; // original concepts always have label
 	boolean ignoreCaseConcept = false;
 
 	enum Status {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus };
@@ -78,7 +79,7 @@ public interface Config {
 	// CONFIG - REPORT 
     //
 	// quantity of nodes to show in short report
-	int quantityNodesShortReport = 5;
+	int quantityNodesShortReport = 3;
 
 	// ============================================================================
 	// CONFIG - CONCEPT MAP 

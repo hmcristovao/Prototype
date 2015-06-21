@@ -13,7 +13,6 @@ import rdf.SetQuerySparql;
 import user.Concept;
 
 public class SystemGraphData {
-	private StreamGraphData streamGraphData;
 	private GephiGraphData gephiGraphData;
 	// private - file GEXF ...
 	private NodesTableHash  nodesTableHash;  // work like nodes index
@@ -25,11 +24,10 @@ public class SystemGraphData {
 	private NodesTableArray eigenvectorSortTable;
 	
 	public SystemGraphData() {
-		this(new StreamGraphData(), new GephiGraphData());
+		this(new GephiGraphData());
 	}
 
-	public SystemGraphData(StreamGraphData streamGraphData, GephiGraphData gephiGraphData) {
-		this.streamGraphData          = streamGraphData; 
+	public SystemGraphData(GephiGraphData gephiGraphData) {
 		this.gephiGraphData           = gephiGraphData;
 		this.nodesTableHash           = new NodesTableHash();
 		this.nodesTableArray          = null;  // will be to fill after nodeTableHash filling
@@ -40,12 +38,6 @@ public class SystemGraphData {
 		this.eigenvectorSortTable     = null;
 	}
 
-	public StreamGraphData getStreamGraphData() {
-		return this.streamGraphData;
-	}
-	public void setStreamGraphData(StreamGraphData streamGraphData) {
-		this.streamGraphData = streamGraphData;
-	}
 	public GephiGraphData getGephiGraphData() {
 		return this.gephiGraphData;
 	}
@@ -82,11 +74,12 @@ public class SystemGraphData {
 	
 	// copy all graph from StreamGraph format to GephiGraph format
 	// also build nodesTableHash and nodesTableArray
-	public void buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
-		org.graphstream.graph.Graph streamGraph = streamGraphData.getStreamGraph();
-		this.nodesTableArray = new NodesTableArray(this.getStreamGraphData().getTotalNodes());
+	public QuantityNodesEdges buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
+		org.graphstream.graph.Graph streamGraph = WholeSystem.getStreamGraphData().getStreamGraph();
+		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getTotalNodes());
 		String idNode;
 		NodeData newNodeData = null;
+		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
 		Config.Status status;
 		// each node: add in graphData, nodesTableArray and nodesTableHash
 		for( org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
@@ -110,6 +103,7 @@ public class SystemGraphData {
 			this.nodesTableArray.insert(newNodeData);
 			// add node (the same) in nodesTableHash
 			this.nodesTableHash.put(idNode,  newNodeData);
+			quantityNodesEdges.incNumNodes();
 		}
 		// each edge: add in gephiGraphData
 		for( org.graphstream.graph.Edge streamEdge : streamGraph.getEachEdge() ) {
@@ -119,7 +113,9 @@ public class SystemGraphData {
 			Node gephiNode1 = this.gephiGraphData.getGephiGraph().getNode(idNode1);
 			Edge gephiEdge = this.gephiGraphData.getGraphModel().factory().newEdge(streamEdge.toString(), gephiNode0, gephiNode1, 1, true);
 			this.gephiGraphData.getGephiGraph().addEdge(gephiEdge);
+			quantityNodesEdges.getNumEdges();
 		}		
+		return quantityNodesEdges;
 	}
 	
 	// put results in NodesData set
@@ -348,8 +344,9 @@ public class SystemGraphData {
 			str.append(this.ranks.getMeasuresRankTable(i).getConnectedComponentNumber());
 			str.append("   (iteration ");
 			str.append(iteration);
-			str.append(")\n\nOriginal concepts:\n");
-			// str.append(this.ranks.getMeasuresRankTable(i).getListCurrentConcepts().toString()); - I can not show this
+			str.append(")\n\nCurrent concepts:\n");
+			str.append(this.ranks.getMeasuresRankTable(i).getListCurrentConcepts().toString());
+			str.append("\n\nOriginal concepts:\n");
 			str.append(this.ranks.getMeasuresRankTable(i).getListOriginalConcepts().toString());
 			str.append("\nNew concepts added from betweenness + closeness rank:\n");
 			str.append(this.ranks.getMeasuresRankTable(i).getListBetweennessClosenessConcept().toString());
@@ -368,8 +365,7 @@ public class SystemGraphData {
 	}
 	
 	public String toString() {
-		return  "Stream Graph Data: \n" + this.getStreamGraphData().toString() +
-				"\nQuantity connected component: " + this.connectedComponentsCount +
+		return  "\nQuantity connected component: " + this.connectedComponentsCount +
 		        "\n"+Config.doubleLine+"Table array: "+Config.singleLine + 
 				this.nodesTableArray.toString() +
 		        "\n"+Config.doubleLine+"Table array (betweenness sorted):"+Config.singleLine + 
@@ -382,8 +378,7 @@ public class SystemGraphData {
 	}
 	
 	public String toStringShort(int quantityNodes) {
-		return  "Stream Graph Data: \n" + this.getStreamGraphData().toStringShort() +
-				"\nQuantity connected component: " + this.connectedComponentsCount +
+		return  "\nQuantity connected component: " + this.connectedComponentsCount +
 		        "\n"+Config.doubleLine+"Table array - Betweenness sorted - (only the first "+quantityNodes+" nodes)"+
 				Config.singleLine + 
 				this.betweennessSortTable.toStringShort(quantityNodes) +

@@ -1,5 +1,6 @@
 package user;
 
+import graph.NodeData;
 import main.*;
 import basic.Token;
 
@@ -8,19 +9,18 @@ public class Concept {
 	private String underlineConcept; // with underlines
 	private boolean isCategory;
 	private Config.Status status;
-	 
-	public Concept(String originalConcept, Config.Status status) {
-		this.basicConcept     = originalConcept.trim();
+	private int iteration;
+	private NodeData registerNodeData[];  // indexed by iteration number
+	
+	public Concept(String basicConcept, Config.Status status, int iteration) {
+		this.basicConcept     = basicConcept.trim();
 		this.status           = status;
 		this.underlineConcept = Concept.blankToUnderline(this.basicConcept);
 		this.isCategory       = Concept.verifyIfCategory(this.basicConcept);
-		if(Concept.verifyIfCategory(this.basicConcept)) 
-			this.isCategory = true;
-		else
-			this.isCategory = false;
+		this.registerNodeData = new NodeData[Config.maxIteration];
 	}
 	public Concept(Token token) {
-		this(token.image, Config.Status.originalConcept);
+		this(token.image, Config.Status.originalConcept, 0);  // this is the first iteration
 	}
 		
 	public String getBasicConcept() {
@@ -28,6 +28,9 @@ public class Concept {
 	}
 	public Config.Status getStatus() {
 		return this.status;
+	}
+	public int getIteration() {
+		return this.iteration;
 	}
 	public boolean isOriginal() {
 		return this.status == Config.Status.originalConcept;
@@ -38,6 +41,17 @@ public class Concept {
 	public boolean getIsCategory() {
 		return this.isCategory;
 	}
+	
+	public NodeData[] getRegisterNodeData() {
+		return this.registerNodeData;
+	}
+	public NodeData getNodeData(int i) {
+		return this.registerNodeData[i];
+	}
+	public int getConnectedComponent(int i) {
+		return this.registerNodeData[i].getConnectedComponent();
+	}
+
 	
 	public static String blankToUnderline(String str) {
 		return str.replace(" ","_");
@@ -58,10 +72,6 @@ public class Concept {
 		return str.substring(9);
 	}
 
-	public String toStringShort() {
-		return this.basicConcept + " ("+Concept.statusToString(this.status)+")";
-	}
-	
 	public static String statusToString(Config.Status status) {
 		if(status == Config.Status.commonConcept)
 			return "common";
@@ -107,11 +117,19 @@ public class Concept {
 			return false;
 		return true;
 	}
-	
+
+	public String toStringShort() {
+		return this.basicConcept +
+	           " - "  + Concept.statusToString(this.status) +
+	           "(i: " + this.iteration + ")";
+	}
+
 	@Override
 	public String toString() {
-		String out = this.underlineConcept;
-		out += " / " + this.toStringShort();
+		String out = this.underlineConcept + 
+				     " / "  + this.basicConcept +
+		             " - "  + Concept.statusToString(this.status) +
+		             "(i: " + this.iteration + ")";
 		if(this.isCategory)
 			out += " - (category)";
 		return out;

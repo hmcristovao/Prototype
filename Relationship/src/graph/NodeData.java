@@ -19,7 +19,7 @@ public class NodeData {
 	private String imageAttribute;
 		
 	// calculated data
-	private int connectedComponent; // 0 indicate the whole network
+	private int connectedComponent; 
 	private double betweenness;
 	private double closeness;
 	private double eigenvector;
@@ -95,7 +95,7 @@ public class NodeData {
 		this.imageAttribute = imageAttribute;
 	}
 
-	public double getConnectedComponent() {
+	public int getConnectedComponent() {
 		return this.connectedComponent;
 	}
 	public void setConnectedComponent(int connectedComponent) {

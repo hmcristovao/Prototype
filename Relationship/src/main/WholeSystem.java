@@ -3,43 +3,34 @@ package main;
 import graph.*;
 import rdf.*;
 import user.Concept;
-import user.ListConcept;
+import user.GroupConcept;
 import map.*;
 
 import java.util.LinkedList;
 
 public class WholeSystem {
-	private static ListConcept originalConcepts;
+	private static GroupConcept conceptsRegister;
 	private LinkedList<SetQuerySparql> listSetQuerySparql;
 	private LinkedList<SystemGraphData> listSystemGraphData;
+	private static StreamGraphData streamGraphData;  // It manage the Gephi graph visualization, just in time.  Only one to store all iterations.
 	private ConceptMap conceptMap;
 	
 	public WholeSystem() {
-		WholeSystem.originalConcepts = new ListConcept(); 
+		WholeSystem.conceptsRegister = new GroupConcept(); 
 		this.listSetQuerySparql      = new LinkedList<SetQuerySparql>();
 		this.listSystemGraphData     = new LinkedList<SystemGraphData>();
+		WholeSystem.streamGraphData  = new StreamGraphData();
 		this.conceptMap              = new ConceptMap();
 	}
 
-	public static ListConcept getOriginalConcepts() {
-		return WholeSystem.originalConcepts;
+	public static StreamGraphData getStreamGraphData() {
+		return WholeSystem.streamGraphData;
 	}
-	public static boolean isOriginalConcept(Concept concept) {
-		for(Concept x : WholeSystem.originalConcepts.getList()) {
-			if(x.equals(concept))
-				return true;
-		}
-		return false;
+
+	public static GroupConcept getConceptsRegister() {
+		return WholeSystem.conceptsRegister;
 	}
-	
-	public static boolean isOriginalConcept(String basicConcept) {
-		for(Concept x : WholeSystem.originalConcepts.getList()) {
-			if(x.getBasicConcept().equals(basicConcept))
-				return true;
-		}
-		return false;
-	}
-	
+
 	public LinkedList<SetQuerySparql> getListSetQuerySparql() {
 		return this.listSetQuerySparql;
 	}

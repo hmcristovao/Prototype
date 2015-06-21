@@ -2,7 +2,7 @@ package graph;
 
 import main.Config;
 import user.Concept;
-import user.ListConcept;
+import user.GroupConcept;
 
 public class MeasuresRanks {
 	private int connectedComponentNumber;  
@@ -13,10 +13,10 @@ public class MeasuresRanks {
 	private NodesTableArray eigenvector;
 	private NodesTableArray betweennessCloseness;
 	
-	private ListConcept originalConcepts;
-	private ListConcept currentConcepts;
-	private ListConcept betweennessClosenessConcepts;
-	private ListConcept eigenvectorConcepts;
+	private GroupConcept originalConcepts;
+	private GroupConcept currentConcepts;
+	private GroupConcept betweennessClosenessConcepts;
+	private GroupConcept eigenvectorConcepts;
 	
 	public MeasuresRanks(int number) {
 		this.connectedComponentNumber     = number;
@@ -26,10 +26,10 @@ public class MeasuresRanks {
 		this.closeness                    = null;
 		this.eigenvector                  = null;
 		this.betweennessCloseness     	  = null;
-		this.originalConcepts             = new ListConcept();
-		this.currentConcepts              = new ListConcept();
-		this.betweennessClosenessConcepts = new ListConcept();
-		this.eigenvectorConcepts          = new ListConcept();	
+		this.originalConcepts             = new GroupConcept();
+		this.currentConcepts              = new GroupConcept();
+		this.betweennessClosenessConcepts = new GroupConcept();
+		this.eigenvectorConcepts          = new GroupConcept();	
 	}
 	
 	public int getConnectedComponentNumber() {
@@ -82,7 +82,7 @@ public class MeasuresRanks {
 		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
 		this.originalConcepts.add(objectNewConcept);
 	}
-	public ListConcept getListOriginalConcepts() {
+	public GroupConcept getListOriginalConcepts() {
 		return this.originalConcepts;
 	}
 
@@ -93,7 +93,7 @@ public class MeasuresRanks {
 		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
 		this.currentConcepts.add(objectNewConcept);
 	}
-	public ListConcept getListCurrentConcepts() {
+	public GroupConcept getListCurrentConcepts() {
 		return this.currentConcepts;
 	}
 
@@ -104,7 +104,7 @@ public class MeasuresRanks {
 		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
 		this.betweennessClosenessConcepts.add(objectNewConcept);
 	}
-	public ListConcept getListBetweennessClosenessConcept() {
+	public GroupConcept getListBetweennessClosenessConcept() {
 		return this.betweennessClosenessConcepts;
 	}
 
@@ -115,7 +115,7 @@ public class MeasuresRanks {
 		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
 		this.eigenvectorConcepts.add(objectNewConcept);
 	}
-	public ListConcept getListEigenvectorConcept() {
+	public GroupConcept getListEigenvectorConcept() {
 		return this.eigenvectorConcepts;
 	}
 

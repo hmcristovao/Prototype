@@ -89,12 +89,12 @@ public class StreamGraphData {
 		StreamGraphData.modifier++;
 	}
 	
-	public int buildStreamGraphData(SetQuerySparql setQuerySparql) {
+	public QuantityNodesEdges buildStreamGraphData(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
 		OneRDF oneRDF;
-		int n = 0;
-		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
+		QuantityNodesEdges quantityNodesEdgesOut = new QuantityNodesEdges();
+		QuantityNodesEdges quantityNodesEdges    = new QuantityNodesEdges();
 		for(int i=0; i < setQuerySparql.getListQuerySparql().size(); i++) {
 			querySparql = setQuerySparql.getListQuerySparql().get(i);
 			listRDF = querySparql.getListRDF();
@@ -108,10 +108,11 @@ public class StreamGraphData {
 				this.incTotalEdges(quantityNodesEdges.getNumEdges());
 				this.incTotalNodesDuplicate(2 - quantityNodesEdges.getNumNodes());
 				this.incTotalEdgesDuplicate(1 - quantityNodesEdges.getNumEdges());
-				n += quantityNodesEdges.getNumNodes();
+				quantityNodesEdgesOut.incNumNodes(quantityNodesEdges.getNumNodes());
+				quantityNodesEdgesOut.incNumEdges(quantityNodesEdges.getNumEdges());
 			}
 		}
-		return n;
+		return quantityNodesEdgesOut;
 	}
 
 	private void insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
@@ -257,6 +258,7 @@ public class StreamGraphData {
 	public String toStringGraph() {
 		StringBuffer str = new StringBuffer();
 		Graph graph = this.getStreamGraph();
+		str.append("\nGraph stream:\n");
 		for( Node node : graph.getEachNode() ) {
 			str.append(StreamGraphData.nodeToString(node));
 			str.append("\n");
@@ -265,7 +267,8 @@ public class StreamGraphData {
 	}
 	
 	public String toStringShort() {
-		return  "\nTotal nodes (counted):  " + this.getTotalNodes() +
+		return  "\nGraph stream (resume):\n" +
+				"\nTotal nodes (counted):  " + this.getTotalNodes() +
 				"\nTotal nodes (real):     " + this.getStreamGraph().getNodeCount() +
 				"\nTotal edges (counted):  " + this.getTotalEdges() + 
 				"\nTotal duplicated nodes: " + this.getTotalNodesDuplicate() +
