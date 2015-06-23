@@ -1,19 +1,26 @@
 package rdf;
 
+import user.Concept;
+
 public class ItemRDF {
 	
-	private String longName;
-	private String shortName;
+	private String longName;           // complete: contains address 
+	private String shortUnderlineName; // still contains underline
+	private String shortBlankName;     // underline change for blank
 	
 	public ItemRDF(String longName) {
-		this.longName = longName;
-		this.shortName = ItemRDF.doShortName(longName);
+		this.longName           = longName;
+		this.shortUnderlineName = ItemRDF.doShortName(longName);
+		this.shortBlankName     = Concept.underlineToBlank(this.shortUnderlineName);
 	}
 	public String getLongName() {
 		return this.longName;
 	}
-	public String getShortName() {
-		return this.shortName;
+	public String getShortUnderlineName() {
+		return this.shortUnderlineName;
+	}
+	public String getShortBlankName() {
+		return this.shortBlankName;
 	}
 	
 	// shortening a name, normally cut the address part and keep on the suffix until the bar
@@ -26,7 +33,6 @@ public class ItemRDF {
 	
 	@Override
 	public String toString() {
-		return this.getLongName() + " (" + this.getShortName() + ")";
+		return this.longName + " (" + this.shortBlankName + ")";
 	}
-
 }

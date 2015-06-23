@@ -54,18 +54,16 @@ public class SetQuerySparql {
 		QuerySparql querySparql = new QuerySparql(concept, auxQuery, auxListRDF);
 		this.listQuerySparql.add(querySparql);  
 	}
+
 	// fill listQuerySparql with a concept list
 	public void insertListConcept(GroupConcept groupConcept) {
-		QueryString auxQuery;
-		ListRDF auxListRDF;
 		QuerySparql querySparql;
 		for(Concept concept : groupConcept.getList()) { 
-			auxQuery = new QueryString();
-			auxListRDF = new ListRDF();
-			querySparql = new QuerySparql(concept, auxQuery, auxListRDF);
+			querySparql = new QuerySparql(concept, new QueryString(), new ListRDF());
 			this.listQuerySparql.add(querySparql); 
 		}
 	}
+
 	// add all objects from old listQuerySparql
 	public void insertListQuerySparql(LinkedList<QuerySparql> listQuerySparql) {
 		for(QuerySparql querySparql : listQuerySparql) { 

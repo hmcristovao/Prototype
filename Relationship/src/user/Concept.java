@@ -5,26 +5,30 @@ import main.*;
 import basic.Token;
 
 public class Concept {
-	private String basicConcept;
-	private String underlineConcept; // with underlines
-	private boolean isCategory;
+	private String blankName;
+	private String underlineName; // with underlines
 	private Config.Status status;
 	private int iteration;
-	private NodeData registerNodeData[];  // indexed by iteration number
+	private boolean isCategory;
+	private int registerNodeData[];  // indexed by iteration number
 	
-	public Concept(String basicConcept, Config.Status status, int iteration) {
-		this.basicConcept     = basicConcept.trim();
+	public Concept(String blankName, Config.Status status, int iteration, int connectedComponent) {
+		this.blankName        = blankName.trim();
+		this.underlineName    = Concept.blankToUnderline(this.blankName);
 		this.status           = status;
-		this.underlineConcept = Concept.blankToUnderline(this.basicConcept);
-		this.isCategory       = Concept.verifyIfCategory(this.basicConcept);
-		this.registerNodeData = new NodeData[Config.maxIteration];
+		this.iteration        = iteration;
+		this.isCategory       = Concept.verifyIfCategory(this.blankName);
+		this.registerNodeData = new int[Config.maxIteration];
+		for(int i=0; i<Config.maxIteration; i++)
+			this.registerNodeData[i] = Config.withoutConnectedComponent;
+		this.registerNodeData[iteration] = connectedComponent;
 	}
 	public Concept(Token token) {
-		this(token.image, Config.Status.originalConcept, 0);  // this is the first iteration
+		this(token.image, Config.Status.originalConcept, 0, Config.withoutConnectedComponent);  // this is before the first iteration
 	}
 		
-	public String getBasicConcept() {
-		return this.basicConcept;
+	public String getBlankName() {
+		return this.blankName;
 	}
 	public Config.Status getStatus() {
 		return this.status;
@@ -36,20 +40,20 @@ public class Concept {
 		return this.status == Config.Status.originalConcept;
 	}
 	public String getUnderlineConcept() {
-		return this.underlineConcept;
+		return this.underlineName;
 	}
 	public boolean getIsCategory() {
 		return this.isCategory;
 	}
 	
-	public NodeData[] getRegisterNodeData() {
+	public int[] getRegisterNodeData() {
 		return this.registerNodeData;
 	}
-	public NodeData getNodeData(int i) {
+	public int getNodeData(int i) {
 		return this.registerNodeData[i];
 	}
-	public int getConnectedComponent(int i) {
-		return this.registerNodeData[i].getConnectedComponent();
+	public int getConnectedComponent(int iteration) {
+		return this.registerNodeData[iteration];
 	}
 
 	
@@ -110,26 +114,37 @@ public class Concept {
 		if (!(obj instanceof Concept))
 			return false;
 		Concept other = (Concept) obj;
-		if (basicConcept == null) {
-			if (other.basicConcept != null)
+		if (blankName == null) {
+			if (other.blankName != null)
 				return false;
-		} else if (!basicConcept.equals(other.basicConcept))
+		} else if (!blankName.equals(other.blankName))
 			return false;
 		return true;
 	}
 
 	public String toStringShort() {
-		return this.basicConcept +
+		return this.blankName +
 	           " - "  + Concept.statusToString(this.status) +
-	           "(i: " + this.iteration + ")";
+	           " (it: " + this.iteration + ")";
 	}
-
+	public String toStringLong() {
+		String out = "[blankName: " + this.blankName +    "]" +
+					 "[underline: " + this.underlineName +"]" + 
+				     "[category: "  + (this.isCategory ? "true" : "false") + "]" +
+					 "[status: "    + Concept.statusToString(this.status) + "]" +
+				     "[iteration: " + this.iteration + "]" +
+					 "[connected components: ";
+		for(int i=0; i<this.registerNodeData.length; i++) 
+			out += this.registerNodeData[i] + " ";
+		out += "]\n";
+		return out;
+	}
 	@Override
 	public String toString() {
-		String out = this.underlineConcept + 
-				     " / "  + this.basicConcept +
+		String out = this.underlineName + 
+				     " / "  + this.blankName +
 		             " - "  + Concept.statusToString(this.status) +
-		             "(i: " + this.iteration + ")";
+		             " (i: " + this.iteration + ")";
 		if(this.isCategory)
 			out += " - (category)";
 		return out;

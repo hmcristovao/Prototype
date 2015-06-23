@@ -1,4 +1,4 @@
-// v2.3 - restruture register of the Group of Concepts
+// v3.0 - many modifications. Working!
 
 package main;
 
@@ -16,7 +16,7 @@ import rdf.SetQuerySparql;
 import basic.*;
 
 public class MainProcess {	
-	public static WholeSystem wholeSystem = new WholeSystem();
+	public static WholeSystem wholeSystem = new WholeSystem();;
 	public static String report;
 	public static boolean isContinue = false;
 	public static int iteration = 0;
@@ -25,7 +25,7 @@ public class MainProcess {
 	public static Graph           currentGraph;
 	public static SetQuerySparql  newSetQuerySparql;
 		
-	public static void body(Wrapterms parser) {
+	public static void body(Wrapterms parser) throws Exception {
 		try {
 			Log.consoleln("- Starting.");
 			Log.init();	
@@ -83,29 +83,25 @@ public class MainProcess {
 				Log.consoleln("- Sorting measures of the whole network (iteration "+iteration+").");
 				currentSystemGraphData.sortMeasuresWholeNetwork();
 
-				Log.consoleln("- Classifying connected component and building sub graphs (iteration "+iteration+").");
+				Log.console("- Classifying connected component and building sub graphs (iteration "+iteration+")");
 				currentSystemGraphData.classifyConnectedComponent_BuildSubGraph();
+                Log.consoleln(" - quantity of connected conponents: "+currentSystemGraphData.getConnectedComponentsCount()+".");
 
 				Log.consoleln("- Building sub-graphs tables belong to connected components (iteration "+iteration+").");
-				currentSystemGraphData.buildBasicTableSubGraph();
+				currentSystemGraphData.buildBasicTableGroupOriginalConceptsSubGraph();
 
 				Log.consoleln("- Sorting connected componets ranks (iteration "+iteration+").");
 				currentSystemGraphData.sortConnectecComponentRanks();
 
-				Log.consoleln("- Selecting current concepts (iteration "+iteration+").");
-				currentSystemGraphData.resumeCurrentConcepts();
+				Log.console("- Selecting largest nodes by betweenness+closeness (iteration "+iteration+")");
+				n = currentSystemGraphData.selectLargestNodesBetweennessCloseness(iteration);
+				Log.consoleln(" - "+n+" new selected concepts.");
+				
+				Log.console("- Selecting largest nodes by eigenvector (iteration "+iteration+")");
+				n = currentSystemGraphData.selectLargestNodesEigenvector(iteration);
+				Log.consoleln(" - "+n+" new selected concepts.");
 
-				Log.consoleln("- Analysing graph data and selecting candidate nodes (iteration "+iteration+").");
-				currentSystemGraphData.analyseGraphData();
-
-				Log.consoleln("- Resuming selected nodes to new interation (iteration "+iteration+")"
-						+ " - Connected conponent: "+currentSystemGraphData.getConnectedComponentsCount()+".");
-				currentSystemGraphData.resumeSelectedNodes(currentSetQuerySparql);
-
-				Log.consoleln("- Reporting selected nodes to new interation (iteration "+iteration+")+"
-						+ " - Quantity new concepts/old concepts: "
-						+ currentSetQuerySparql.getListNewConcepts().size()+"/"
-						+ currentSetQuerySparql.getListCurrentConcepts().size());
+				Log.consoleln("- Reporting selected nodes to new interation (iteration "+iteration+").");
 				
 				Log.outFileCompleteReport("Iteration "+iteration);
 				Log.outFileShortReport("Iteration "+iteration);
@@ -119,10 +115,10 @@ public class MainProcess {
 				Log.outFileCompleteReport(currentSystemGraphData.toString());
 				Log.outFileShortReport(currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
 				
-				report = currentSystemGraphData.reportSelectedNodes(currentSetQuerySparql, iteration);			
+				report = currentSystemGraphData.reportSelectedNodes(iteration);			
 				Log.outFileCompleteReport(report);
 				Log.outFileShortReport(report);
-				
+
 				// conditionals to continue the iteration
 				// verify the iteration limit				
 				if(iteration >= Config.maxIteration) {
@@ -141,7 +137,7 @@ public class MainProcess {
 				isContinue = true;
 				newSetQuerySparql = new SetQuerySparql();
 				// copy new selected concepts
-				newSetQuerySparql.insertListConcept(currentSetQuerySparql.getListNewConcepts());
+				newSetQuerySparql.insertListConcept(WholeSystem.getConceptsRegister().getSelectedConcepts(iteration));
 				wholeSystem.insertListSetQuerySparql(newSetQuerySparql);
 				iteration++;
 			} while(isContinue);
@@ -177,6 +173,8 @@ public class MainProcess {
 			System.err.println("Other error: " + e.getMessage());
 			e.printStackTrace();
 		}
+		// if error then close all log files
+		Log.close();
 	}
 }
 	

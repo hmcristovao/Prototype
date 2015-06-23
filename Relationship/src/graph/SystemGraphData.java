@@ -17,7 +17,7 @@ public class SystemGraphData {
 	// private - file GEXF ...
 	private NodesTableHash  nodesTableHash;  // work like nodes index
 	private NodesTableArray nodesTableArray;
-	private int connectedComponentsCount;
+	private int connectedComponentsCount;  
 	private Ranks ranks;
 	private NodesTableArray betweennessSortTable;
 	private NodesTableArray closenessSortTable;
@@ -77,19 +77,20 @@ public class SystemGraphData {
 	public QuantityNodesEdges buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
 		org.graphstream.graph.Graph streamGraph = WholeSystem.getStreamGraphData().getStreamGraph();
 		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getTotalNodes());
-		String idNode;
+		String idNode, shortBlankName;
 		NodeData newNodeData = null;
 		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
 		Config.Status status;
-		// each node: add in graphData, nodesTableArray and nodesTableHash
-		for( org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
+		// each node: add in GephiGraph, nodesTableArray and nodesTableHash
+		for(org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
 			// add node in gephiGraphData
-			idNode = streamNode.toString();
+			idNode         = streamNode.toString();
+			shortBlankName = streamNode.getAttribute("shortblankname");
 			Node gephiNode = this.gephiGraphData.getGraphModel().factory().newNode(idNode);
 			this.gephiGraphData.getGephiGraph().addNode(gephiNode);
-			status = Concept.stringToStatus(streamNode.getAttribute("status").toString());
+			status = WholeSystem.getConceptsRegister().getStatus(shortBlankName);
 			// create a new NodeData object
-			newNodeData = new NodeData(idNode, streamNode.getAttribute("shortname").toString(), streamNode, gephiNode, status);
+			newNodeData = new NodeData(idNode, shortBlankName, streamNode, gephiNode, status);
 			// add attributes to new nodeData
 			if(streamNode.getAttribute("homepage") != null) 
 				newNodeData.setHomepageAttribute(streamNode.getAttribute("homepage").toString());
@@ -107,11 +108,11 @@ public class SystemGraphData {
 		}
 		// each edge: add in gephiGraphData
 		for( org.graphstream.graph.Edge streamEdge : streamGraph.getEachEdge() ) {
-			String idNode0 = streamEdge.getNode0().toString();
-			String idNode1 = streamEdge.getNode1().toString();
+			String idNode0  = streamEdge.getNode0().toString();
+			String idNode1  = streamEdge.getNode1().toString();
 			Node gephiNode0 = this.gephiGraphData.getGephiGraph().getNode(idNode0);
 			Node gephiNode1 = this.gephiGraphData.getGephiGraph().getNode(idNode1);
-			Edge gephiEdge = this.gephiGraphData.getGraphModel().factory().newEdge(streamEdge.toString(), gephiNode0, gephiNode1, 1, true);
+			Edge gephiEdge  = this.gephiGraphData.getGraphModel().factory().newEdge(streamEdge.toString(), gephiNode0, gephiNode1, 1, true);
 			this.gephiGraphData.getGephiGraph().addEdge(gephiEdge);
 			quantityNodesEdges.getNumEdges();
 		}		
@@ -149,7 +150,7 @@ public class SystemGraphData {
 	}
 	
 	// clasify connected components and create rank of MeasuresRanks objects
-	public void classifyConnectedComponent_BuildSubGraph() throws Exception {
+	public int classifyConnectedComponent_BuildSubGraph() throws Exception {
 		ConnectedComponents connectedComponents = new ConnectedComponents();
 		connectedComponents.execute(this.gephiGraphData.getGraphModel(), this.gephiGraphData.getAttributeModel());
 		this.connectedComponentsCount = connectedComponents.getConnectedComponentsCount();
@@ -182,23 +183,33 @@ public class SystemGraphData {
 				// add edge into currentGephiGraph
 				currentGephiGraph.addEdge(edgesGephiNode[i]);
 			}
-		}			
+		}
+		return this.connectedComponentsCount;
 	}
 
-	public void buildBasicTableSubGraph() throws Exception {
+	// build the basic table to each connected component
+	// build the group of the original concepts
+	public void buildBasicTableGroupOriginalConceptsSubGraph() throws Exception {
 		org.gephi.graph.api.Graph currentGephiGraph;
 		int connectedComponentNodesQuantity;
 		NodesTableArray newBasicTable;
 		NodeData nodeData;
+		Concept concept;
 		// for each group of the connected components, build the NodesTableArray:
 		for(int i=0; i < this.ranks.getCount(); i++) {
 			currentGephiGraph = this.ranks.getMeasuresRankTable(i).getGephiGraphData().getGephiGraph();
 			connectedComponentNodesQuantity = currentGephiGraph.getNodeCount();
 			// create the Basic Table Array
 			newBasicTable = new NodesTableArray(connectedComponentNodesQuantity);
+			// create the Group Original Concepts
 			for(Node gephiNode: currentGephiGraph.getNodes()) {
+				// fill the Basic Table Array
 				nodeData = this.nodesTableHash.get(gephiNode.toString());
 				newBasicTable.insert(nodeData);
+				// fill the Group Original Concepts
+				concept = new Concept(nodeData.getShortName(), nodeData.getStatus(), 0, Config.withoutConnectedComponent);
+				if(concept.getStatus() == Config.Status.originalConcept)
+					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().add(concept);
 			}
 			this.ranks.getMeasuresRankTable(i).setBasicTable(newBasicTable);
 		}
@@ -207,7 +218,7 @@ public class SystemGraphData {
 	
 	public void sortConnectecComponentRanks() throws Exception {
 		NodesTableArray currentNodesTableArray, sortedNodesTableArray;
-
+		int countOriginalConcepts = WholeSystem.getConceptsRegister().getQuantityOriginalConcept();
 		// for each group of the connected components, build the sorted NodesTableArray:
 		for(int i=0; i < this.ranks.getCount(); i++) {
 			
@@ -223,28 +234,25 @@ public class SystemGraphData {
 			sortedNodesTableArray  = currentNodesTableArray.sortEigenvector();
 			this.ranks.getMeasuresRankTable(i).setEigenvector(sortedNodesTableArray);
 			
-			int filterQuantity = (int)(WholeSystem.getOriginalConcepts().size() * Config.proporcionBetweenness);
+			int filterQuantity = (int)(countOriginalConcepts * Config.proporcionBetweenness);
 			sortedNodesTableArray  = currentNodesTableArray.sortBetweennessCloseness(filterQuantity);
 			this.ranks.getMeasuresRankTable(i).setBetweennessCloseness(sortedNodesTableArray);	
 		}
 	}
 		
-	public void analyseGraphData() throws Exception {
-		// First part of selection
-		this.selectLargestNodesBetweennessCloseness();
-		// Second part of selection
-		this.selectLargestNodesEigenvector();
-	}
-
-	private void selectLargestNodesBetweennessCloseness() throws Exception {
+	// select the firt largest maxBetweennessCloseness nodes of each connected component
+	public int selectLargestNodesBetweennessCloseness(int iteration) throws Exception {
 		// quantity total of nodes to change the status (all connected components)
-		int countTotalSelectNodes = (int)(WholeSystem.getOriginalConcepts().size() * Config.proporcionBetweennessCloseness);
+		int countOriginalConcepts = WholeSystem.getConceptsRegister().getQuantityOriginalConcept();
+		int countTotalSelectNodes = (int)(countOriginalConcepts * Config.proporcionBetweennessCloseness);
 		int countConnectedComponentSelectNodes;
+		NodeData currentNodeData;
+		int count = 0;
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			// calculate proportionate the quantity to each connected component group  
 			countConnectedComponentSelectNodes = 
-			(int)( ( (double)countTotalSelectNodes / (double)WholeSystem.getOriginalConcepts().size()) * 
-					this.ranks.getMeasuresRankTable(i).getListOriginalConcepts().size() + 
+			(int)( ( (double)countTotalSelectNodes / (double)countOriginalConcepts ) * 
+					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().size() + 
 			        Config.precisionBetweennessCloseness
 			      );
 			// mark the level of the firt nodes to new status, except original nodes
@@ -252,24 +260,34 @@ public class SystemGraphData {
 					          j < this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getCount() &&
 					          k < Config.maxBetweennessCloseness; 
 				j++) {
-				// changes status only of common nodes
-				if(this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).getStatus() == Config.Status.commonConcept) {
+				currentNodeData = this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j);
+				// changes status only of nodes still not selected or not original concept
+				if(!WholeSystem.getConceptsRegister().isConcept(currentNodeData.getShortName())) {
 					this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).setStatus(Config.Status.selectedBetweennessClosenessConcept);
 					k++;
+					// add this node in the general register concepts
+					Concept concept = new Concept(currentNodeData.getShortName(), Config.Status.selectedBetweennessClosenessConcept, iteration, i);
+					WholeSystem.getConceptsRegister().add(concept);
+					count++;
 				}
 			}	
 		}
+		return count;
 	}
 	
-	private void selectLargestNodesEigenvector() throws Exception {
+	// select the firt largest maxEigenvector nodes of each connected component
+	public int selectLargestNodesEigenvector(int iteration) throws Exception {
+		int countOriginalConcepts = WholeSystem.getConceptsRegister().getQuantityOriginalConcept();
 		// quantity total of nodes to change the status (all connected components)
-		int countTotalSelectNodes = (int)(WholeSystem.getOriginalConcepts().size() * Config.proporcionEigenvector);
+		int countTotalSelectNodes = (int)(countOriginalConcepts * Config.proporcionEigenvector);
 		int countConnectedComponentSelectNodes;
+		NodeData currentNodeData;
+		int count = 0;
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			// calculate proportionate the quantity to each connected component group  
 			countConnectedComponentSelectNodes = 
-			(int)( ( (double)countTotalSelectNodes / (double)WholeSystem.getOriginalConcepts().size()) * 
-					this.ranks.getMeasuresRankTable(i).getListOriginalConcepts().size() + 
+			(int)( ( (double)countTotalSelectNodes / (double)countOriginalConcepts ) * 
+					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().size() + 
 			        Config.precisionEigenvector
 			      );
 			// mark the level of the firt nodes to new status, except original nodes
@@ -277,89 +295,45 @@ public class SystemGraphData {
 					          j < this.ranks.getMeasuresRankTable(i).getEigenvector().getCount() &&
 					          k < Config.maxEigenvector;  
 				j++) {
-				// changes status only of common nodes
-				if(this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).getStatus() == Config.Status.commonConcept) {
+				currentNodeData = this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j);
+				// changes status only of nodes still not selected or not original concept
+				if(!WholeSystem.getConceptsRegister().isConcept(currentNodeData.getShortName())) {
 					this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).setStatus(Config.Status.selectedEigenvectorConcept);
 					k++;
+					// add this node in the general register concepts
+					Concept concept = new Concept(currentNodeData.getShortName(), Config.Status.selectedEigenvectorConcept, iteration, i);
+					WholeSystem.getConceptsRegister().add(concept);
+					count++;
 				}
 			}	
 		}
+		return count;
 	}
 
-	// store current concepts into new concept table, in each connected component
-	public void resumeCurrentConcepts() throws Exception {
-		NodeData currentNodeData = null;
-		for(int i=0; i < this.connectedComponentsCount; i++) {
-			for(int j=0; j < this.ranks.getMeasuresRankTable(i).getBasicTable().getCount(); j++) {
-				currentNodeData = this.ranks.getMeasuresRankTable(i).getBasicTable().getNodeData(j);
-				if(currentNodeData.getStatus() != Config.Status.commonConcept) {
-					this.ranks.getMeasuresRankTable(i).insertCurrentConcept(currentNodeData);
-				}
-				if(currentNodeData.getStatus() == Config.Status.originalConcept) { 
-					this.ranks.getMeasuresRankTable(i).insertOriginalConcept(currentNodeData);
-				}
-			}
-		}
-	}
-
-	// store new concepts into ranks table, in each connected component
-	public void resumeSelectedNodes(SetQuerySparql setQuerySparql) throws Exception {
-		NodeData currentNodeData = null;
-		Concept concept;
-		for(int i=0; i < this.connectedComponentsCount; i++) {
-			for(int j=0; j < this.ranks.getMeasuresRankTable(i).getBasicTable().getCount(); j++) {
-				currentNodeData = this.ranks.getMeasuresRankTable(i).getBasicTable().getNodeData(j);
-				
-				if(currentNodeData.getStatus() == Config.Status.selectedBetweennessClosenessConcept) {
-					this.ranks.getMeasuresRankTable(i).insertBetweennessClosenessConcept(currentNodeData);
-					setQuerySparql.insertNewConcept(currentNodeData);
-					if(Config.additionNewConceptWithoutCategory) {
-						if(Concept.verifyIfCategory(currentNodeData.getShortName())) {
-							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()),currentNodeData.getStatus());
-							this.ranks.getMeasuresRankTable(i).insertBetweennessClosenessConcept(concept);
-							setQuerySparql.insertNewConcept(concept);							
-						}
-					}
-				}
-				else if(currentNodeData.getStatus() == Config.Status.selectedEigenvectorConcept) {
-					this.ranks.getMeasuresRankTable(i).insertEigenvectorConcept(currentNodeData);
-					setQuerySparql.insertNewConcept(currentNodeData);
-					if(Config.additionNewConceptWithoutCategory) {
-						if(Concept.verifyIfCategory(currentNodeData.getShortName())) {
-							concept = new Concept(Concept.extractCategory(currentNodeData.getShortName()),currentNodeData.getStatus());
-							this.ranks.getMeasuresRankTable(i).insertEigenvectorConcept(concept);
-							setQuerySparql.insertNewConcept(concept);							
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	
-	public String reportSelectedNodes(SetQuerySparql setQuerySparql, int iteration) throws Exception {
+	public String reportSelectedNodes(int iteration) throws Exception {
 		StringBuffer str = new StringBuffer();
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			str.append("Connected component number: ");
 			str.append(this.ranks.getMeasuresRankTable(i).getConnectedComponentNumber());
 			str.append("   (iteration ");
 			str.append(iteration);
-			str.append(")\n\nCurrent concepts:\n");
-			str.append(this.ranks.getMeasuresRankTable(i).getListCurrentConcepts().toString());
-			str.append("\n\nOriginal concepts:\n");
-			str.append(this.ranks.getMeasuresRankTable(i).getListOriginalConcepts().toString());
+			str.append(")\n\nOriginal concepts:\n");
+			str.append(this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().toString());
 			str.append("\nNew concepts added from betweenness + closeness rank:\n");
-			str.append(this.ranks.getMeasuresRankTable(i).getListBetweennessClosenessConcept().toString());
+			str.append(WholeSystem.getConceptsRegister().getSelectedBetweennessClosenessConcepts(iteration, i).toString());
 			str.append("\nNew concepts added from eigenvector rank:\n");
-			str.append(this.ranks.getMeasuresRankTable(i).getListEigenvectorConcept().toString());			
+			str.append(WholeSystem.getConceptsRegister().getSelectedEigenvectorConcepts(iteration, i).toString());			
 			str.append(Config.doubleLine);
 		}
 		str.append("Whole network   (iteration ");
 		str.append(iteration);
-		str.append(")\n\nCurrent concepts:\n");
-		str.append(setQuerySparql.getListCurrentConcepts().toString());
+		if(iteration == 0)
+			str.append(")\n\nCurrent concepts:\n");
+		else
+			str.append(")\n\nCurrent concepts (original and selected in the previous iterations) :\n");
+		str.append(WholeSystem.getConceptsRegister().getCurrentConcepts(iteration).toString());  // get original concepts and selected concepts of the previous iteration
 		str.append("\nNew concepts:\n");
-		str.append(setQuerySparql.getListNewConcepts());
+		str.append(WholeSystem.getConceptsRegister().getSelectedConcepts(iteration).toString());
 		str.append("\n");
 		return str.toString();
 	}
@@ -368,11 +342,11 @@ public class SystemGraphData {
 		return  "\nQuantity connected component: " + this.connectedComponentsCount +
 		        "\n"+Config.doubleLine+"Table array: "+Config.singleLine + 
 				this.nodesTableArray.toString() +
-		        "\n"+Config.doubleLine+"Table array (betweenness sorted):"+Config.singleLine + 
+		        "\n"+Config.doubleLine+"Table array - Betweenness sorted:"+Config.singleLine + 
 				this.betweennessSortTable.toString() +
-		        "\n"+Config.doubleLine+"Table array (closeness sorted): "+Config.singleLine + 
+		        "\n"+Config.doubleLine+"Table array - Closeness sorted (closeness sorted): "+Config.singleLine + 
 				this.closenessSortTable.toString() +
-		        "\n"+Config.doubleLine+"Table array (eingenvector sorted): "+Config.singleLine + 
+		        "\n"+Config.doubleLine+"Table array - Eingenvector sorted: "+Config.singleLine + 
 				this.eigenvectorSortTable.toString() +		
 				this.getRanks().toString();
 	}

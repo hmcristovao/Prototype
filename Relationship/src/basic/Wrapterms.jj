@@ -13,7 +13,7 @@ import user.*;
 import rdf.*; 
 
 public class Wrapterms {
-   public static void main(String args[])  throws ParseException  {
+   public static void main(String args[])  throws Exception {
       Wrapterms firstParser = null;
 	  MainProcess.body(firstParser);
    }
@@ -44,7 +44,7 @@ void element(SetQuerySparql originalSetQuerySparql) : {Token token; Concept conc
     {		concept = new Concept(token);
 		originalSetQuerySparql.insertQuerySparql(concept);
 		// copy the concept to static attribute in root class:
-		WholeSystem.getOriginalConcepts().add(concept);			
+		WholeSystem.getConceptsRegister().add(concept);			
     }
     ( < SEPARATORS > )*
 }

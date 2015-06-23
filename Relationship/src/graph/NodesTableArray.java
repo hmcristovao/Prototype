@@ -3,6 +3,8 @@ package graph;
 import java.util.Arrays;
 import java.util.Comparator;
 
+import user.Concept;
+import user.GroupConcept;
 import main.*;
 
 public class NodesTableArray {
@@ -38,7 +40,7 @@ public class NodesTableArray {
 		return this.table[position];
 	}
 	
-	public int calculateOriginalQuantity() {
+	public int calculateOriginalConceptQuantity() {
 		int originalQuantity = 0;
 		for(int i=0; i<this.count; i++) {
 			if(this.table[i].getStatus() == Config.Status.originalConcept)
@@ -46,6 +48,18 @@ public class NodesTableArray {
 		}
 		return originalQuantity;
 	}
+	public GroupConcept getGroupOriginalConcepts() {
+		GroupConcept groupConcept = new GroupConcept();
+		Concept concept;
+		for(int i=0; i<this.count; i++) {
+			if(this.table[i].getStatus() == Config.Status.originalConcept) {
+				concept = new Concept(this.table[i].getShortName(), this.table[i].getStatus(), 0, Config.withoutConnectedComponent);  
+				groupConcept.add(concept);
+			}
+		}
+		return groupConcept;
+	}
+	
 	
 	
 	public NodesTableArray sortBetwennness() {

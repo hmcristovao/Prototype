@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - LOG AND PRINT 
     //
-	String  testNumber = "16"; 
+	String  testNumber = "00"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
@@ -55,7 +55,7 @@ public interface Config {
 	int minIteration = 2;
 	int maxIteration = 3;
 	
-	// proporcion above total original concept
+	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;
 
 	// quantity of nodes to selection (about the quantity total of original nodes)
@@ -74,6 +74,9 @@ public interface Config {
 
 	// make the duplication of concept: from with "Category:" to without one
 	boolean additionNewConceptWithoutCategory = true;
+	
+	// indicate concepts that do not belong to connected component (for example: original conpects)
+	int withoutConnectedComponent = -1;
 	
 	// ============================================================================
 	// CONFIG - REPORT 

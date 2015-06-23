@@ -13,23 +13,17 @@ public class MeasuresRanks {
 	private NodesTableArray eigenvector;
 	private NodesTableArray betweennessCloseness;
 	
-	private GroupConcept originalConcepts;
-	private GroupConcept currentConcepts;
-	private GroupConcept betweennessClosenessConcepts;
-	private GroupConcept eigenvectorConcepts;
-	
+	private GroupConcept originalGroupConcept;
+
 	public MeasuresRanks(int number) {
-		this.connectedComponentNumber     = number;
-		this.gephiGraphData               = new GephiGraphData();
-		this.basicTable                   = null; // will be fill before to sort the ranks
-		this.betweenness                  = null; // will be fill when happen the sorts to the ranks
-		this.closeness                    = null;
-		this.eigenvector                  = null;
-		this.betweennessCloseness     	  = null;
-		this.originalConcepts             = new GroupConcept();
-		this.currentConcepts              = new GroupConcept();
-		this.betweennessClosenessConcepts = new GroupConcept();
-		this.eigenvectorConcepts          = new GroupConcept();	
+		this.connectedComponentNumber         = number;
+		this.gephiGraphData                   = new GephiGraphData();
+		this.basicTable                       = null; // will be fill before to sort the ranks
+		this.betweenness                      = null; // will be fill when happen the sorts to the ranks
+		this.closeness                        = null;
+		this.eigenvector                      = null;
+		this.betweennessCloseness         	  = null;
+		this.originalGroupConcept             = new GroupConcept();
 	}
 	
 	public int getConnectedComponentNumber() {
@@ -74,49 +68,8 @@ public class MeasuresRanks {
 	public void setBetweennessCloseness(NodesTableArray betweennessCloseness) {
 		this.betweennessCloseness = betweennessCloseness;
 	}
-
-	public void insertOriginalConcepts(Concept concept) {
-		this.originalConcepts.add(concept);
-	}
- 	public void insertOriginalConcept(NodeData nodeData) { 
-		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
-		this.originalConcepts.add(objectNewConcept);
-	}
-	public GroupConcept getListOriginalConcepts() {
-		return this.originalConcepts;
-	}
-
-	public void insertCurrentConcepts(Concept concept) {
-		this.currentConcepts.add(concept);
-	}
- 	public void insertCurrentConcept(NodeData nodeData) {
-		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
-		this.currentConcepts.add(objectNewConcept);
-	}
-	public GroupConcept getListCurrentConcepts() {
-		return this.currentConcepts;
-	}
-
-	public void insertBetweennessClosenessConcept(Concept concept) {
-		this.betweennessClosenessConcepts.add(concept);
-	}
-	public void insertBetweennessClosenessConcept(NodeData nodeData) {
-		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
-		this.betweennessClosenessConcepts.add(objectNewConcept);
-	}
-	public GroupConcept getListBetweennessClosenessConcept() {
-		return this.betweennessClosenessConcepts;
-	}
-
-	public void insertEigenvectorConcept(Concept concept) {
-		this.eigenvectorConcepts.add(concept);
-	}
-	public void insertEigenvectorConcept(NodeData nodeData) {
-		Concept objectNewConcept = new Concept(nodeData.getShortName(),nodeData.getStatus());  
-		this.eigenvectorConcepts.add(objectNewConcept);
-	}
-	public GroupConcept getListEigenvectorConcept() {
-		return this.eigenvectorConcepts;
+	public GroupConcept getOriginalGroupConcepts() {
+		return this.originalGroupConcept;
 	}
 
 	public String toStringShort(int connectedComponentNumber, int quantityNodes) {

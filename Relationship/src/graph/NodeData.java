@@ -6,8 +6,8 @@ import main.Config;
 
 public class NodeData {
 	// basic data
-	private String strIdNode;
-	private String shortName;
+	private String strIdNode;  // is the same as longName in the rdf package 
+	private String shortName;  // is the same as blankName in the Concept class
 	private org.graphstream.graph.Node streamNode;
 	private org.gephi.graph.api.Node gephiNode;
 	private Config.Status status;

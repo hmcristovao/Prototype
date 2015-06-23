@@ -7,7 +7,7 @@ import user.*;
 import rdf.*;
 
 public class Wrapterms implements WraptermsConstants {
-   public static void main(String args[])  throws ParseException  {
+   public static void main(String args[])  throws Exception {
       Wrapterms firstParser = null;
           MainProcess.body(firstParser);
    }
@@ -38,7 +38,7 @@ element ->  < TERM > ( < SEPARATORS > )*
                 concept = new Concept(token);
                 originalSetQuerySparql.insertQuerySparql(concept);
                 // copy the concept to static attribute in root class:
-                WholeSystem.getOriginalConcepts().add(concept);
+                WholeSystem.getConceptsRegister().add(concept);
     label_2:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {

@@ -1,6 +1,7 @@
  package graph;
 import main.Config;
 import main.Log;
+import main.WholeSystem;
 
 import org.graphstream.algorithm.BetweennessCentrality;
 import org.graphstream.algorithm.measure.ClosenessCentrality;
@@ -122,18 +123,16 @@ public class StreamGraphData {
 		ItemRDF objectRDF    = oneRDF.getObject();
 		Node node = null;
 		Edge edge = null;
-		String strStatus;
 		try {
 			node = this.streamGraph.addNode(subjectRDF.getLongName());
 			quantityNodesEdges.incNumNodes();
-			node.addAttribute("shortname", Concept.underlineToBlank(subjectRDF.getShortName()));
-			strStatus = Concept.statusToString(((NodeRDF)subjectRDF).getStatus());
-			node.addAttribute("status", strStatus);
+			node.addAttribute("shortunderlinename", subjectRDF.getShortUnderlineName());
+			node.addAttribute("shortblankname",     subjectRDF.getShortBlankName());
 			if(Config.nodeLabel)
-				node.addAttribute("label", subjectRDF.getShortName());
-			// if main node, put label
-			if(((NodeRDF)subjectRDF).getStatus() == Config.Status.originalConcept) { 
-				node.addAttribute("label", Concept.underlineToBlank(subjectRDF.getShortName()));
+				node.addAttribute("label", subjectRDF.getShortBlankName());
+			// if original concept then put label
+			if(WholeSystem.getConceptsRegister().isOriginalConcept(subjectRDF.getShortBlankName())) { 
+				node.addAttribute("label", subjectRDF.getShortBlankName());
 			}		
 		}
 		catch(IdAlreadyInUseException e) {
@@ -154,14 +153,13 @@ public class StreamGraphData {
 			try {
 				node = this.streamGraph.addNode(objectRDF.getLongName());
 				quantityNodesEdges.incNumNodes();
-				node.addAttribute("shortname", Concept.underlineToBlank(objectRDF.getShortName()));
-				strStatus = Concept.statusToString(((NodeRDF)objectRDF).getStatus());
-				node.addAttribute("status", strStatus);
+				node.addAttribute("shortunderlinename", objectRDF.getShortUnderlineName());
+				node.addAttribute("shortblankname",     objectRDF.getShortBlankName());
 				if(Config.nodeLabel)
-					node.addAttribute("label", objectRDF.getShortName());
-				// if main node, put label 
-				if(((NodeRDF)objectRDF).getStatus() == Config.Status.originalConcept) { 
-					node.addAttribute("label", Concept.underlineToBlank(objectRDF.getShortName()));
+					node.addAttribute("label", objectRDF.getShortBlankName());
+				// if original concept then put label
+				if(WholeSystem.getConceptsRegister().isOriginalConcept(objectRDF.getShortBlankName())) { 
+					node.addAttribute("label", objectRDF.getShortBlankName());
 				}
 			}
 			catch(IdAlreadyInUseException e) {
@@ -170,9 +168,11 @@ public class StreamGraphData {
 			}
 			try {
 				edge = this.streamGraph.addEdge(predicateRDF.getLongName(), subjectRDF.getLongName(), objectRDF.getLongName(),true);
+				edge.addAttribute("shortunderlinename", predicateRDF.getShortUnderlineName());
+				edge.addAttribute("shortblankname",     predicateRDF.getShortBlankName());
 				quantityNodesEdges.incNumEdges();
 				if(Config.edgeLabel)
-					edge.addAttribute("label", predicateRDF.getShortName());
+					edge.addAttribute("label", predicateRDF.getShortBlankName());
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated edge, insert a different element in the identifying string and try again
@@ -181,7 +181,7 @@ public class StreamGraphData {
 				quantityNodesEdges.incNumEdges();
 				if(Config.edgeLabel)
 					// add modifier to differentiate each link into the graph
-					edge.addAttribute("label", predicateRDF.getShortName()+" - "+StreamGraphData.getStrModifier());
+					edge.addAttribute("label", predicateRDF.getShortBlankName()+" - "+StreamGraphData.getStrModifier());
 			}
 		}
 	}
@@ -212,10 +212,8 @@ public class StreamGraphData {
 		StringBuffer str = new StringBuffer();
 		str.append("\nID: ");
 		str.append(node.toString());
-		str.append(" - Short name: ");
-		str.append(node.getAttribute("shortname"));
-		str.append(" - ");
-		str.append(node.getAttribute("status").toString());
+		str.append(" - Short blank name: ");
+		str.append(node.getAttribute("shortblankname"));
 		str.append("\n[Degree: ");
 		str.append(node.getDegree());
 		str.append("] [In degree: ");
@@ -243,14 +241,6 @@ public class StreamGraphData {
 			str.append("\nImage: ");
 			str.append(node.getAttribute("image"));
 		}
-		/*
-		str.append("\nBetweenness centrality: ");
-		str.append(node.getAttribute("betweenness"));
-		str.append("\nCloseness centrality: ");
-		str.append(node.getAttribute("closeness"));
-		str.append("\nEingenvector centrality: ");
-		str.append(node.getAttribute("eigenvector"));
-		*/
 		return str.toString();
 	}
  
