@@ -26,6 +26,17 @@ public class GroupConcept {
 		if(!this.hash.containsKey(concept.getBlankName())) {
 			this.hash.put(concept.getBlankName(), concept);
 			this.list.add(concept);
+			// if is concept "Category", add pure concept too (if is also the configuration true)
+			if(Config.additionNewConceptWithoutCategory && concept.getIsCategory()) {
+				// create new concept without "Category"
+				Concept newConceptWithoutCategory = new Concept(Concept.extractCategoryFullName(concept.getFullName()),
+						                                        Concept.extractCategory(concept.getBlankName()), 
+						                                        concept.getStatus(), 
+						                                        concept.getIteration(),
+						                                        concept.getConnectedComponent(concept.getIteration()));
+				this.hash.put(newConceptWithoutCategory.getBlankName(), concept);
+				this.list.add(newConceptWithoutCategory);				
+			}
 			return true;
 		}
 		return false;

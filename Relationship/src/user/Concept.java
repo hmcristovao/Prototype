@@ -1,32 +1,36 @@
 package user;
 
-import graph.NodeData;
 import main.*;
 import basic.Token;
 
 public class Concept {
-	private String blankName;
-	private String underlineName; // with underlines
+	private String        fullName;  // with address and underline
+	private String        blankName;
+	private String        underlineName; // with underline
 	private Config.Status status;
-	private int iteration;
-	private boolean isCategory;
-	private int registerNodeData[];  // indexed by iteration number
+	private int           iteration;
+	private boolean       isCategory;
+	private int           registerConnectedComponent[];  // indexed by iteration number
 	
-	public Concept(String blankName, Config.Status status, int iteration, int connectedComponent) {
-		this.blankName        = blankName.trim();
-		this.underlineName    = Concept.blankToUnderline(this.blankName);
-		this.status           = status;
-		this.iteration        = iteration;
-		this.isCategory       = Concept.verifyIfCategory(this.blankName);
-		this.registerNodeData = new int[Config.maxIteration];
+	public Concept(String fullName, String blankName, Config.Status status, int iteration, int connectedComponent) {
+		this.fullName                   = fullName;
+		this.blankName                  = blankName.trim();
+		this.underlineName              = Concept.blankToUnderline(this.blankName);
+		this.status                     = status;
+		this.iteration                  = iteration;
+		this.isCategory                 = Concept.verifyIfCategory(this.blankName);
+		this.registerConnectedComponent = new int[Config.maxIteration];
 		for(int i=0; i<Config.maxIteration; i++)
-			this.registerNodeData[i] = Config.withoutConnectedComponent;
-		this.registerNodeData[iteration] = connectedComponent;
+			this.registerConnectedComponent[i] = Config.withoutConnectedComponent;
+		this.registerConnectedComponent[iteration] = connectedComponent;
 	}
 	public Concept(Token token) {
-		this(token.image, Config.Status.originalConcept, 0, Config.withoutConnectedComponent);  // this is before the first iteration
+		this(Config.originalConceptAddress+Concept.blankToUnderline(token.image), token.image, Config.Status.originalConcept, 0, Config.withoutConnectedComponent);  // this is before the first iteration
 	}
 		
+	public String getFullName() {
+		return this.fullName;
+	}
 	public String getBlankName() {
 		return this.blankName;
 	}
@@ -47,18 +51,18 @@ public class Concept {
 	}
 	
 	public int[] getRegisterNodeData() {
-		return this.registerNodeData;
+		return this.registerConnectedComponent;
 	}
 	public int getNodeData(int i) {
-		return this.registerNodeData[i];
+		return this.registerConnectedComponent[i];
 	}
 	public int getConnectedComponent(int iteration) {
-		return this.registerNodeData[iteration];
+		return this.registerConnectedComponent[iteration];
 	}
 
 	
 	public static String blankToUnderline(String str) {
-		return str.replace(" ","_");
+		return str.trim().replace(" ","_");
 	}
 	
 	public static String underlineToBlank(String str) {
@@ -72,8 +76,17 @@ public class Concept {
 				return true;
 		return false;
 	}
-	public static String extractCategory(String str) {
-		return str.substring(9);
+	public static String extractCategory(String shortName) {
+		return shortName.substring(9);
+	}
+	public static String extractCategoryFullName(String fullName) {
+		int posCategory    = fullName.indexOf("Category:");
+		if(posCategory != -1) {
+			String onlyAddress = fullName.substring(0, posCategory);
+		    String onlyName    = fullName.substring(posCategory+9); 
+		    return onlyAddress + onlyName;
+		}
+		return fullName;
 	}
 
 	public static String statusToString(Config.Status status) {
@@ -114,10 +127,10 @@ public class Concept {
 		if (!(obj instanceof Concept))
 			return false;
 		Concept other = (Concept) obj;
-		if (blankName == null) {
-			if (other.blankName != null)
+		if (this.fullName == null) {
+			if (other.fullName != null)
 				return false;
-		} else if (!blankName.equals(other.blankName))
+		} else if (!this.fullName.equals(other.fullName))
 			return false;
 		return true;
 	}
@@ -128,14 +141,15 @@ public class Concept {
 	           " (it: " + this.iteration + ")";
 	}
 	public String toStringLong() {
-		String out = "[blankName: " + this.blankName +    "]" +
+		String out = "[fullName: "  + this.fullName +    "]" +
+					 "[blankName: " + this.blankName +    "]" +
 					 "[underline: " + this.underlineName +"]" + 
 				     "[category: "  + (this.isCategory ? "true" : "false") + "]" +
 					 "[status: "    + Concept.statusToString(this.status) + "]" +
 				     "[iteration: " + this.iteration + "]" +
 					 "[connected components: ";
-		for(int i=0; i<this.registerNodeData.length; i++) 
-			out += this.registerNodeData[i] + " ";
+		for(int i=0; i<this.registerConnectedComponent.length; i++) 
+			out += this.registerConnectedComponent[i] + " ";
 		out += "]\n";
 		return out;
 	}

@@ -21,11 +21,15 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RDFs 
     //
-	String serviceEndpoint  = "http://dbpedia.org/sparql";
-	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
+	String serviceEndpoint2  = "http://dbpedia.org/sparql";
+	String serviceEndpoint = "http://lod.openlinksw.com/sparql/";
 
 	String addressBasic = "http://relationship/";
 	String addressImage = "http://http://commons.wikimedia.org/wiki/File:";
+	
+	String markQueryReplacement = "#######";
+	
+	String originalConceptAddress = "http://dbpedia.org/resource/";
 	
 	// ============================================================================
 	// CONFIG - GRAPHs 
@@ -40,20 +44,25 @@ public interface Config {
 	int totalNodes = 50000;
 	int totalEdges = 50000;
 
-	boolean edgeLabel = 		true;
-	boolean nodeLabel = 		false; // original concepts always have label
 	boolean ignoreCaseConcept = false;
+	
+	boolean edgeLabelStreamGephi = true;
+	boolean nodeLabelStreamGephi = false; // original concepts always have label in Stream Gephi
+	
+	boolean edgeLabelFileGephi   = true;
+	boolean nodeLabelFileGephi   = false; // original concepts always have label in Stream Gephi
 
 	enum Status {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus };
 	
-	String nameGEXFGraph = "graph\\graph"+Config.testNumber+".gext";
+	String nameGEXFGraph = "graph\\graph"+Config.testNumber;
+
 	
 	// ============================================================================
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 2;
-	int maxIteration = 3;
+	int minIteration = 3;
+	int maxIteration = 5;
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;
@@ -82,7 +91,7 @@ public interface Config {
 	// CONFIG - REPORT 
     //
 	// quantity of nodes to show in short report
-	int quantityNodesShortReport = 3;
+	int quantityNodesShortReport = 1;
 
 	// ============================================================================
 	// CONFIG - CONCEPT MAP 

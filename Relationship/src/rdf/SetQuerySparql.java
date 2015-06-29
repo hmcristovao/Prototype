@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.LinkedList;
 
 import main.Config;
+import main.Log;
 import user.Concept;
 import user.GroupConcept;
 
@@ -108,9 +109,8 @@ public class SetQuerySparql {
 	private StringBuffer replaceQueryDefault(StringBuffer queryDefault, String concept) {
 		StringBuffer newQueryDefault = new StringBuffer(queryDefault);
 		int start = 0;
-		while( (start = newQueryDefault.indexOf(":#######", start)) != -1)
-		   // add ":" before concept
-		   newQueryDefault.replace(start, start+8, ":"+concept);
+		while( (start = newQueryDefault.indexOf(Config.markQueryReplacement, start)) != -1)
+		   newQueryDefault.replace(start, start+Config.markQueryReplacement.length(), concept);
 		return newQueryDefault;
 	}
 	

@@ -53,7 +53,7 @@ public class NodesTableArray {
 		Concept concept;
 		for(int i=0; i<this.count; i++) {
 			if(this.table[i].getStatus() == Config.Status.originalConcept) {
-				concept = new Concept(this.table[i].getShortName(), this.table[i].getStatus(), 0, Config.withoutConnectedComponent);  
+				concept = new Concept(this.table[i].getStrIdNode(), this.table[i].getShortName(), this.table[i].getStatus(), 0, Config.withoutConnectedComponent);  
 				groupConcept.add(concept);
 			}
 		}

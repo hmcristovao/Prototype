@@ -19,6 +19,7 @@ import rdf.OneRDF;
 import rdf.QuerySparql;
 import rdf.SetQuerySparql;
 import user.Concept;
+import user.GroupConcept;
 
 public class StreamGraphData {
 	private Graph streamGraph;
@@ -128,7 +129,7 @@ public class StreamGraphData {
 			quantityNodesEdges.incNumNodes();
 			node.addAttribute("shortunderlinename", subjectRDF.getShortUnderlineName());
 			node.addAttribute("shortblankname",     subjectRDF.getShortBlankName());
-			if(Config.nodeLabel)
+			if(Config.nodeLabelStreamGephi)
 				node.addAttribute("label", subjectRDF.getShortBlankName());
 			// if original concept then put label
 			if(WholeSystem.getConceptsRegister().isOriginalConcept(subjectRDF.getShortBlankName())) { 
@@ -155,7 +156,7 @@ public class StreamGraphData {
 				quantityNodesEdges.incNumNodes();
 				node.addAttribute("shortunderlinename", objectRDF.getShortUnderlineName());
 				node.addAttribute("shortblankname",     objectRDF.getShortBlankName());
-				if(Config.nodeLabel)
+				if(Config.nodeLabelStreamGephi)
 					node.addAttribute("label", objectRDF.getShortBlankName());
 				// if original concept then put label
 				if(WholeSystem.getConceptsRegister().isOriginalConcept(objectRDF.getShortBlankName())) { 
@@ -171,7 +172,7 @@ public class StreamGraphData {
 				edge.addAttribute("shortunderlinename", predicateRDF.getShortUnderlineName());
 				edge.addAttribute("shortblankname",     predicateRDF.getShortBlankName());
 				quantityNodesEdges.incNumEdges();
-				if(Config.edgeLabel)
+				if(Config.edgeLabelStreamGephi)
 					edge.addAttribute("label", predicateRDF.getShortBlankName());
 			}
 			catch(IdAlreadyInUseException e) {
@@ -179,13 +180,14 @@ public class StreamGraphData {
 				StreamGraphData.incModifier();
 				edge = this.streamGraph.addEdge(predicateRDF.getLongName()+" - "+StreamGraphData.getStrModifier(), subjectRDF.getLongName(), objectRDF.getLongName(),true);
 				quantityNodesEdges.incNumEdges();
-				if(Config.edgeLabel)
+				if(Config.edgeLabelStreamGephi)
 					// add modifier to differentiate each link into the graph
 					edge.addAttribute("label", predicateRDF.getShortBlankName()+" - "+StreamGraphData.getStrModifier());
 			}
 		}
 	}
 	
+	// don't used (it was used to Gephi Tool Kit)
 	public void computeBetweennessCentrality() {
 		BetweennessCentrality betweenness = new BetweennessCentrality();
 		betweenness.init(this.getStreamGraph());
@@ -193,19 +195,31 @@ public class StreamGraphData {
 		betweenness.setCentralityAttributeName("betweenness");
 		betweenness.compute();
 	}
-	
+	// don't used (it was used to Gephi Tool Kit)
 	public void computeClosenessCentrality() {
 		ClosenessCentrality closeness = new ClosenessCentrality();
 		closeness.init(this.getStreamGraph());
 		closeness.setCentralityAttribute("closeness");
 		closeness.compute();
 	}
-	
+	// don't used (it was used to Gephi Tool Kit)
 	public void computeEigenvectorCentrality() {
 		EigenvectorCentrality eingenvector = new EigenvectorCentrality();
 		eingenvector.init(this.getStreamGraph());
 		eingenvector.setCentralityAttribute("eingenvector");
 		eingenvector.compute();	
+	}
+	
+	public void addNewConceptsLabel(GroupConcept newConcepts) {
+		Node node;
+		for(Concept concept : newConcepts.getList()) {
+			node = this.streamGraph.getNode(concept.getFullName());
+			// some nodes will not be found because they are from "Category"
+			if(node != null) {
+			   node.addAttribute("label", concept.getBlankName());  // the process enters here, but this act do not updade the graph visualization!!!
+			   //node.changeAttribute("label", concept.getBlankName());  // it is also not working
+			}
+		}
 	}
 	
 	public static String nodeToString(Node node) {
