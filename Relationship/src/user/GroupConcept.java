@@ -235,6 +235,17 @@ public class GroupConcept {
 		return concept.getStatus();
 	}
 	
+
+	// GET ELEMENTS AND INFORMATION ========================================================================
+	
+	public boolean removeConcept(String blankName) {
+		if(!this.hash.containsKey(blankName))
+			return false;
+		Concept concept = this.hash.get(blankName);
+		this.list.remove(concept);
+		this.hash.remove(blankName);
+		return true;
+	}
 	
 	// toString's() ========================================================================
 	

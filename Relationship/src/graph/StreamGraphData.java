@@ -1,4 +1,6 @@
  package graph;
+import java.util.LinkedList;
+
 import main.Config;
 import main.Log;
 import main.WholeSystem;
@@ -24,8 +26,9 @@ import user.GroupConcept;
 public class StreamGraphData {
 	private Graph streamGraph;
 	private static int modifier = 0;
-	private QuantityNodesEdges added;
-    private QuantityNodesEdges duplicate;
+	private QuantityNodesEdges total;
+    private QuantityNodesEdges duplicated;
+    private QuantityNodesEdges deleted;
 		
 
 	public StreamGraphData() {
@@ -33,56 +36,92 @@ public class StreamGraphData {
 									Config.nameGraph,
 				                    true,                   // non-fatal error throws an exception = verify duplicated nodes
 				                    false,                  // auto-create
-				                    Config.totalNodes,
-				                    Config.totalEdges
+				                    Config.maxNodes,
+				                    Config.minEdges
 				                         );
-		this.added     = new QuantityNodesEdges();
-		this.duplicate = new QuantityNodesEdges();
+		this.total      = new QuantityNodesEdges();
+		this.duplicated = new QuantityNodesEdges();
+		this.deleted    = new QuantityNodesEdges();
 	}
 	
 	public Graph getStreamGraph() {
 		return this.streamGraph;
 	}
+	
+	
+	// intern control of quantity of nodes and edges
+
+	// total:
 	public int getTotalNodes() {
-		return this.added.getNumNodes();
+		return this.total.getNumNodes();
 	}
 	public void incTotalNodes() {
-		this.added.incNumNodes();
+		this.total.incNumNodes();
 	}
 	public void incTotalNodes(int value) {
-		this.added.incNumNodes(value);
+		this.total.incNumNodes(value);
 	}
 
 	public int getTotalEdges() {
-		return this.added.getNumEdges();
+		return this.total.getNumEdges();
 	}
 	public void incTotalEdges() {
-		this.added.incNumEdges();
+		this.total.incNumEdges();
 	}
 	public void incTotalEdges(int value) {
-		this.added.incNumEdges(value);
+		this.total.incNumEdges(value);
 	}
 
+	// duplicated
 	public int getTotalNodesDuplicate() {
-		return this.duplicate.getNumNodes();
+		return this.duplicated.getNumNodes();
 	}
 	public void incTotalNodesDuplicate() {
-		this.duplicate.incNumNodes();
+		this.duplicated.incNumNodes();
 	}
 	public void incTotalNodesDuplicate(int value) {
-		this.duplicate.incNumNodes(value);
+		this.duplicated.incNumNodes(value);
 	}
 
 	public int getTotalEdgesDuplicate() {
-		return this.duplicate.getNumEdges();
+		return this.duplicated.getNumEdges();
 	}
 	public void incTotalEdgesDuplicate() {
-		this.duplicate.incNumEdges();
+		this.duplicated.incNumEdges();
 	}
 	public void incTotalEdgesDuplicate(int value) {
-		this.duplicate.incNumEdges(value);
+		this.duplicated.incNumEdges(value);
 	}
 
+	// deleted
+	public int getTotalNodesDeleted() {
+		return this.deleted.getNumNodes();
+	}
+	public void incTotalNodesDeleted() {
+		this.deleted.incNumNodes();
+	}
+	public void incTotalNodesDeleted(int value) {
+		this.deleted.incNumNodes(value);
+	}
+
+	public int getTotalEdgesDeleted() {
+		return this.deleted.getNumEdges();
+	}
+	public void incTotalEdgesDeleted() {
+		this.deleted.incNumEdges();
+	}
+	public void incTotalEdgesDeleted(int value) {
+		this.deleted.incNumEdges(value);
+	}
+	
+	// actual and real quantity of nodes and edges
+	public int getRealTotalNodes() {
+		return this.streamGraph.getNodeCount();
+	}
+	public int getRealTotalEdges() {
+		return this.streamGraph.getEdgeCount();
+	}	
+	
 	public static String getStrModifier() {
 		return String.valueOf(StreamGraphData.modifier); 
 	}
@@ -222,6 +261,64 @@ public class StreamGraphData {
 		}
 	}
 	
+	// Apply K-core n on the Graph
+	// return quantity of selected concepts deleted
+	public int applyKcoreN() {
+		int quantityDeletedSelectedConcepts = 0;
+		for( Node node : this.streamGraph.getEachNode() ) {
+			// if node has degree less than kcoreN ...
+			if(node.getDegree() < Config.kCoreN) {
+				String blankName = (String)node.getAttribute("shortblankname");
+				// ...and it is not original node
+				if(!WholeSystem.getConceptsRegister().isOriginalConcept(blankName)) {
+					this.incTotalNodesDeleted();
+					this.incTotalEdgesDeleted(node.getEdgeSet().size());
+					this.incTotalNodes(-1);
+					this.incTotalEdges(node.getEdgeSet().size());
+					this.streamGraph.removeNode(node);
+					// remove node of the concepts register, if is the case
+					if(WholeSystem.getConceptsRegister().isConcept(blankName)) {
+						WholeSystem.getConceptsRegister().removeConcept(blankName);
+						quantityDeletedSelectedConcepts++;
+					}
+				}
+			}	
+		} 
+		return quantityDeletedSelectedConcepts;
+	}
+	
+	// Apply n-degree filter on the Graph
+	// return quantity of selected concepts deleted
+	public int applyNdegreeFilter() {
+		LinkedList<Node> auxList = new LinkedList<Node>();
+		// at first select the candidates nodes and put them in an auxiliary list
+		for( Node node : this.streamGraph.getEachNode() ) {
+			// if node has degree less than nDegreeFilter ...
+			if(node.getDegree() < Config.nDegreeFilter) {
+				// ...and it is not original node
+				if(!WholeSystem.getConceptsRegister().isOriginalConcept((String)node.getAttribute("shortblankname"))) {
+					auxList.add(node);
+				}
+			}
+		}
+		// second: delete the selected nodes
+		int quantityDeletedSelectedConcepts = 0;
+		for( Node node : auxList ) {
+			this.incTotalNodesDeleted();
+			this.incTotalEdgesDeleted(node.getEdgeSet().size());
+			this.incTotalNodes(-1);
+			this.incTotalEdges(node.getEdgeSet().size());
+			this.streamGraph.removeNode(node);
+			// remove node of the concepts register, if is the case
+			if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
+				WholeSystem.getConceptsRegister().removeConcept((String)node.getAttribute("shortblankname"));
+				quantityDeletedSelectedConcepts++;
+			}
+		} 
+		return quantityDeletedSelectedConcepts;
+	}
+	
+	
 	public static String nodeToString(Node node) {
 		StringBuffer str = new StringBuffer();
 		str.append("\nID: ");
@@ -273,10 +370,12 @@ public class StreamGraphData {
 	public String toStringShort() {
 		return  "\nGraph stream (resume):\n" +
 				"\nTotal nodes (counted):  " + this.getTotalNodes() +
-				"\nTotal nodes (real):     " + this.getStreamGraph().getNodeCount() +
+				"\nTotal nodes (real):     " + this.getRealTotalNodes() +
 				"\nTotal edges (counted):  " + this.getTotalEdges() + 
 				"\nTotal duplicated nodes: " + this.getTotalNodesDuplicate() +
-				"\nTotal duplicated edges: " + this.getTotalEdgesDuplicate();
+				"\nTotal duplicated edges: " + this.getTotalEdgesDuplicate() +
+				"\nTotal deleted nodes: "    + this.getTotalNodesDeleted() +
+				"\nTotal deleted edges: "    + this.getTotalEdgesDeleted();
 	}
 	
 	public String toString() {

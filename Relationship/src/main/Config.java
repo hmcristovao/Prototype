@@ -21,8 +21,8 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RDFs 
     //
-	String serviceEndpoint2  = "http://dbpedia.org/sparql";
-	String serviceEndpoint = "http://lod.openlinksw.com/sparql/";
+	String serviceEndpoint  = "http://dbpedia.org/sparql";
+	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
 
 	String addressBasic = "http://relationship/";
 	String addressImage = "http://http://commons.wikimedia.org/wiki/File:";
@@ -41,8 +41,8 @@ public interface Config {
 
 	boolean graphStreamVisualization = 	false;
 
-	int totalNodes = 50000;
-	int totalEdges = 50000;
+	int maxNodes = 50000;
+	int minEdges = 50000;
 
 	boolean ignoreCaseConcept = false;
 	
@@ -50,7 +50,7 @@ public interface Config {
 	boolean nodeLabelStreamGephi = false; // original concepts always have label in Stream Gephi
 	
 	boolean edgeLabelFileGephi   = true;
-	boolean nodeLabelFileGephi   = false; // original concepts always have label in Stream Gephi
+	boolean nodeLabelFileGephi   = true; // original concepts always have label in Stream Gephi
 
 	enum Status {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus };
 	
@@ -86,6 +86,17 @@ public interface Config {
 	
 	// indicate concepts that do not belong to connected component (for example: original conpects)
 	int withoutConnectedComponent = -1;
+	
+	// K-core used in all system
+	int kCoreN = 2;
+	// quantity of nodes to shoot K-core n algorithm
+	int quantityNodesToApplyKcoreN = 3000;
+	
+	// N-degree filter used in all system
+	int nDegreeFilter = 2;
+	// quantity of nodes to shoot n-degree filter algorithm
+	int quantityNodesToApplyNdegreeFilter = 3000;
+
 	
 	// ============================================================================
 	// CONFIG - REPORT 

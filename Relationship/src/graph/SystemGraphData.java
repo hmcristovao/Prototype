@@ -71,11 +71,11 @@ public class SystemGraphData {
 		this.eigenvectorSortTable = eigenvectorSortTable;
 	}
 	
-	// copy all graph from StreamGraph format to GephiGraph format
-	// also build nodesTableHash and nodesTableArray
+	// It copies all graph from StreamGraph format to GephiGraph format.
+	// Tt also builds nodesTableHash and nodesTableArray
 	public QuantityNodesEdges buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
 		org.graphstream.graph.Graph streamGraph = WholeSystem.getStreamGraphData().getStreamGraph();
-		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getTotalNodes());
+		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getRealTotalNodes());
 		String idNode, shortBlankName;
 		NodeData newNodeData = null;
 		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();

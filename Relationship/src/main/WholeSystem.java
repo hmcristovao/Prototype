@@ -12,7 +12,7 @@ public class WholeSystem {
 	private static GroupConcept conceptsRegister;
 	private LinkedList<SetQuerySparql> listSetQuerySparql;
 	private LinkedList<SystemGraphData> listSystemGraphData;
-	private static StreamGraphData streamGraphData;  // It manage the Gephi graph visualization, just in time.  Only one to store all iterations.
+	private static StreamGraphData streamGraphData;  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
 	private ConceptMap conceptMap;
 	
 	public WholeSystem() {
