@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - LOG AND PRINT 
     //
-	String  testNumber = "00"; 
+	String  testNumber = "04"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
@@ -21,8 +21,8 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RDFs 
     //
-	String serviceEndpoint  = "http://dbpedia.org/sparql";
-	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
+	String serviceEndpoint2  = "http://dbpedia.org/sparql";
+	String serviceEndpoint = "http://lod.openlinksw.com/sparql/";
 
 	String addressBasic = "http://relationship/";
 	String addressImage = "http://http://commons.wikimedia.org/wiki/File:";
@@ -50,7 +50,7 @@ public interface Config {
 	boolean nodeLabelStreamGephi = false; // original concepts always have label in Stream Gephi
 	
 	boolean edgeLabelFileGephi   = true;
-	boolean nodeLabelFileGephi   = true; // original concepts always have label in Stream Gephi
+	boolean nodeLabelFileGephi   = false; // original concepts always have label in Stream Gephi
 
 	enum Status {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus };
 	
@@ -61,8 +61,8 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 3;
-	int maxIteration = 5;
+	int minIteration = 2;
+	int maxIteration = 2;
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;
@@ -95,7 +95,7 @@ public interface Config {
 	// N-degree filter used in all system
 	int nDegreeFilter = 2;
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 3000;
+	int quantityNodesToApplyNdegreeFilter = 10;
 
 	
 	// ============================================================================
@@ -107,6 +107,11 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - CONCEPT MAP 
     //
+	// to calculate min and max concepts to map
+	int conceptsQuantityCalulationFactor = 18;
+	int conceptsMinMaxRange = 5;
+	
+	
 	String nameConceptMap = "conceptmap\\conceptmap"+Config.testNumber+".gext";
 
 }

@@ -248,7 +248,7 @@ public class StreamGraphData {
 		eingenvector.setCentralityAttribute("eingenvector");
 		eingenvector.compute();	
 	}
-	
+/*
 	public void addNewConceptsLabel(GroupConcept newConcepts) {
 		Node node;
 		for(Concept concept : newConcepts.getList()) {
@@ -260,7 +260,7 @@ public class StreamGraphData {
 			}
 		}
 	}
-	
+*/
 	// Apply K-core n on the Graph
 	// return quantity of selected concepts deleted
 	public int applyKcoreN() {
@@ -289,25 +289,30 @@ public class StreamGraphData {
 	
 	// Apply n-degree filter on the Graph
 	// return quantity of selected concepts deleted
-	public int applyNdegreeFilter() {
+	public int applyNdegreeFilterTrigger() {
 		LinkedList<Node> auxList = new LinkedList<Node>();
 		// at first select the candidates nodes and put them in an auxiliary list
 		for( Node node : this.streamGraph.getEachNode() ) {
-			// if node has degree less than nDegreeFilter ...
+			// if node has degree less than nDegreeFilter...
 			if(node.getDegree() < Config.nDegreeFilter) {
-				// ...and it is not original node
+				// ...and it is not original node, store this node
 				if(!WholeSystem.getConceptsRegister().isOriginalConcept((String)node.getAttribute("shortblankname"))) {
 					auxList.add(node);
 				}
 			}
 		}
-		// second: delete the selected nodes
+		// second: delete the selected nodes and their respectives edges
 		int quantityDeletedSelectedConcepts = 0;
 		for( Node node : auxList ) {
 			this.incTotalNodesDeleted();
 			this.incTotalEdgesDeleted(node.getEdgeSet().size());
 			this.incTotalNodes(-1);
 			this.incTotalEdges(node.getEdgeSet().size());
+			// remove all edges linked with this node
+			for( Edge edge : node.getEachEdge()) {
+				this.streamGraph.removeEdge(edge);
+			}
+			// finally, remove the node of the Strem Graph
 			this.streamGraph.removeNode(node);
 			// remove node of the concepts register, if is the case
 			if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
