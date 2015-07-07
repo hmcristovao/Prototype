@@ -66,10 +66,14 @@ public class SetQuerySparql {
 	}
 
 	// add all objects from old listQuerySparql
-	public void insertListQuerySparql(LinkedList<QuerySparql> listQuerySparql) {
+	// return quantity of the element copied 
+	public int insertListQuerySparql(LinkedList<QuerySparql> listQuerySparql) {
+		int count = 0;
 		for(QuerySparql querySparql : listQuerySparql) { 
-			this.listQuerySparql.add(querySparql); 
+			this.listQuerySparql.add(querySparql);
+			count++;
 		}
+		return count;
 	}
 		
 	// exceptional function, direct access to current concepts listQuerySparql

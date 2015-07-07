@@ -4,9 +4,12 @@ public class QuantityNodesEdges {
 	private int numNodes;
 	private int numEdges;
 	
+	public QuantityNodesEdges(int nodesCount, int edgesCount) {
+		this.numNodes = nodesCount;
+		this.numEdges = edgesCount;
+	}
 	public QuantityNodesEdges() {
-		this.numNodes = 0;
-		this.numEdges = 0;
+		this(0,0);
 	}
 	public int getNumNodes() {
 		return this.numNodes;
@@ -31,7 +34,7 @@ public class QuantityNodesEdges {
 		this.numEdges = 0;
 	}
 	public String toString() {
-		return "(Nodes: " + String.valueOf(this.numNodes) + ", Edges: " + String.valueOf(this.numEdges) + ")";
+		return this.numNodes + " nodes, " + this.numEdges + " edges";
 	}
 	
 }

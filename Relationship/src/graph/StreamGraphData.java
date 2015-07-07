@@ -357,6 +357,12 @@ public class StreamGraphData {
 			str.append("\nImage: ");
 			str.append(node.getAttribute("image"));
 		}
+		str.append("\nEdges:\n");
+		for( Edge edge : node.getEachEdge()) {
+			str.append("      ");
+			str.append(edge.toString());
+			str.append("\n");
+		}
 		return str.toString();
 	}
  
@@ -364,16 +370,15 @@ public class StreamGraphData {
 	public String toStringGraph() {
 		StringBuffer str = new StringBuffer();
 		Graph graph = this.getStreamGraph();
-		str.append("\nGraph stream:\n");
+		str.append("\n\nGraph stream:\n");
 		for( Node node : graph.getEachNode() ) {
 			str.append(StreamGraphData.nodeToString(node));
-			str.append("\n");
 		}
 		return str.toString();
 	}
 	
 	public String toStringShort() {
-		return  "\nGraph stream (resume):\n" +
+		return  "\n\nGraph stream (resume):\n" +
 				"\nTotal nodes (counted):  " + this.getTotalNodes() +
 				"\nTotal nodes (real):     " + this.getRealTotalNodes() +
 				"\nTotal edges (counted):  " + this.getTotalEdges() + 

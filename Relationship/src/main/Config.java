@@ -11,6 +11,7 @@ public interface Config {
 	String nameFileConsoleError  = "log\\consoleErr.txt";
 	String doubleLine = "\n=============================================================================================\n";
 	String singleLine = "\n---------------------------------------------------------------------------------------------\n";
+	String starsLine  = "\n*********************************************************************************************\n";
 
 	// ============================================================================
 	// CONFIG - INPUT FILES 
@@ -21,8 +22,8 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RDFs 
     //
-	String serviceEndpoint2  = "http://dbpedia.org/sparql";
-	String serviceEndpoint = "http://lod.openlinksw.com/sparql/";
+	String serviceEndpoint  = "http://dbpedia.org/sparql";
+	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
 
 	String addressBasic = "http://relationship/";
 	String addressImage = "http://http://commons.wikimedia.org/wiki/File:";
@@ -94,6 +95,8 @@ public interface Config {
 	
 	// N-degree filter used in all system
 	int nDegreeFilter = 2;
+	// iteration number to apply n-degree filter trigger
+	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;
 	// quantity of nodes to shoot n-degree filter algorithm
 	int quantityNodesToApplyNdegreeFilter = 10;
 

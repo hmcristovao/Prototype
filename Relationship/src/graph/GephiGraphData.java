@@ -9,9 +9,11 @@ import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.data.attributes.api.AttributeTable;
 import org.gephi.data.attributes.api.AttributeType;
+import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
 import org.gephi.graph.api.GraphModel;
+import org.gephi.graph.api.Node;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.exporter.spi.GraphExporter;
 import org.gephi.project.api.ProjectController;
@@ -85,6 +87,12 @@ public class GephiGraphData {
 	public AttributeColumn getConnectedComponentColumn() {
 		return this.connectedComponentColumn;
 	}
+
+	public QuantityNodesEdges getRealQuantityNodesEdges() {
+		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges(this.gephiGraph.getNodeCount(),this.gephiGraph.getEdgeCount());
+		return quantityNodesEdges;
+	}
+	
 	
 	// calculate measures of the table. In our case, we use only betweenness and closeness
 	public void calculateGephiGraphDistanceMeasures() {
@@ -132,5 +140,26 @@ public class GephiGraphData {
 		// https://github.com/gephi/gephi/wiki/How-to-use-filters
 				
 	}
-
+	public String toString() {
+		StringBuffer str = new StringBuffer();
+		str.append("\nGephi Graph:\n\n");
+		//Iterate over nodes
+		for(Node node : this.gephiGraph.getNodes()) {
+		    str.append(node.getNodeData().getId());
+		    str.append("\n[Degree: ");
+		    str.append(this.gephiGraph.getDegree(node));
+		    str.append("] ");
+		    str.append("[Label: ");
+		    str.append(node.getNodeData().getLabel());
+		    str.append("]\n");
+	    	str.append("Edges:\n");
+	    	for(Edge edge : this.gephiGraph.getEdges(node)) {
+	    		str.append("      ");
+		    	str.append(edge.getEdgeData().getId());
+		    	str.append("\n");
+		    }
+	    	str.append("\n");
+		}
+		return str.toString();
+	}
 }

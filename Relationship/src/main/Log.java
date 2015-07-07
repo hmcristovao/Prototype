@@ -23,12 +23,12 @@ public class Log {
 	public static void outFileCompleteReport(String msgSingle) throws Exception {
 		fileCompleteReport.write(Config.doubleLine);
 		fileCompleteReport.write(msgSingle);
-		fileCompleteReport.write(Config.singleLine);
+		fileCompleteReport.write("\n");
 	}
 	public static void outFileShortReport(String msgSingle) throws Exception {
 		fileShortReport.write(Config.doubleLine);
 		fileShortReport.write(msgSingle);
-		fileShortReport.write(Config.singleLine);
+		fileShortReport.write("\n");
 	}
 	public static void console(String msg, String value) {
 		System.out.print(Config.doubleLine);

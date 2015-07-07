@@ -82,7 +82,7 @@ public class SystemGraphData {
 		Config.Status status;
 		// get "label" attribute
 		AttributeColumn labelAttributeColumn = this.getGephiGraphData().getAttributeModel().getNodeTable().getColumn("Label");
-		// each node: add in GephiGraph, nodesTableArray and nodesTableHash
+		// first: each node, add in GephiGraph, nodesTableArray and nodesTableHash
 		for(org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
 			idNode         = streamNode.toString();
 			shortBlankName = streamNode.getAttribute("shortblankname");
@@ -116,13 +116,13 @@ public class SystemGraphData {
 			this.nodesTableHash.put(idNode,  newNodeData);
 			quantityNodesEdges.incNumNodes();
 		}
-		// each edge: add in gephiGraphData
+		// second: each edge, add in gephiGraphData
 		for( org.graphstream.graph.Edge streamEdge : streamGraph.getEachEdge() ) {
-			String idNode0  = streamEdge.getNode0().toString();
-			String idNode1  = streamEdge.getNode1().toString();
-			Node gephiNode0 = this.gephiGraphData.getGephiGraph().getNode(idNode0);
-			Node gephiNode1 = this.gephiGraphData.getGephiGraph().getNode(idNode1);
-			Edge gephiEdge  = this.gephiGraphData.getGraphModel().factory().newEdge(streamEdge.toString(), gephiNode0, gephiNode1, 1, true);
+			String idNodeSource  = streamEdge.getSourceNode().toString();
+			String idNodeTarget  = streamEdge.getTargetNode().toString();
+			Node gephiNodeSource = this.gephiGraphData.getGephiGraph().getNode(idNodeSource);
+			Node gephiNodeTarget = this.gephiGraphData.getGephiGraph().getNode(idNodeTarget);
+			Edge gephiEdge  = this.gephiGraphData.getGraphModel().factory().newEdge(streamEdge.toString(), gephiNodeSource, gephiNodeTarget, 1, true);
 			// put "label" if configured to this
 			if(Config.edgeLabelFileGephi)  // or add to all, if configured to this
 				gephiEdge.getEdgeData().getAttributes().setValue(labelAttributeColumn.getIndex(), streamEdge.toString());				
