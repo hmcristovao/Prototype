@@ -4,17 +4,17 @@ import user.Concept;
 
 public class ItemRDF {
 	
-	private String longName;           // complete: contains address 
+	private String fullName;           // complete: contains address 
 	private String shortUnderlineName; // still contains underline
 	private String shortBlankName;     // underline change for blank
 	
 	public ItemRDF(String longName) {
-		this.longName           = longName;
+		this.fullName           = longName;
 		this.shortUnderlineName = ItemRDF.doShortName(longName);
 		this.shortBlankName     = Concept.underlineToBlank(this.shortUnderlineName);
 	}
-	public String getLongName() {
-		return this.longName;
+	public String getFullName() {
+		return this.fullName;
 	}
 	public String getShortUnderlineName() {
 		return this.shortUnderlineName;
@@ -33,6 +33,6 @@ public class ItemRDF {
 	
 	@Override
 	public String toString() {
-		return this.longName + " (" + this.shortBlankName + ")";
+		return this.fullName + " (" + this.shortBlankName + ")";
 	}
 }

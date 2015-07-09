@@ -6,8 +6,9 @@ import main.Config;
 
 public class NodeData {
 	// basic data
-	private String strIdNode;  // is the same as longName in the rdf package 
-	private String shortName;  // is the same as blankName in the Concept class
+	private String strIdNode;   
+	private String shortName;  // is the same as blankName in the Concept class = strIdNode
+	private String fullName;  // is the same as fullName in the Concept class
 	private org.graphstream.graph.Node streamNode;
 	private org.gephi.graph.api.Node gephiNode;
 	private Config.Status status;
@@ -27,12 +28,14 @@ public class NodeData {
 	
 	// constructor to permanent data
 	public NodeData(String strIdNode, 
-					String shortName, 
+					String shortName,
+					String fullName,
 					org.graphstream.graph.Node streamNode, 
 					org.gephi.graph.api.Node gephiNode,
 					Config.Status status) {
 		this.strIdNode         = strIdNode;
 		this.shortName         = shortName;
+		this.fullName          = fullName;
 		this.streamNode        = streamNode;
 		this.gephiNode         = gephiNode;
 		this.status	    	   = status;
@@ -43,10 +46,11 @@ public class NodeData {
 	}
 	public NodeData(String strIdNode, 
 					String shortName, 
+					String fullName,
 					StreamGraphData streamGraphData, 
 					GephiGraphData gephiGraphData, 
 					Config.Status status) {
-		this(strIdNode, shortName, 
+		this(strIdNode, shortName, fullName,
 			 streamGraphData.getStreamGraph().getNode(strIdNode), 
 			 gephiGraphData.getGephiGraph().getNode(strIdNode), 
 			 status);
@@ -56,6 +60,9 @@ public class NodeData {
 	}
 	public String getShortName() {
 		return this.shortName;
+	}
+	public String getFullName() {
+		return this.fullName;
 	}
 	public org.graphstream.graph.Node getStreamNode() {
 		return this.streamNode;
@@ -133,7 +140,7 @@ public class NodeData {
 	@Override
 	public String toString() {
 		return  "Id: " + this.getStrIdNode() +
-				"\nShort name: " + this.getShortName() +
+				"\nFull name: " + this.getFullName() +
 				"\nStatus: " + Concept.statusToString(this.status) +
 				"\nConnected component: " + this.getConnectedComponent() +
 				"\nBetweenness: " + this.getBetweenness() +

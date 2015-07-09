@@ -76,7 +76,7 @@ public class SystemGraphData {
 	public QuantityNodesEdges buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
 		org.graphstream.graph.Graph streamGraph = WholeSystem.getStreamGraphData().getStreamGraph();
 		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getRealTotalNodes());
-		String idNode, shortBlankName;
+		String idNode, shortBlankName, fullName;
 		NodeData newNodeData = null;
 		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
 		Config.Status status;
@@ -86,6 +86,7 @@ public class SystemGraphData {
 		for(org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
 			idNode         = streamNode.toString();
 			shortBlankName = streamNode.getAttribute("shortblankname");
+			fullName       = streamNode.getAttribute("fullname");
 			// create a new gephiNode
 			Node gephiNode = this.gephiGraphData.getGraphModel().factory().newNode(idNode);
 			// add attribute "label" if the concept is selected or original
@@ -99,7 +100,7 @@ public class SystemGraphData {
 			
 			status = WholeSystem.getConceptsRegister().getStatus(shortBlankName);
 			// create a new NodeData object
-			newNodeData = new NodeData(idNode, shortBlankName, streamNode, gephiNode, status);
+			newNodeData = new NodeData(idNode, shortBlankName, fullName, streamNode, gephiNode, status);
 			// add attributes to new nodeData
 			if(streamNode.getAttribute("homepage") != null) 
 				newNodeData.setHomepageAttribute(streamNode.getAttribute("homepage").toString());

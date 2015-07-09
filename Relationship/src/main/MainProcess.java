@@ -1,4 +1,4 @@
-// v3.4 - found the error about edges to same pair of nodes
+// v3.4b - found the error about edges to same pair of nodes. not ready!
 
 package main;
 

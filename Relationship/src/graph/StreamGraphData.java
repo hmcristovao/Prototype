@@ -9,10 +9,12 @@ import org.graphstream.algorithm.BetweennessCentrality;
 import org.graphstream.algorithm.measure.ClosenessCentrality;
 import org.graphstream.algorithm.measure.EigenvectorCentrality;
 import org.graphstream.graph.Edge;
+import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
 import org.graphstream.graph.Node;
 import org.graphstream.graph.implementations.MultiGraph;
+import org.graphstream.graph.implementations.SingleGraph;
 
 import rdf.ItemRDF;
 import rdf.ListRDF;
@@ -32,7 +34,7 @@ public class StreamGraphData {
 		
 
 	public StreamGraphData() {
-		this.streamGraph = new MultiGraph(
+		this.streamGraph = new SingleGraph(
 									Config.nameGraph,
 				                    true,                   // non-fatal error throws an exception = verify duplicated nodes
 				                    false,                  // auto-create
@@ -122,14 +124,17 @@ public class StreamGraphData {
 		return this.streamGraph.getEdgeCount();
 	}	
 	
+	public static int getModifier() {
+		return StreamGraphData.modifier; 
+	}
 	public static String getStrModifier() {
 		return String.valueOf(StreamGraphData.modifier); 
 	}
-	
 	public static void incModifier() {
 		StreamGraphData.modifier++;
 	}
 	
+	// build stream graph from rdfs in set query Sparql
 	public QuantityNodesEdges buildStreamGraphData(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
@@ -155,7 +160,6 @@ public class StreamGraphData {
 		}
 		return quantityNodesEdgesOut;
 	}
-
 	private void insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
@@ -164,10 +168,11 @@ public class StreamGraphData {
 		Node node = null;
 		Edge edge = null;
 		try {
-			node = this.streamGraph.addNode(subjectRDF.getLongName());
+			node = this.streamGraph.addNode(subjectRDF.getShortBlankName());
 			quantityNodesEdges.incNumNodes();
+			node.addAttribute("fullname",           subjectRDF.getFullName());
 			node.addAttribute("shortunderlinename", subjectRDF.getShortUnderlineName());
-			node.addAttribute("shortblankname",     subjectRDF.getShortBlankName());
+			node.addAttribute("shortblankname",     subjectRDF.getShortBlankName());  // repeated with node id, but it is important...
 			if(Config.nodeLabelStreamGephi)
 				node.addAttribute("label", subjectRDF.getShortBlankName());
 			// if original concept then put label
@@ -176,23 +181,26 @@ public class StreamGraphData {
 			}		
 		}
 		catch(IdAlreadyInUseException e) {
-			// repeated node, do nothing
-			node = this.streamGraph.getNode(subjectRDF.getLongName());
+			// repeated node, do nothing, only get it to continue the process
+			node = this.streamGraph.getNode(subjectRDF.getShortBlankName());
 		}
+
 		// if predicate is known, transform it in attributes into node
-		if(predicateRDF.getLongName().equals(Config.addressBasic + "homepage"))
-			node.addAttribute("homepage", objectRDF.getLongName());
-		else if(predicateRDF.getLongName().equals(Config.addressBasic + "comment"))
-			node.addAttribute("comment", objectRDF.getLongName());
-		else if(predicateRDF.getLongName().equals(Config.addressBasic + "abstract"))
-			node.addAttribute("abstract", objectRDF.getLongName());
-		else if(predicateRDF.getLongName().equals(Config.addressBasic + "image"))
-			node.addAttribute("image", objectRDF.getLongName());
-        // insert common predicate (unknown)
+		if(predicateRDF.getFullName().equals(Config.addressBasic + "homepage"))
+			node.addAttribute("homepage", objectRDF.getShortBlankName());
+		else if(predicateRDF.getFullName().equals(Config.addressBasic + "comment"))
+			node.addAttribute("comment", objectRDF.getShortBlankName());
+		else if(predicateRDF.getFullName().equals(Config.addressBasic + "abstract"))
+			node.addAttribute("abstract", objectRDF.getShortBlankName());
+		else if(predicateRDF.getFullName().equals(Config.addressBasic + "image"))
+			node.addAttribute("image", objectRDF.getShortBlankName());
+        
+		// insert common predicate (unknown)
 		else {
 			try {
-				node = this.streamGraph.addNode(objectRDF.getLongName());
+				node = this.streamGraph.addNode(objectRDF.getShortBlankName());
 				quantityNodesEdges.incNumNodes();
+				node.addAttribute("fullname",           subjectRDF.getFullName());
 				node.addAttribute("shortunderlinename", objectRDF.getShortUnderlineName());
 				node.addAttribute("shortblankname",     objectRDF.getShortBlankName());
 				if(Config.nodeLabelStreamGephi)
@@ -204,24 +212,52 @@ public class StreamGraphData {
 			}
 			catch(IdAlreadyInUseException e) {
 				// repeated node, do nothing
-				node = this.streamGraph.getNode(objectRDF.getLongName());
+				node = this.streamGraph.getNode(objectRDF.getShortBlankName());
 			}
+			
+			// predicate...
 			try {
-				edge = this.streamGraph.addEdge(predicateRDF.getLongName(), subjectRDF.getLongName(), objectRDF.getLongName(),true);
+				edge = this.streamGraph.addEdge(predicateRDF.getShortBlankName(), subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),true);
+				edge.addAttribute("fullname",           predicateRDF.getFullName());
 				edge.addAttribute("shortunderlinename", predicateRDF.getShortUnderlineName());
 				edge.addAttribute("shortblankname",     predicateRDF.getShortBlankName());
+				edge.addAttribute("times",              "1");  // quantity of repeated edges to same pair of nodes (default: 1) 
 				quantityNodesEdges.incNumEdges();
 				if(Config.edgeLabelStreamGephi)
 					edge.addAttribute("label", predicateRDF.getShortBlankName());
 			}
+			// detected that there is the same predicate from even node
 			catch(IdAlreadyInUseException e) {
-				// repeated edge, insert a different element in the identifying string and try again
-				StreamGraphData.incModifier();
-				edge = this.streamGraph.addEdge(predicateRDF.getLongName()+" - "+StreamGraphData.getStrModifier(), subjectRDF.getLongName(), objectRDF.getLongName(),true);
-				quantityNodesEdges.incNumEdges();
-				if(Config.edgeLabelStreamGephi)
-					// add modifier to differentiate each link into the graph
-					edge.addAttribute("label", predicateRDF.getShortBlankName()+" - "+StreamGraphData.getStrModifier());
+				String newNameEdge=null;
+				try {
+					// repeated edge, store insert a different element in the identifying string and try again
+(criar uma tab hash para guardar todos os edges, e a suas quantidades
+					StreamGraphData.incModifier();
+					String formatedModifierNumber =  (StreamGraphData.getModifier()<10) ? ("0"+StreamGraphData.getStrModifier()) : StreamGraphData.getStrModifier();
+					newNameEdge = predicateRDF.getShortBlankName()+"(#"+formatedModifierNumber+")";
+					edge = this.streamGraph.addEdge(newNameEdge, subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),true);
+					quantityNodesEdges.incNumEdges();
+					if(Config.edgeLabelStreamGephi)
+						// add modifier to differentiate each link into the graph
+						edge.addAttribute("label", newNameEdge);
+				}
+				// besides detect that there is the same predicate from even node, it also detect this predicate go to the same target node   
+				catch(EdgeRejectedException e2) {
+					// store +1 in edge "times" attribute. Do not create other edge
+					int currentTimes = Integer.parseInt((String)edge.getAttribute("times"));
+					currentTimes++;
+					edge.addAttribute("times", String.valueOf(currentTimes));
+Log.consoleln("\ntentou-se criar o mesmo edge para o mesmo par de nós: "+predicateRDF.getShortBlankName()+" ["+ subjectRDF.getShortBlankName()+" -> "+objectRDF.getShortBlankName());
+				}
+			}
+			// detected creation of a second edge to the same pair of nodes (differents)
+			catch(EdgeRejectedException e) {
+				// create a extension to the edge attribute. Do not create other edge
+				edge.addAttribute("nextedge"+numero..., predicateRDF.getShortBlankName());
+				
+verificar a questão da criação do edge, pois se houve erro então ele não foi criado...				
+				
+Log.consoleln("tentou-se criar mais de um edge para o mesmo par de nós: "+predicateRDF.getShortBlankName()+" ["+ subjectRDF.getShortBlankName()+" -> "+objectRDF.getShortBlankName());				
 			}
 		}
 	}
@@ -248,11 +284,13 @@ public class StreamGraphData {
 		eingenvector.setCentralityAttribute("eingenvector");
 		eingenvector.compute();	
 	}
-/*
+
+	/*
+	// do not working...
 	public void addNewConceptsLabel(GroupConcept newConcepts) {
 		Node node;
 		for(Concept concept : newConcepts.getList()) {
-			node = this.streamGraph.getNode(concept.getFullName());
+			node = this.streamGraph.getNode(concept.getBlankName());
 			// some nodes will not be found because they are from "Category"
 			if(node != null) {
 			   node.addAttribute("label", concept.getBlankName());  // the process enters here, but this act do not updade the graph visualization!!!
@@ -260,7 +298,8 @@ public class StreamGraphData {
 			}
 		}
 	}
-*/
+    */
+	
 	// Apply K-core n on the Graph
 	// return quantity of selected concepts deleted
 	public int applyKcoreN() {
@@ -328,8 +367,8 @@ public class StreamGraphData {
 		StringBuffer str = new StringBuffer();
 		str.append("\nID: ");
 		str.append(node.toString());
-		str.append(" - Short blank name: ");
-		str.append(node.getAttribute("shortblankname"));
+		str.append(" - Full name: ");
+		str.append(node.getAttribute("fullname"));
 		str.append("\n[Degree: ");
 		str.append(node.getDegree());
 		str.append("] [In degree: ");
