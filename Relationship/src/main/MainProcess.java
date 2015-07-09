@@ -1,4 +1,4 @@
-// v3.4b - found the error about edges to same pair of nodes. not ready!
+// v3.4c - creating mapping between RDFs and network. not ready!
 
 package main;
 

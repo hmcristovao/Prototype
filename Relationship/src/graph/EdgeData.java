@@ -1,0 +1,42 @@
+// It is one raw of the table of edges (EdgesTableArray)
+package graph;
+
+public class EdgeData {
+	private String idEdge;  // is the same short name with space blank   
+	int times;   // used in the case: same subject, predicate and object
+	int number;  // used in the cases: (1)same subject and predicate, (2)same predicate and object
+	
+	public EdgeData(String idEdge) {
+		this.idEdge = idEdge;
+		this.times  = 0;
+		this.number = 0;
+	}
+	public String getIdEdge() {
+		return this.idEdge;
+	}
+	public int getTimes() {
+		return this.times;
+	}
+	public int getNumber() {
+		return this.number;
+	}
+	public void incTimes() {
+		this.times++;
+	}
+	private void incNumber() {
+		this.number++;
+	}
+	public String getNumberAndIncrement() {
+		String formatedNumber = this.number<10 ? "00" : (this.number<100 ? "0" : "");
+		formatedNumber += String.valueOf(this.number);
+		this.incNumber();
+		return formatedNumber;
+	}
+	
+	@Override
+	public String toString() {
+		return  "\nEdge id: " + this.idEdge +
+				"\nTimes: " + this.times +
+				"\nCurrent number: " + this.number;
+	}
+}

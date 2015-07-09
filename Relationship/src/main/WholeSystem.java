@@ -10,6 +10,7 @@ import java.util.LinkedList;
 
 public class WholeSystem {
 	private static GroupConcept conceptsRegister;
+	private static EdgesTableHash edgesTable;
 	private LinkedList<SetQuerySparql> listSetQuerySparql;
 	private LinkedList<SystemGraphData> listSystemGraphData;
 	private static StreamGraphData streamGraphData;  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
@@ -19,6 +20,7 @@ public class WholeSystem {
 	
 	public WholeSystem() {
 		WholeSystem.conceptsRegister = new GroupConcept(); 
+		WholeSystem.edgesTable       = new EdgesTableHash(); 
 		this.listSetQuerySparql      = new LinkedList<SetQuerySparql>();
 		this.listSystemGraphData     = new LinkedList<SystemGraphData>();
 		WholeSystem.streamGraphData  = new StreamGraphData();
@@ -35,9 +37,11 @@ public class WholeSystem {
 	public static StreamGraphData getStreamGraphData() {
 		return WholeSystem.streamGraphData;
 	}
-
 	public static GroupConcept getConceptsRegister() {
 		return WholeSystem.conceptsRegister;
+	}
+	public static EdgesTableHash getEdgesTable() {
+		return WholeSystem.edgesTable;
 	}
 
 	public LinkedList<SetQuerySparql> getListSetQuerySparql() {
