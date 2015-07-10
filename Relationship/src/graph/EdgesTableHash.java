@@ -4,6 +4,7 @@
 package graph;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 public class EdgesTableHash {
@@ -12,19 +13,41 @@ public class EdgesTableHash {
 	public EdgesTableHash() {
 		this.table = new HashMap<String, EdgeData>();
 	}	
+	public int size() {
+		return this.table.size();
+	}
 	public EdgeData get(String idEdge) {
 		if(this.table.containsKey(idEdge))
 			return this.table.get(idEdge);
 		return null;
 	}
+	public String getNewName(String idEdge) {
+		if(this.table.containsKey(idEdge))
+			return this.table.get(idEdge).getNameAndIncrement();
+		return null;
+	}
 	public void put(String idEdge, EdgeData edgeData) {
 		this.table.put(idEdge, edgeData);
+	}
+	public void put(String idEdge) {
+		EdgeData edgeData = new EdgeData(idEdge);
+		this.put(idEdge, edgeData);
 	}
 	public boolean containsKey(String idEdge) {
 		return this.table.containsKey(idEdge);
 	}
-	
+	public int incEdgeTimes(String idEdge) {
+		EdgeData edgeData = this.get(idEdge);
+		if(edgeData == null)
+			return -1;
+		return edgeData.incTimes();
+	}
 	public String toString() {
+		StringBuffer str = new StringBuffer();
+		for(String idEdge: this.table.keySet()) {
+			str.append(this.table.get(idEdge).toString());
+			str.append("\n");
+		}
 		return  this.table.toString();
 	}
 }

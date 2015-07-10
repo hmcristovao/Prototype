@@ -100,9 +100,9 @@ public class GephiGraphData {
 		graphDistance.setDirected(false);
 		graphDistance.setNormalized(true);
 		graphDistance.execute(this.graphModel, this.attributeModel);
-		this.attributeTable = this.attributeModel.getNodeTable();
-		this.betweennessColumn        = this.attributeTable.getColumn(GraphDistance.BETWEENNESS);
-		this.closenessColumn          = this.attributeTable.getColumn(GraphDistance.CLOSENESS);
+		this.attributeTable 	= this.attributeModel.getNodeTable();
+		this.betweennessColumn  = this.attributeTable.getColumn(GraphDistance.BETWEENNESS);
+		this.closenessColumn    = this.attributeTable.getColumn(GraphDistance.CLOSENESS);
 	}
 	
 	// calculate eigenvector measure of the table

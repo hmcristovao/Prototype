@@ -1,4 +1,4 @@
-// v3.4c - creating mapping between RDFs and network. not ready!
+// v3.5 - mapping between RDFs and network ready! Without errors.
 
 package main;
 
@@ -33,7 +33,7 @@ public class MainProcess {
 				collectRDFs();
 				createCurrentSystemGraphData();
 				connectStreamVisualization();
-				buildStreamGraphData();
+				buildStreamGraphData_buildEdgeTable();
 				showQuantitiesStreamGraph();
 				if(iteration >= 1) 
 					copyAllObjectsLastIteration();
@@ -43,8 +43,9 @@ public class MainProcess {
 				clearStreamGraphSink();
 				calculateDistanceMeasuresWholeNetwork();
 				calculateEigenvectorMeasureWholeNetwork();
+				storeMeasuresWholeNetworkToMainNodeTable();
 				sortMeasureWholeNetwork();
-				classifyConnectedComponent_BuildSubGraphs();
+				classifyConnectedComponent_buildSubGraphs();
                 buildSubGraphsRanks();
 				buildSubGraphsTablesInConnectedComponents();
 				sortConnectedComponentsRanks();
@@ -148,22 +149,28 @@ public class MainProcess {
 			WholeSystem.getStreamGraphData().getStreamGraph().addSink(sender);
 		}
 	}
-	public static void buildStreamGraphData() throws Exception {
+	public static void buildStreamGraphData_buildEdgeTable() throws Exception {
 		Log.console("- Building Stream Graph Data");
 		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData(currentSetQuerySparql);
 		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" new nodes, "+quantityNodesEdges.getNumEdges()+" new edges in the visualization graph.");
+		Log.consoleln("- Creating edge hash table - "+WholeSystem.getEdgesTable().size()+" edges.");
 		Log.outFileCompleteReport("Stream Graph Data created (graph used in the preview): \n" + 
 		        quantityNodesEdges.getNumNodes() + " new nodes, " + 
 				quantityNodesEdges.getNumEdges() + " new edges in the visualization graph.\n" +
 		        WholeSystem.getStreamGraphData().getRealTotalNodes() + " total nodes, " +
 		        WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges." + 
-		        WholeSystem.getStreamGraphData().toString());				                  
+		        WholeSystem.getStreamGraphData().toString());
+		Log.outFileCompleteReport("Edge hash table created:" + 
+				"\n("+WholeSystem.getEdgesTable().size()+" edges)." +
+				"\n"+WholeSystem.getEdgesTable().toString());
 		Log.outFileShortReport("Stream Graph Data created (graph used in the preview): \n" + 
                 quantityNodesEdges.getNumNodes() + " new nodes, " + 
                 quantityNodesEdges.getNumEdges() + " new edges in the visualization graph.\n" +
                 WholeSystem.getStreamGraphData().getRealTotalNodes() + " total nodes, " +
                 WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges." +
         		WholeSystem.getStreamGraphData().toStringShort());				                  
+		Log.outFileShortReport("Edge hash table created:" + 
+				"\n("+WholeSystem.getEdgesTable().size()+" edges).");
 	}
 	public static void showQuantitiesStreamGraph() throws Exception {
 		Log.consoleln("- Quantities Stream Graph built: "+WholeSystem.getStreamGraphData().getRealTotalNodes()+
@@ -231,24 +238,36 @@ public class MainProcess {
 			WholeSystem.getStreamGraphData().getStreamGraph().clearSinks();
 	}
 	public static void calculateDistanceMeasuresWholeNetwork() throws Exception {
-		Log.consoleln("- Calculating distance measures of the whole network.");
+		Log.console("- Calculating distance measures of the whole network");
 		currentSystemGraphData.getGephiGraphData().calculateGephiGraphDistanceMeasures();
-		Log.outFileCompleteReport("Distance measures of the whole network calculated.");
-		Log.outFileShortReport("Distance measures of the whole network calculated.");
+		Log.consoleln(" - "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString());
+		Log.outFileCompleteReport("Distance measures of the whole network calculated." + 
+				"\n(betweenness and closeness to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
+		Log.outFileShortReport("Distance measures of the whole network calculated." + 
+				"\n(betweenness and closeness to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
 	}
 	public static void calculateEigenvectorMeasureWholeNetwork() throws Exception {
-		Log.consoleln("- Calculating eigenvector measure of the whole network.");
+		Log.console("- Calculating eigenvector measure of the whole network");
 		currentSystemGraphData.getGephiGraphData().calculateGephiGraphEigenvectorMeasure();
-		Log.outFileCompleteReport("Eigenvector measure of the whole network calculated.");
-		Log.outFileShortReport("Eigenvector measure of the whole network calculated.");
+		Log.consoleln(" - "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString());
+		Log.outFileCompleteReport("Eigenvector measure of the whole network calculated." + 
+				"\n(eigenvector to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
+		Log.outFileShortReport("Eigenvector measure of the whole network calculated." + 
+				"\n(eigenvector to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
 	}
+	public static void storeMeasuresWholeNetworkToMainNodeTable() throws Exception {
+		Log.consoleln("- Storing measures of the whole network to main node table.");
+		currentSystemGraphData.storeMeasuresWholeNetwork();
+		Log.outFileCompleteReport("Stored measures of the whole network to main node table.");
+		Log.outFileShortReport("Stored measures of the whole network to main node table.");
+	} 
 	public static void sortMeasureWholeNetwork() throws Exception {
 		Log.consoleln("- Sorting measures of the whole network.");
 		currentSystemGraphData.sortMeasuresWholeNetwork();
 		Log.outFileCompleteReport("Measures of the whole network sorted.");
 		Log.outFileShortReport("Measures of the whole network sorted.");
 	}
-	public static void classifyConnectedComponent_BuildSubGraphs() throws Exception {
+	public static void classifyConnectedComponent_buildSubGraphs() throws Exception {
 		Log.console("- Classifying connected component and building sub graphs");
 		int num = currentSystemGraphData.getGephiGraphData().classifyConnectedComponent();
 		currentSystemGraphData.setConnectedComponentsCount(num);
@@ -280,8 +299,8 @@ public class MainProcess {
 	public static void sortConnectedComponentsRanks() throws Exception {
 		Log.consoleln("- Sorting connected componets ranks.");
 		currentSystemGraphData.sortConnectecComponentRanks();
-		Log.outFileCompleteReport("Connected componets ranks sorted.");
-		Log.outFileShortReport("Connected componets ranks sorted.");
+		Log.outFileCompleteReport("Connected components ranks sorted.");
+		Log.outFileShortReport("Connected components ranks sorted.");
 	}
 	public static void selectLargestNodesByBetweennessCloseness() throws Exception {
 		Log.console("- Selecting largest nodes by betweenness+closeness");

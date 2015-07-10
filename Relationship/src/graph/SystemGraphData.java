@@ -72,7 +72,7 @@ public class SystemGraphData {
 	}
 	
 	// It copies all graph from StreamGraph format to GephiGraph format.
-	// Tt also builds nodesTableHash and nodesTableArray
+	// It also builds nodesTableHash and nodesTableArray
 	public QuantityNodesEdges buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
 		org.graphstream.graph.Graph streamGraph = WholeSystem.getStreamGraphData().getStreamGraph();
 		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getRealTotalNodes());
@@ -135,7 +135,7 @@ public class SystemGraphData {
 	}
 	
 	// store results in NodesData set
-	// BEFORE: must calculate "buildGephiGraphTable"
+	// BEFORE: must calculate calculateGephiGraphDistanceMeasures() and calculateGephiGraphEigenvectorMeasure() of GephiGraphData class
 	public void storeMeasuresWholeNetwork() {
 		Double betweennessValue, closenessValue, eigenvectorValue;
 		String nodeId;

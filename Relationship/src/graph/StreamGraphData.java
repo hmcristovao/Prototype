@@ -1,4 +1,4 @@
- package graph;
+package graph;
 import java.util.LinkedList;
 
 import main.Config;
@@ -27,7 +27,6 @@ import user.GroupConcept;
 
 public class StreamGraphData {
 	private Graph streamGraph;
-	private static int modifier = 0;
 	private QuantityNodesEdges total;
     private QuantityNodesEdges duplicated;
     private QuantityNodesEdges deleted;
@@ -123,17 +122,7 @@ public class StreamGraphData {
 	public int getRealTotalEdges() {
 		return this.streamGraph.getEdgeCount();
 	}	
-	
-	public static int getModifier() {
-		return StreamGraphData.modifier; 
-	}
-	public static String getStrModifier() {
-		return String.valueOf(StreamGraphData.modifier); 
-	}
-	public static void incModifier() {
-		StreamGraphData.modifier++;
-	}
-	
+		
 	// build stream graph from rdfs in set query Sparql
 	public QuantityNodesEdges buildStreamGraphData(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
@@ -200,7 +189,7 @@ public class StreamGraphData {
 			try {
 				node = this.streamGraph.addNode(objectRDF.getShortBlankName());
 				quantityNodesEdges.incNumNodes();
-				node.addAttribute("fullname",           subjectRDF.getFullName());
+				node.addAttribute("fullname",           objectRDF.getFullName());
 				node.addAttribute("shortunderlinename", objectRDF.getShortUnderlineName());
 				node.addAttribute("shortblankname",     objectRDF.getShortBlankName());
 				if(Config.nodeLabelStreamGephi)
@@ -221,43 +210,52 @@ public class StreamGraphData {
 				edge.addAttribute("fullname",           predicateRDF.getFullName());
 				edge.addAttribute("shortunderlinename", predicateRDF.getShortUnderlineName());
 				edge.addAttribute("shortblankname",     predicateRDF.getShortBlankName());
-				edge.addAttribute("times",              "1");  // quantity of repeated edges to same pair of nodes (default: 1) 
+				edge.addAttribute("repeatedtimes",      "0");  // quantity of repeated edges to same pair of nodes (default: 1) 
+				// put new edge in hash table
+				WholeSystem.getEdgesTable().put(predicateRDF.getShortBlankName());
 				quantityNodesEdges.incNumEdges();
 				if(Config.edgeLabelStreamGephi)
 					edge.addAttribute("label", predicateRDF.getShortBlankName());
 			}
-			// detected that there is the same predicate from even node
+			// case 4(scratch): same predicate (different subject and object)
+			// case 5(scratch): same subject and predicate (different object)
+			// case 6(scratch): same predicate and object (different subject)
+			// case 10(scratch): subject and object commuted, moreover same predicate
 			catch(IdAlreadyInUseException e) {
-				String newNameEdge=null;
 				try {
-					// repeated edge, store insert a different element in the identifying string and try again
-(criar uma tab hash para guardar todos os edges, e a suas quantidades
-					StreamGraphData.incModifier();
-					String formatedModifierNumber =  (StreamGraphData.getModifier()<10) ? ("0"+StreamGraphData.getStrModifier()) : StreamGraphData.getStrModifier();
-					newNameEdge = predicateRDF.getShortBlankName()+"(#"+formatedModifierNumber+")";
+					// insert a count element in the id edge and try again
+                    String newNameEdge = WholeSystem.getEdgesTable().getNewName(predicateRDF.getShortBlankName());  // add "#n" in the edge name
 					edge = this.streamGraph.addEdge(newNameEdge, subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),true);
 					quantityNodesEdges.incNumEdges();
 					if(Config.edgeLabelStreamGephi)
 						// add modifier to differentiate each link into the graph
 						edge.addAttribute("label", newNameEdge);
 				}
-				// besides detect that there is the same predicate from even node, it also detect this predicate go to the same target node   
+				// case 7(scratch): same subject, predicate and object    
 				catch(EdgeRejectedException e2) {
-					// store +1 in edge "times" attribute. Do not create other edge
-					int currentTimes = Integer.parseInt((String)edge.getAttribute("times"));
+					Edge repeatedEdge = this.streamGraph.getEdge(predicateRDF.getShortBlankName()); 
+					// store +1 in edge "repeatedTimes" attribute. Do not create other edge
+					int currentTimes = Integer.parseInt((String)repeatedEdge.getAttribute("repeatedtimes"));
 					currentTimes++;
-					edge.addAttribute("times", String.valueOf(currentTimes));
-Log.consoleln("\ntentou-se criar o mesmo edge para o mesmo par de nós: "+predicateRDF.getShortBlankName()+" ["+ subjectRDF.getShortBlankName()+" -> "+objectRDF.getShortBlankName());
+					repeatedEdge.addAttribute("repeatedtimes", String.valueOf(currentTimes));
+					// update the edge table
+					WholeSystem.getEdgesTable().incEdgeTimes(predicateRDF.getShortBlankName());
 				}
 			}
-			// detected creation of a second edge to the same pair of nodes (differents)
+			// case 8(scratch): same subject and object (different predicate) 
 			catch(EdgeRejectedException e) {
+				// search the existent edge with subject and object
+				Node sourceNode = this.streamGraph.getNode(subjectRDF.getShortBlankName()); 
+				Node targetNode = this.streamGraph.getNode(objectRDF.getShortBlankName()); 
+				Edge existentEdge = sourceNode.getEdgeBetween(targetNode);
 				// create a extension to the edge attribute. Do not create other edge
-				edge.addAttribute("nextedge"+numero..., predicateRDF.getShortBlankName());
-				
-verificar a questão da criação do edge, pois se houve erro então ele não foi criado...				
-				
-Log.consoleln("tentou-se criar mais de um edge para o mesmo par de nós: "+predicateRDF.getShortBlankName()+" ["+ subjectRDF.getShortBlankName()+" -> "+objectRDF.getShortBlankName());				
+				// seach next free attribute...
+				int numberNextFreeAttribute = 0;
+				for( ; ; numberNextFreeAttribute++) {
+					if(existentEdge.getAttribute("nextedge"+numberNextFreeAttribute) == null) 
+						break;
+				}
+				existentEdge.addAttribute("nextedge"+numberNextFreeAttribute, predicateRDF.getShortBlankName());
 			}
 		}
 	}
@@ -400,11 +398,24 @@ Log.consoleln("tentou-se criar mais de um edge para o mesmo par de nós: "+predic
 		for( Edge edge : node.getEachEdge()) {
 			str.append("      ");
 			str.append(edge.toString());
-			str.append("\n");
+			str.append(" (times: ");
+			str.append(edge.getAttribute("repeatedTimes"));
+			str.append(")\n");
+			for(int numberExtraEdge = 0; ; numberExtraEdge++) {
+				if(edge.getAttribute("nextedge"+numberExtraEdge) == null) 
+					break;
+				else {
+					str.append("         extra edge ");
+					str.append(numberExtraEdge);
+					str.append(": ");
+					str.append(edge.getAttribute("nextedge"+numberExtraEdge));
+					str.append("\n");
+				}
+			}
 		}
 		return str.toString();
 	}
- 
+
 	
 	public String toStringGraph() {
 		StringBuffer str = new StringBuffer();

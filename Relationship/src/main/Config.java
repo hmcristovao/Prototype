@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - LOG AND PRINT 
     //
-	String  testNumber = "04"; 
+	String  testNumber = "00"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
@@ -98,7 +98,7 @@ public interface Config {
 	// iteration number to apply n-degree filter trigger
 	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 10;
+	int quantityNodesToApplyNdegreeFilter = 2000;
 
 	
 	// ============================================================================
