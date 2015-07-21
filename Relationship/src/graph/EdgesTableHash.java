@@ -45,10 +45,10 @@ public class EdgesTableHash {
 	public String toString() {
 		StringBuffer str = new StringBuffer();
 		for(String idEdge: this.table.keySet()) {
-			str.append(this.table.get(idEdge).toString());
+			str.append((this.table.get(idEdge)).toString());
 			str.append("\n");
 		}
-		return  this.table.toString();
+		return  str.toString();
 	}
 }
 

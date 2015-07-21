@@ -5,13 +5,14 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 
+import org.apache.jena.riot.WebContent;
+
 import main.Config;
 import main.Log;
 import user.Concept;
 import user.GroupConcept;
 
 import com.hp.hpl.jena.query.Query;
-import com.hp.hpl.jena.query.QueryExecution;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
 import com.hp.hpl.jena.query.QueryFactory;
 import com.hp.hpl.jena.rdf.model.Model;
@@ -20,6 +21,7 @@ import com.hp.hpl.jena.rdf.model.RDFNode;
 import com.hp.hpl.jena.rdf.model.Resource;
 import com.hp.hpl.jena.rdf.model.Statement;
 import com.hp.hpl.jena.rdf.model.StmtIterator;
+import com.hp.hpl.jena.sparql.engine.http.QueryEngineHTTP;
 
 public class SetQuerySparql {
 	private LinkedList<QuerySparql> listQuerySparql;
@@ -134,45 +136,34 @@ public class SetQuerySparql {
 		return n;
 	}
 	
+	//  read all RDF triples belongs to one query concept 
 	public int fillRDFs() throws Exception {
-		QuerySparql querySparql;
-		String queryStr;
-		Query query;
-		QueryExecution queryExecution;
-		Model model;
-		ListRDF listRDF;
-		StmtIterator stmtIterator;
-		Statement statement;
-		Resource  subject;
-		Property  predicate;
-		RDFNode   object;
-		OneRDF oneRDF;
-		ItemRDF subjectRDF;
-		ItemRDF predicateRDF;
-		ItemRDF objectRDF;
 		int n = 0;
 		for(int i=0; i < this.getListQuerySparql().size(); i++) {
-			querySparql = this.getListQuerySparql().get(i);
-			queryStr = querySparql.getQueryString().getQueryStrString();
-			query = QueryFactory.create(queryStr);
-			queryExecution = QueryExecutionFactory.sparqlService(Config.serviceEndpoint,  query);
-			model = queryExecution.execConstruct();
+			QuerySparql querySparql = this.getListQuerySparql().get(i);
+			String queryStr = querySparql.getQueryString().getQueryStrString();
+
+			Query query = QueryFactory.create(queryStr);
+			QueryEngineHTTP queryEngineHTTP = (QueryEngineHTTP)QueryExecutionFactory.sparqlService(Config.selectedServiceSnorqlEndPoint,  query);
+			queryEngineHTTP.setModelContentType(WebContent.contentTypeJSONLD);
+			Model model = queryEngineHTTP.execConstruct();
+			
 			querySparql.setModel(model);
-			listRDF = querySparql.getListRDF();
-			stmtIterator = model.listStatements();
+			ListRDF listRDF = querySparql.getListRDF();
+			StmtIterator stmtIterator = model.listStatements();
 
 			while (stmtIterator.hasNext()) {
 				// read elements of the model
-				statement = stmtIterator.nextStatement();  
-				subject   = statement.getSubject();     
-				predicate = statement.getPredicate();   
-				object    = statement.getObject();
+				Statement statement = stmtIterator.nextStatement();  
+				Resource  subject   = statement.getSubject();     
+				Property  predicate = statement.getPredicate();   
+				RDFNode   object    = statement.getObject();
 				
 				// create complete registerRDF 
-				subjectRDF   = new SubjectRDF(subject.toString(), subject);
-				predicateRDF = new PredicateRDF(predicate.toString(), predicate);
-				objectRDF    = new ObjectRDF(object.toString(), object);
-				oneRDF       = new OneRDF(statement, subjectRDF, predicateRDF, objectRDF);
+				ItemRDF subjectRDF   = new SubjectRDF(subject.toString(), subject);
+				ItemRDF predicateRDF = new PredicateRDF(predicate.toString(), predicate);
+				ItemRDF objectRDF    = new ObjectRDF(object.toString(), object);
+				OneRDF  oneRDF       = new OneRDF(statement, subjectRDF, predicateRDF, objectRDF);
 				
 				// insert complete item into listQuerySparql of the RDFs
 				listRDF.getList().add(oneRDF);
@@ -180,7 +171,7 @@ public class SetQuerySparql {
 				
 				this.incTotalRDFs();
 			}
-		    queryExecution.close();
+			queryEngineHTTP.close();
 		}
 		return n;
 	}

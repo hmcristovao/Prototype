@@ -1,4 +1,4 @@
-// v3.5 - mapping between RDFs and network ready! Without errors.
+// v3.6 - fixed error about incompatible caracter in RDF reading (by stack overflow site). Working (but, error in test 17)
 
 package main;
 
@@ -151,7 +151,7 @@ public class MainProcess {
 	}
 	public static void buildStreamGraphData_buildEdgeTable() throws Exception {
 		Log.console("- Building Stream Graph Data");
-		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData(currentSetQuerySparql);
+		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData_buildEdgeTable(currentSetQuerySparql);
 		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" new nodes, "+quantityNodesEdges.getNumEdges()+" new edges in the visualization graph.");
 		Log.consoleln("- Creating edge hash table - "+WholeSystem.getEdgesTable().size()+" edges.");
 		Log.outFileCompleteReport("Stream Graph Data created (graph used in the preview): \n" + 

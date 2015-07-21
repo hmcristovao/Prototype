@@ -2,9 +2,9 @@ package main;
 public interface Config {
 
 	// ============================================================================
-	// CONFIG - LOG AND PRINT 
+	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "00"; 
+	String  testNumber = "17"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
@@ -22,11 +22,16 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RDFs 
     //
-	String serviceEndpoint  = "http://dbpedia.org/sparql";
-	String serviceEndpoint2 = "http://lod.openlinksw.com/sparql/";
+	String selectedServiceSnorqlEndPoint = Config.serviceSnorqlEndpoint_1;
+	
+	String serviceSnorqlEndpoint_1 = "http://dbpedia.org/sparql";
+	String serviceSnorqlEndpoint_2 = "http://lod.openlinksw.com/sparql/";
+	String serviceSnorqlEndpoint_3 = "http://www.ida.liu.se/projects/semtech/energy/snorql/";
+	String serviceSnorqlEndpoint_4 = "http://data.nobelprize.org/snorql/";
+	String serviceSnorqlEndpoint_5 = "http://dbpedia.org/snorql";
 
 	String addressBasic = "http://relationship/";
-	String addressImage = "http://http://commons.wikimedia.org/wiki/File:";
+	String addressImage = "http://commons.wikimedia.org/wiki/File:";
 	
 	String markQueryReplacement = "#######";
 	
@@ -63,7 +68,7 @@ public interface Config {
     //
 	// range of the quantity of iterations
 	int minIteration = 2;
-	int maxIteration = 2;
+	int maxIteration = 5;
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;

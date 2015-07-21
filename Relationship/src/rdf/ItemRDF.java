@@ -8,9 +8,9 @@ public class ItemRDF {
 	private String shortUnderlineName; // still contains underline
 	private String shortBlankName;     // underline change for blank
 	
-	public ItemRDF(String longName) {
-		this.fullName           = longName;
-		this.shortUnderlineName = ItemRDF.doShortName(longName);
+	public ItemRDF(String fullName) {
+		this.fullName           = fullName;
+		this.shortUnderlineName = ItemRDF.doShortName(fullName);
 		this.shortBlankName     = Concept.underlineToBlank(this.shortUnderlineName);
 	}
 	public String getFullName() {

@@ -124,7 +124,8 @@ public class StreamGraphData {
 	}	
 		
 	// build stream graph from rdfs in set query Sparql
-	public QuantityNodesEdges buildStreamGraphData(SetQuerySparql setQuerySparql) {
+	// build edge hash table
+	public QuantityNodesEdges buildStreamGraphData_buildEdgeTable(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
 		OneRDF oneRDF;
@@ -149,6 +150,8 @@ public class StreamGraphData {
 		}
 		return quantityNodesEdgesOut;
 	}
+	// only used by buildStreamGraphData_buildEdgeTable
+	// work with one triple RDF
 	private void insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
@@ -156,6 +159,7 @@ public class StreamGraphData {
 		ItemRDF objectRDF    = oneRDF.getObject();
 		Node node = null;
 		Edge edge = null;
+		// work with the subject RDF
 		try {
 			node = this.streamGraph.addNode(subjectRDF.getShortBlankName());
 			quantityNodesEdges.incNumNodes();
@@ -184,7 +188,8 @@ public class StreamGraphData {
 		else if(predicateRDF.getFullName().equals(Config.addressBasic + "image"))
 			node.addAttribute("image", objectRDF.getShortBlankName());
         
-		// insert common predicate (unknown)
+		// continue to common predicate (unknown)
+		// work with the object RDF
 		else {
 			try {
 				node = this.streamGraph.addNode(objectRDF.getShortBlankName());
@@ -204,7 +209,7 @@ public class StreamGraphData {
 				node = this.streamGraph.getNode(objectRDF.getShortBlankName());
 			}
 			
-			// predicate...
+			// work with predicate RDF
 			try {
 				edge = this.streamGraph.addEdge(predicateRDF.getShortBlankName(), subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),true);
 				edge.addAttribute("fullname",           predicateRDF.getFullName());
