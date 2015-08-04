@@ -123,8 +123,9 @@ public class StreamGraphData {
 		return this.streamGraph.getEdgeCount();
 	}	
 		
-	// build stream graph from rdfs in set query Sparql
-	// build edge hash table
+	// in the firt iteration build StramGraphData and EdgeTable
+	// in the second iteration so foth, just add new data into StreamGraphData and EdgeTable
+    // (build stream graph from rdfs in set query Sparql)
 	public QuantityNodesEdges buildStreamGraphData_buildEdgeTable(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
@@ -139,7 +140,10 @@ public class StreamGraphData {
 				oneRDF = listRDF.getList().get(j);
 				// insert into of graph
 				quantityNodesEdges.reset();
+				
+				// map RDF to Graph:
 				this.insertRDF(oneRDF, quantityNodesEdges);
+				
 				this.incTotalNodes(quantityNodesEdges.getNumNodes());
 				this.incTotalEdges(quantityNodesEdges.getNumEdges());
 				this.incTotalNodesDuplicate(2 - quantityNodesEdges.getNumNodes());
@@ -151,7 +155,7 @@ public class StreamGraphData {
 		return quantityNodesEdgesOut;
 	}
 	// only used by buildStreamGraphData_buildEdgeTable
-	// work with one triple RDF
+	// work with only one triple RDF each time
 	private void insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
@@ -161,6 +165,7 @@ public class StreamGraphData {
 		Edge edge = null;
 		// work with the subject RDF
 		try {
+			// case 01
 			node = this.streamGraph.addNode(subjectRDF.getShortBlankName());
 			quantityNodesEdges.incNumNodes();
 			node.addAttribute("fullname",           subjectRDF.getFullName());
@@ -173,11 +178,13 @@ public class StreamGraphData {
 				node.addAttribute("label", subjectRDF.getShortBlankName());
 			}		
 		}
+		// case 02
 		catch(IdAlreadyInUseException e) {
 			// repeated node, do nothing, only get it to continue the process
 			node = this.streamGraph.getNode(subjectRDF.getShortBlankName());
 		}
 
+		// case 12
 		// if predicate is known, transform it in attributes into node
 		if(predicateRDF.getFullName().equals(Config.addressBasic + "homepage"))
 			node.addAttribute("homepage", objectRDF.getShortBlankName());
@@ -192,6 +199,7 @@ public class StreamGraphData {
 		// work with the object RDF
 		else {
 			try {
+				// case 01
 				node = this.streamGraph.addNode(objectRDF.getShortBlankName());
 				quantityNodesEdges.incNumNodes();
 				node.addAttribute("fullname",           objectRDF.getFullName());
@@ -205,18 +213,21 @@ public class StreamGraphData {
 				}
 			}
 			catch(IdAlreadyInUseException e) {
-				// repeated node, do nothing
+				// case 03
+				// repeated node, do nothing, only get it to continue the process
 				node = this.streamGraph.getNode(objectRDF.getShortBlankName());
 			}
 			
 			// work with predicate RDF
 			try {
+				// case 01
 				edge = this.streamGraph.addEdge(predicateRDF.getShortBlankName(), subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),true);
 				edge.addAttribute("fullname",           predicateRDF.getFullName());
 				edge.addAttribute("shortunderlinename", predicateRDF.getShortUnderlineName());
 				edge.addAttribute("shortblankname",     predicateRDF.getShortBlankName());
 				edge.addAttribute("repeatedtimes",      "0");  // quantity of repeated edges to same pair of nodes (default: 1) 
 				// put new edge in hash table
+				// if existent predicate (I don't know why!!! because the "catch" should get...) do nothing
 				WholeSystem.getEdgesTable().put(predicateRDF.getShortBlankName());
 				quantityNodesEdges.incNumEdges();
 				if(Config.edgeLabelStreamGephi)

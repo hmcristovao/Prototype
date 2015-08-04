@@ -1,4 +1,4 @@
-// v3.6 - fixed error about incompatible caracter in RDF reading (by stack overflow site). Working (but, error in test 17)
+// v3.7 - fixed error about repeated edges. It is working!
 
 package main;
 
@@ -149,6 +149,8 @@ public class MainProcess {
 			WholeSystem.getStreamGraphData().getStreamGraph().addSink(sender);
 		}
 	}
+	// in the firt iteration build StramGraphData and EdgeTable
+	// in the second iteration so foth, just add new data into StreamGraphData and EdgeTable
 	public static void buildStreamGraphData_buildEdgeTable() throws Exception {
 		Log.console("- Building Stream Graph Data");
 		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData_buildEdgeTable(currentSetQuerySparql);
@@ -297,7 +299,7 @@ public class MainProcess {
 		Log.outFileShortReport("Sub-graphs tables belong to connected components built.");
 	}
 	public static void sortConnectedComponentsRanks() throws Exception {
-		Log.consoleln("- Sorting connected componets ranks.");
+		Log.consoleln("- Sorting connected components ranks.");
 		currentSystemGraphData.sortConnectecComponentRanks();
 		Log.outFileCompleteReport("Connected components ranks sorted.");
 		Log.outFileShortReport("Connected components ranks sorted.");

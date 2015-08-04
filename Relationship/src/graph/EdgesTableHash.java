@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import main.Log;
+import main.WholeSystem;
+
 public class EdgesTableHash {
 	private Map<String,EdgeData> table; 
 	
@@ -22,7 +25,7 @@ public class EdgesTableHash {
 		return null;
 	}
 	public String getNewName(String idEdge) {
-		if(this.table.containsKey(idEdge))
+		if(this.table.containsKey(idEdge)) 
 			return this.table.get(idEdge).getNameAndIncrement();
 		return null;
 	}
@@ -30,8 +33,12 @@ public class EdgesTableHash {
 		this.table.put(idEdge, edgeData);
 	}
 	public void put(String idEdge) {
-		EdgeData edgeData = new EdgeData(idEdge);
-		this.put(idEdge, edgeData);
+		if(!this.containsKey(idEdge)) {
+		   EdgeData edgeData = new EdgeData(idEdge);
+		   this.put(idEdge, edgeData);
+		}
+		else
+			System.err.println("Repeated edge inserted in graph: "+idEdge);
 	}
 	public boolean containsKey(String idEdge) {
 		return this.table.containsKey(idEdge);

@@ -28,6 +28,7 @@ public class EdgeData {
 		this.number++;
 	}
 	public String getNumberAndIncrement() {
+		// format to 3 digits, or more if number > 999
 		String formatedNumber = this.number<10 ? "00" : (this.number<100 ? "0" : "");
 		formatedNumber += String.valueOf(this.number);
 		this.incNumber();
