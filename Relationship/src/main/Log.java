@@ -7,18 +7,21 @@ import java.io.PrintStream;
 public class Log {
 	public static BufferedWriter fileCompleteReport;
 	public static BufferedWriter fileShortReport;
+	public static BufferedWriter fileConsoleReport;
 	public static PrintStream printStreamError;
 
 	public static void init() throws Exception {
-		Log.fileCompleteReport = new BufferedWriter(new FileWriter(Config.nameFileCompletReport));
-		Log.fileShortReport    = new BufferedWriter(new FileWriter(Config.nameFileShortReport));
-		Log.printStreamError   = new PrintStream(Config.nameFileConsoleError);
+		fileCompleteReport = new BufferedWriter(new FileWriter(Config.nameFileCompletReport));
+		fileShortReport    = new BufferedWriter(new FileWriter(Config.nameFileShortReport));
+		fileConsoleReport  = new BufferedWriter(new FileWriter(Config.nameFileConsoleReport));
+		printStreamError   = new PrintStream(Config.nameFileConsoleError);
 		System.setErr(printStreamError);
 	}
 	public static void close() throws Exception {
-		Log.fileCompleteReport.close();
-		Log.fileShortReport.close();
-		Log.printStreamError.close();
+		if(fileCompleteReport != null) fileCompleteReport.close();
+		if(fileShortReport != null)    fileShortReport.close();
+		if(fileConsoleReport != null)  fileConsoleReport.close();
+		if(printStreamError != null)   printStreamError.close();
 	}
 	public static void outFileCompleteReport(String msgSingle) throws Exception {
 		fileCompleteReport.write(Config.doubleLine);
@@ -30,57 +33,66 @@ public class Log {
 		fileShortReport.write(msgSingle);
 		fileShortReport.write("\n");
 	}
-	public static void console(String msg, String value) {
-		System.out.print(Config.doubleLine);
-		System.out.println(msg);
-		System.out.println("<=>");
-		System.out.println(value);
-		System.out.print(Config.singleLine);
+	private static void print(String str) throws Exception {
+		System.out.print(str);
+		fileConsoleReport.write(str);
 	}
-	public static void console(boolean bool) {
+	private static void println(String str) throws Exception {
+		System.out.println(str);
+		fileConsoleReport.write(str);
+		fileConsoleReport.write("\n");
+	}
+	public static void console(String msg, String value) throws Exception {
+		Log.print(Config.doubleLine);
+		Log.println(msg);
+		Log.println("<=>");
+		Log.println(value);
+		Log.print(Config.singleLine);
+	}
+	public static void console(boolean bool) throws Exception  {
 		if(bool)
 			Log.console("Boolean value: true");
 		else
 			Log.console("Boolean value: false");
 	}
-	public static void console(String msg, long value) {
-		System.out.print(Config.doubleLine);
-		System.out.println(msg);
-		System.out.println("<=>");
-		System.out.println(value);
-		System.out.print(Config.singleLine);
+	public static void console(String msg, long value) throws Exception  {
+		Log.print(Config.doubleLine);
+		Log.println(msg);
+		Log.println("<=>");
+		Log.println(String.valueOf(value));
+		Log.print(Config.singleLine);
+}
+	public static void console(String msg) throws Exception  {
+		Log.print(msg);
 	}
-	public static void console(String msg) {
-		System.out.print(msg);
+	public static void console(double value) throws Exception  {
+		Log.print("\n" + value + "\n");
 	}
-	public static void console(double value) {
-		System.out.print("\n" + value + "\n");
+	public static void console(String msg, double value) throws Exception  {
+		Log.print("\n" + msg + ": " + value + "\n");
 	}
-	public static void console(String msg, double value) {
-		System.out.print("\n" + msg + ": " + value + "\n");
-	}
-	public static void consoleln(String msg, String value) {
+	public static void consoleln(String msg, String value) throws Exception  {
 		Log.console(msg, value);
-		System.out.print("\n");
+		Log.print("\n");
 	}
-	public static void consoleln(boolean bool) {
+	public static void consoleln(boolean bool) throws Exception  {
 		Log.console(bool);
-		System.out.print("\n");
+		Log.print("\n");
 	}
-	public static void consoleln(String msg, long value) {
+	public static void consoleln(String msg, long value) throws Exception  {
 		Log.console(msg, value);
-		System.out.print("\n");
+		Log.print("\n");
 	}
-	public static void consoleln(String msg) {
+	public static void consoleln(String msg) throws Exception  {
 		Log.console(msg);
-		System.out.print("\n");
+		Log.print("\n");
 	}
-	public static void consoleln(double value) {
+	public static void consoleln(double value) throws Exception  {
 		Log.console(value);
 		System.out.print("\n");
 	}
-	public static void consoleln(String msg, double value) {
+	public static void consoleln(String msg, double value) throws Exception  {
 		Log.console(msg, value);
-		System.out.print("\n");
+		Log.print("\n");
 	}		
 }

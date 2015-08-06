@@ -4,10 +4,11 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "00"; 
+	String  testNumber = "16"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
+	String nameFileConsoleReport = "log\\console_report_"+Config.testNumber+".txt";
 	String nameFileConsoleError  = "log\\consoleErr.txt";
 	String doubleLine = "\n=============================================================================================\n";
 	String singleLine = "\n---------------------------------------------------------------------------------------------\n";

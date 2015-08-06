@@ -1,4 +1,4 @@
-// v3.7 - fixed error about repeated edges. It is working!
+// v3.8 - created console file log. It is working!
 
 package main;
 
@@ -91,8 +91,8 @@ public class MainProcess {
 	}
 	
 	public static void start() throws Exception {
-		Log.consoleln("- Starting.");
 		Log.init();
+		Log.consoleln("- Starting.");
 	}
 	public static void parseTerms(Wrapterms parser) throws Exception {
 		Log.consoleln("- Parsing terms.");
@@ -373,8 +373,8 @@ public class MainProcess {
 			WholeSystem.getStreamGraphData().getStreamGraph().clear();
 		Log.outFileCompleteReport("Closed.\nOk!");
 		Log.outFileShortReport("Closed.\nOk!");
-		Log.close();
 		Log.consoleln("- Ok!");
+		Log.close();
 	}
 }
 
