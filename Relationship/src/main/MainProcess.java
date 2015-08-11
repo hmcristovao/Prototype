@@ -1,4 +1,4 @@
-// v3.8 - created console file log. It is working!
+// v3.9 - show quantity to each conceot RDFs set. It is working!
 
 package main;
 
@@ -8,6 +8,7 @@ import graph.SystemGraphData;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.DecimalFormat;
 
 import org.graphstream.stream.gephi.JSONSender;
 
@@ -130,9 +131,19 @@ public class MainProcess {
 		Log.console("- Collecting RDFs");
 		int num =  currentSetQuerySparql.fillRDFs();
 		Log.consoleln(" - "+num+" new RDFs triples collected.");
-		Log.outFileCompleteReport("RDFs collected: " + num + "\n\n" +
+		// extract collected quantity of RDFs to each concept
+		StringBuffer conceptsOut = new StringBuffer();
+		DecimalFormat formater =  new DecimalFormat("00000");
+		for(int i=0; i < currentSetQuerySparql.getTotalConcepts(); i++) {
+			conceptsOut.append("\n");
+			conceptsOut.append(formater.format(currentSetQuerySparql.getListQuerySparql().get(i).getListRDF().size()));
+			conceptsOut.append(" RDFs to concept \"");
+			conceptsOut.append(currentSetQuerySparql.getListQuerySparql().get(i).getConcept().getBlankName());
+			conceptsOut.append("\"");
+		}
+		Log.outFileCompleteReport("Total collected RDFs: " + num + "\n" + conceptsOut.toString() + "\n\n" +
 				currentSetQuerySparql.toString());
-		Log.outFileShortReport("RDFs collected: " + num);
+		Log.outFileShortReport("Total collected RDFs: " + num + "\n" + conceptsOut.toString());
 	}
 	public static void createCurrentSystemGraphData() throws Exception {
 		wholeSystem.insertListSystemGraphData(new SystemGraphData());

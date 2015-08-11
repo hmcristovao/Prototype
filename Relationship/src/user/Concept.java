@@ -11,7 +11,7 @@ public class Concept {
 	private int           iteration;
 	private boolean       isCategory;
 	private int           registerConnectedComponent[];  // indexed by iteration number
-	
+
 	public Concept(String fullName, String blankName, Config.Status status, int iteration, int connectedComponent) {
 		this.fullName                   = fullName;
 		this.blankName                  = blankName.trim();

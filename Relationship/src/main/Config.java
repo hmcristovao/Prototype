@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "16"; 
+	String  testNumber = "20"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
