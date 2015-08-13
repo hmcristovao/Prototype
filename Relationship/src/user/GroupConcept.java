@@ -46,7 +46,10 @@ public class GroupConcept {
 	
 	public int size() {
 		return this.list.size();
-	}	
+	}
+	
+	// obsolete because there is absolut consult by WholeSystem.getQuantityOriginalConcepts()
+	/*
 	public int getQuantityOriginalConcept() {
 		int count = 0;
 		for(Concept concept : this.list) {
@@ -55,11 +58,11 @@ public class GroupConcept {
 			}
 		}		
 		return count;
-	}
+	} */
 
 	// GET GROUP CONCEPTS ========================================================================
 		
-	public GroupConcept getCurrentConcepts(int iteration) {  // original and selected of the previous iterations 
+	public GroupConcept getCurrentConcepts(int iteration) {  // original and selected concepts of all previous iterations (except the current iteration) 
 		GroupConcept result = new GroupConcept();
 		for(Concept concept : this.list) {
 			if( concept.getStatus() == Config.Status.originalConcept)
@@ -233,6 +236,9 @@ public class GroupConcept {
 		if(concept == null)
 			return Config.Status.noStatus;
 		return concept.getStatus();
+	}
+	public Concept getConcept(int pos) {
+		return this.list.get(pos);
 	}
 	
 

@@ -1,15 +1,21 @@
-// v3.9 - show quantity to each conceot RDFs set. It is working!
+// v3.10 - building k-core and deleting nodes conserving quantity connected components. It is not working.
 
 package main;
 
+import graph.NodeData;
+import graph.NodesTableArray;
 import graph.QuantityNodesEdges;
 import graph.SystemGraphData;
+import graph.StreamGraphData;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
+import java.util.ArrayList;
 
+import org.graphstream.graph.Edge;
+import org.graphstream.graph.Node;
 import org.graphstream.stream.gephi.JSONSender;
 
 import rdf.SetQuerySparql;
@@ -38,28 +44,85 @@ public class MainProcess {
 				showQuantitiesStreamGraph();
 				if(iteration >= 1) 
 					copyAllObjectsLastIteration();
-				if(iteration >= Config.iterationTriggerApplyNDegreeFilterAlgorithm) 
-					applyNDegreeFilterTrigger();
+				if(iteration >= Config.iterationTriggerApplyNDegreeFilterAlgorithm 
+				   && WholeSystem.getStreamGraphData().getTotalNodes() > Config.quantityNodesToApplyNdegreeFilter) 
+ 					applyNDegreeFilterTrigger();
 				buildGephiGraphData_NodesTableHash_NodesTableArray();
 				clearStreamGraphSink();
 				calculateDistanceMeasuresWholeNetwork();
+				storeDistanceMeasuresWholeNetworkToMainNodeTable();
 				calculateEigenvectorMeasureWholeNetwork();
-				storeMeasuresWholeNetworkToMainNodeTable();
-				sortMeasureWholeNetwork();
+				storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
+				sortMeasuresWholeNetwork();
 				classifyConnectedComponent_buildSubGraphs();
                 buildSubGraphsRanks();
 				buildSubGraphsTablesInConnectedComponents();
 				sortConnectedComponentsRanks();
-				selectLargestNodesByBetweennessCloseness();
-				selectLargestNodesByEigenvector();
-				reportSelectedNodesToNewIteration();
-                buildGephiGraphFile();
+				buildGexfGraphFile(Config.time.whileIteration);
 				// conditionals set to continue the iteration
 				if(breakIteration())
 					break;
 				prepareDataToNewIteration();
 				iteration++;
-			} while(true);			
+			} while(true);
+			showAlgorithmIntermediateStage1(); // application K-core algorithm
+			iteration++;
+			createCurrentSystemGraphData();
+			applyKCoreFilterTrigger();
+			buildGephiGraphData_NodesTableHash_NodesTableArray();
+			calculateEigenvectorMeasureWholeNetwork();
+			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
+			createSortEigenvectorSelectedConcepts();
+			classifyConnectedComponent_buildSubGraphs(); 
+			buildGexfGraphFile(Config.time.afterKcore);
+			showAlgorithmIntermediateStage2(); // selection main concepts
+			int baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
+			int nodeDataPos = 0;
+			do {
+				// pega o selected concept de menor eigenvector dentro do conjunto de nodes
+				Log.consoleln("NodeDataPos="+nodeDataPos);
+				NodeData nodeDataWithLeastEigenvector = WholeSystem.getSortEigenvectorSelectedConcepts().getNodeData(nodeDataPos);
+				Log.consoleln("nodeDataWithLeastEigenvector="+nodeDataWithLeastEigenvector.getShortName());
+				// store the current informations of node that will be deleted (because it can be recovered)
+				Node currentNode = nodeDataWithLeastEigenvector.getStreamNode();
+				ArrayList<Edge> currentEdgeSet = (ArrayList<Edge>)currentNode.getEdgeSet();
+				// deleta o node do stream graph
+				WholeSystem.getStreamGraphData().deleteNode(currentNode);
+				// cria novo systemGraphData
+				iteration++;
+				createCurrentSystemGraphData();
+				buildGephiGraphData_NodesTableHash_NodesTableArray();
+				calculateEigenvectorMeasureWholeNetwork();
+				storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
+				classifyConnectedComponent_buildSubGraphs(); 
+				// verifica se connected component aumentou
+				if(currentSystemGraphData.getConnectedComponentsCount() > baseConnectedComponentCount) {
+					// se sim, então recoloca o node e os edges no grafo novamente
+					WholeSystem.getStreamGraphData().insert(currentNode,currentEdgeSet);
+					// e recupera a iteração anterior
+					iteration--;
+					nodeDataPos++;
+				}	
+				createSortEigenvectorSelectedConcepts();
+				
+				// verifica se a qtde de selected concepts == goal
+				Log.consoleln("comparacao= "+WholeSystem.getSortEigenvectorSelectedConcepts().getCount()+" <= "+WholeSystem.getGoalConceptsQuantity());
+				if(WholeSystem.getSortEigenvectorSelectedConcepts().getCount() <= WholeSystem.getGoalConceptsQuantity())
+					break;				
+			} while(nodeDataPos < WholeSystem.getSortEigenvectorSelectedConcepts().getCount());
+			if(WholeSystem.getSortEigenvectorSelectedConcepts().getCount() <= WholeSystem.getGoalConceptsQuantity())
+				// ok, meta atingida;
+				Log.consoleln("- Meta atingida!");
+			else
+				Log.consoleln("- Meta nao atingida!");
+			    // meta não atingida
+				// tentar retirar seguinda a ordem de betweenness, depois de closeness
+				// mas, se mesmo assim não conseguir processa para atingir o maximo de conceitos possível, mesmo que aumente os connected component 
+			
+            buildGexfGraphFile(Config.time.atEnd);
+			// a partir daqui ele irá construir o mapa conceitual (na verdade, proposições em formato de texto)
+
+			showAlgorithmFinalStage(); // building concept map
 			end();
 		}
 		catch(FileNotFoundException e) {
@@ -100,9 +163,10 @@ public class MainProcess {
 		parser = new Wrapterms(new FileInputStream(Config.nameFileInput));
 		wholeSystem.insertListSetQuerySparql(new SetQuerySparql());
 		parser.start(wholeSystem.getListSetQuerySparql().getFirst());
+		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
 		WholeSystem.initGoalMaxConceptsQuantity();
 		Log.outFileCompleteReport("Quantity of terms parsed: " + 
-		        WholeSystem.getConceptsRegister().size() +   
+		        WholeSystem.getQuantityOriginalConcepts() +   
                 " (file: "+Config.nameFileInput+")\n" +  
 		        WholeSystem.getConceptsRegister().getOriginalConcepts().toStringLong());
 		Log.outFileShortReport("Quantity of terms parsed: " + 
@@ -114,6 +178,21 @@ public class MainProcess {
 		Log.consoleln("*** Iteration "+iteration+" ***");
 		Log.outFileCompleteReport(Config.starsLine+"Iteration "+iteration+Config.starsLine);
 		Log.outFileShortReport(Config.starsLine+"Iteration "+iteration+Config.starsLine);
+	}
+	public static void showAlgorithmIntermediateStage1() throws Exception {
+		Log.consoleln("*** Intermediate stage 1 (application K-core algorithm) ***");
+		Log.outFileCompleteReport(Config.starsLine+"Intermediate stage 1 (application K-core algorithm)"+Config.starsLine);
+		Log.outFileShortReport(Config.starsLine+"Intermediate stage 1 (application K-core algorithm)"+Config.starsLine);
+	}
+	public static void showAlgorithmIntermediateStage2() throws Exception {
+		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***");
+		Log.outFileCompleteReport(Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine);
+		Log.outFileShortReport(Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine);
+	}
+	public static void showAlgorithmFinalStage() throws Exception {
+		Log.consoleln("*** Final stage (building concept map) ***");
+		Log.outFileCompleteReport(Config.starsLine+"Final stage (building concept map)"+Config.starsLine);
+		Log.outFileShortReport(Config.starsLine+"Final stage (building concept map)"+Config.starsLine);
 	}
 	public static void createCurrentSetQuerySparql() throws Exception {
 		currentSetQuerySparql = wholeSystem.getListSetQuerySparql().get(iteration);
@@ -200,40 +279,66 @@ public class MainProcess {
 				wholeSystem.getListSetQuerySparql().get(iteration-1).toStringShort());
 	}
 	public static void applyNDegreeFilterTrigger() throws Exception {
-		// conditional to apply n-degree filter trigger
-		if(WholeSystem.getStreamGraphData().getTotalNodes() > Config.quantityNodesToApplyNdegreeFilter) {
-			Log.console("- Starting "+Config.kCoreN+"-degree filter algoritm "+
-					"(iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + ", quantity of nodes greater than " + 
-					Config.quantityNodesToApplyNdegreeFilter + ")");
+		Log.console("- Starting "+Config.nDegreeFilter+"-degree filter algorithm "+
+				"(iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + ", quantity of nodes greater than " + 
+				Config.quantityNodesToApplyNdegreeFilter + ")");
 			
-			int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
-			int numOldEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
-			int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyNdegreeFilterTrigger();
-			int numCurrentNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
-			int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
-			Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes");
-			Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
-			Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges");
-			Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
-			Log.outFileCompleteReport("Runned "+Config.kCoreN+"-degree filter algorithm "+
-					"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " + 
-					Config.quantityNodesToApplyNdegreeFilter + ")\n" +
-					(numOldNodes - numCurrentNodes) +" deleted nodes" +
-					"("+ numDeletedOriginalConcepts +" selected concepts)" + 
-					" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
-					"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
-					"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges." +
-					"\n\n" + WholeSystem.getStreamGraphData().toString() );
-			Log.outFileShortReport("Triggered "+Config.kCoreN+"-degree filter algorithm "+
-					"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " +					
-					Config.quantityNodesToApplyNdegreeFilter + ")\n" +
-					(numOldNodes - numCurrentNodes) +" deleted nodes" +
-					"("+ numDeletedOriginalConcepts +" selected concepts)" + 
-					" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
-					"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
-					"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
-		}
+		int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
+		int numOldEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
+		// call algorithm:
+		int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyNdegreeFilterTrigger(Config.nDegreeFilter);
+		int numCurrentNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
+		int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
+		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes");
+		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
+		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges");
+		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
+		Log.outFileCompleteReport("Runned "+Config.nDegreeFilter+"-degree filter algorithm "+
+				"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " + 
+				Config.quantityNodesToApplyNdegreeFilter + ")\n" +
+				(numOldNodes - numCurrentNodes) +" deleted nodes" +
+				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
+				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
+				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges." +
+				"\n\n" + WholeSystem.getStreamGraphData().toString() );
+		Log.outFileShortReport("Triggered "+Config.nDegreeFilter+"-degree filter algorithm "+
+				"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " +					
+				Config.quantityNodesToApplyNdegreeFilter + ")\n" +
+				(numOldNodes - numCurrentNodes) +" deleted nodes" +
+				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
+				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
+				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
 	}			
+	
+	public static void applyKCoreFilterTrigger() throws Exception {
+		Log.console("- Starting "+Config.kCoreFilter+"-core filter algorithm ");
+		int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
+		int numOldEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
+		// call algorithm:
+		int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyKCoreFilterTrigger(Config.kCoreFilter);
+		int numCurrentNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
+		int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
+		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes");
+		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
+		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges");
+		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
+		Log.outFileCompleteReport("Runned "+Config.kCoreFilter+"-core filter algorithm\n" +
+				(numOldNodes - numCurrentNodes) +" deleted nodes" +
+				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
+				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
+				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges." +
+				"\n\n" + WholeSystem.getStreamGraphData().toString() );
+		Log.outFileShortReport("Triggered "+Config.kCoreFilter+"-core filter algorithm\n" +
+				(numOldNodes - numCurrentNodes) +" deleted nodes" +
+				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
+				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
+				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
+	}
+			
 	public static void buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
 		Log.console("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array from Stream Graph");
 		QuantityNodesEdges quantityNodesEdges = currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
@@ -268,17 +373,25 @@ public class MainProcess {
 		Log.outFileShortReport("Eigenvector measure of the whole network calculated." + 
 				"\n(eigenvector to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
 	}
-	public static void storeMeasuresWholeNetworkToMainNodeTable() throws Exception {
-		Log.consoleln("- Storing measures of the whole network to main node table.");
-		currentSystemGraphData.storeMeasuresWholeNetwork();
-		Log.outFileCompleteReport("Stored measures of the whole network to main node table.");
-		Log.outFileShortReport("Stored measures of the whole network to main node table.");
+	public static void storeDistanceMeasuresWholeNetworkToMainNodeTable() throws Exception {
+		Log.consoleln("- Storing distance measures of the whole network to main node table.");
+		currentSystemGraphData.storeDistanceMeasuresWholeNetwork();
+		Log.outFileCompleteReport("Stored distance measures of the whole network to main node table.");
+		Log.outFileShortReport("Stored distance measures of the whole network to main node table.");
 	} 
-	public static void sortMeasureWholeNetwork() throws Exception {
+	public static void storeEigenvectorMeasuresWholeNetworkToMainNodeTable() throws Exception {
+		Log.consoleln("- Storing eigenvector measures of the whole network to main node table.");
+		currentSystemGraphData.storeEigenvectorMeasuresWholeNetwork();
+		Log.outFileCompleteReport("Stored eigenvector measures of the whole network to main node table.");
+		Log.outFileShortReport("Stored eigenvector measures of the whole network to main node table.");
+	} 
+	public static void sortMeasuresWholeNetwork() throws Exception {
 		Log.consoleln("- Sorting measures of the whole network.");
-		currentSystemGraphData.sortMeasuresWholeNetwork();
-		Log.outFileCompleteReport("Measures of the whole network sorted.");
-		Log.outFileShortReport("Measures of the whole network sorted.");
+		currentSystemGraphData.sortBetweennessWholeNetwork();
+		currentSystemGraphData.sortClosenessWholeNetwork();
+		currentSystemGraphData.sortEigenvectorWholeNetwork();
+		Log.outFileCompleteReport("Sorted measures of the whole network.");
+		Log.outFileShortReport("Sorted measures of the whole network.");
 	}
 	public static void classifyConnectedComponent_buildSubGraphs() throws Exception {
 		Log.console("- Classifying connected component and building sub graphs");
@@ -296,8 +409,14 @@ public class MainProcess {
 		Log.outFileCompleteReport("Sub-graphs ranks built.");
 		Log.outFileShortReport("Sub-graphs ranks built.");
 	}
-	public static void buildGephiGraphFile() throws Exception {
-		String nameFileGexf = Config.nameGEXFGraph + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
+	public static void buildGexfGraphFile(Config.time time) throws Exception {
+		String nameFileGexf = null;
+		if(time == Config.time.whileIteration) 
+			nameFileGexf = Config.nameGEXFGraph + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
+		else if(time == Config.time.afterKcore)
+	   		nameFileGexf = Config.nameGEXFGraph + "_after_kcore.gexf";
+		else if(time == Config.time.atEnd)
+			nameFileGexf = Config.nameGEXFGraph + "_final.gexf";	
 		Log.consoleln("- Building Gephi Graph File (generated file: " + nameFileGexf + ").");
 		currentSystemGraphData.getGephiGraphData().buildGephiGraphFile(nameFileGexf);
 		Log.outFileCompleteReport("Gephi graph file generated: " + nameFileGexf);
@@ -377,7 +496,19 @@ public class MainProcess {
 		Log.outFileShortReport("Data to new iteration prepared.\n" +
 					newGroupConcept.size()+" concepts inserted in the set of query Sparql.\n" +
 					newGroupConcept.toString());
-	}			
+	}
+	public static NodesTableArray createSortEigenvectorSelectedConcepts() throws Exception {
+		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts(iteration);
+		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
+		for(int i=0; i<selectedConcepts.size(); i++) {
+			Concept concept = selectedConcepts.getConcept(i);
+			NodeData nodeData = currentSystemGraphData.getNodeData(concept.getBlankName());
+			nodesTableArray.insert(nodeData);
+		}
+		nodesTableArray.sortCrescentEigenvector();
+		WholeSystem.setSortEigenvectorSelectedConcepts(nodesTableArray);
+		return nodesTableArray;
+	}
 	public static void end() throws Exception {
 		Log.consoleln("- Closing.");
 		if(Config.graphStreamVisualization) 

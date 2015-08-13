@@ -1,4 +1,5 @@
 package graph;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import main.Config;
@@ -34,12 +35,12 @@ public class StreamGraphData {
 
 	public StreamGraphData() {
 		this.streamGraph = new SingleGraph(
-									Config.nameGraph,
-				                    true,                   // non-fatal error throws an exception = verify duplicated nodes
-				                    false,                  // auto-create
-				                    Config.maxNodes,
-				                    Config.minEdges
-				                         );
+				Config.nameGraph,
+				true,                   // non-fatal error throws an exception = verify duplicated nodes
+				false,                  // auto-create
+				Config.maxNodes,
+				Config.minEdges
+				);
 		this.total      = new QuantityNodesEdges();
 		this.duplicated = new QuantityNodesEdges();
 		this.deleted    = new QuantityNodesEdges();
@@ -48,7 +49,6 @@ public class StreamGraphData {
 	public Graph getStreamGraph() {
 		return this.streamGraph;
 	}
-	
 	
 	// intern control of quantity of nodes and edges
 
@@ -276,7 +276,7 @@ public class StreamGraphData {
 		}
 	}
 	
-	// don't used (it was used to Gephi Tool Kit)
+	// don't used (instead of, it was used Gephi Tool Kit)
 	public void computeBetweennessCentrality() {
 		BetweennessCentrality betweenness = new BetweennessCentrality();
 		betweenness.init(this.getStreamGraph());
@@ -284,14 +284,14 @@ public class StreamGraphData {
 		betweenness.setCentralityAttributeName("betweenness");
 		betweenness.compute();
 	}
-	// don't used (it was used to Gephi Tool Kit)
+	// don't used (instead of, it was used Gephi Tool Kit)
 	public void computeClosenessCentrality() {
 		ClosenessCentrality closeness = new ClosenessCentrality();
 		closeness.init(this.getStreamGraph());
 		closeness.setCentralityAttribute("closeness");
 		closeness.compute();
 	}
-	// don't used (it was used to Gephi Tool Kit)
+	// don't used (instead of, it was used Gephi Tool Kit)
 	public void computeEigenvectorCentrality() {
 		EigenvectorCentrality eingenvector = new EigenvectorCentrality();
 		eingenvector.init(this.getStreamGraph());
@@ -314,40 +314,26 @@ public class StreamGraphData {
 	}
     */
 	
-	// Apply K-core n on the Graph
-	// return quantity of selected concepts deleted
-	public int applyKcoreN() {
+	// Apply K-core on the Graph
+	// return quantity of selected concepts that was deleted
+	public int applyKCoreFilterTrigger(int k) {
+		int totalQuantityDeletedSelectedConcepts = 0;
 		int quantityDeletedSelectedConcepts = 0;
-		for( Node node : this.streamGraph.getEachNode() ) {
-			// if node has degree less than kcoreN ...
-			if(node.getDegree() < Config.kCoreN) {
-				String blankName = (String)node.getAttribute("shortblankname");
-				// ...and it is not original node
-				if(!WholeSystem.getConceptsRegister().isOriginalConcept(blankName)) {
-					this.incTotalNodesDeleted();
-					this.incTotalEdgesDeleted(node.getEdgeSet().size());
-					this.incTotalNodes(-1);
-					this.incTotalEdges(node.getEdgeSet().size());
-					this.streamGraph.removeNode(node);
-					// remove node of the concepts register, if is the case
-					if(WholeSystem.getConceptsRegister().isConcept(blankName)) {
-						WholeSystem.getConceptsRegister().removeConcept(blankName);
-						quantityDeletedSelectedConcepts++;
-					}
-				}
-			}	
-		} 
-		return quantityDeletedSelectedConcepts;
+		do {
+			quantityDeletedSelectedConcepts = this.applyNdegreeFilterTrigger(k);
+			totalQuantityDeletedSelectedConcepts += quantityDeletedSelectedConcepts;
+		}while(quantityDeletedSelectedConcepts != 0);
+		return totalQuantityDeletedSelectedConcepts;
 	}
 	
 	// Apply n-degree filter on the Graph
-	// return quantity of selected concepts deleted
-	public int applyNdegreeFilterTrigger() {
+	// return quantity of selected concepts that was deleted
+	public int applyNdegreeFilterTrigger(int n) {
 		LinkedList<Node> auxList = new LinkedList<Node>();
 		// at first select the candidates nodes and put them in an auxiliary list
 		for( Node node : this.streamGraph.getEachNode() ) {
 			// if node has degree less than nDegreeFilter...
-			if(node.getDegree() < Config.nDegreeFilter) {
+			if(node.getDegree() < n) {
 				// ...and it is not original node, store this node
 				if(!WholeSystem.getConceptsRegister().isOriginalConcept((String)node.getAttribute("shortblankname"))) {
 					auxList.add(node);
@@ -357,26 +343,63 @@ public class StreamGraphData {
 		// second: delete the selected nodes and their respectives edges
 		int quantityDeletedSelectedConcepts = 0;
 		for( Node node : auxList ) {
-			this.incTotalNodesDeleted();
-			this.incTotalEdgesDeleted(node.getEdgeSet().size());
-			this.incTotalNodes(-1);
-			this.incTotalEdges(node.getEdgeSet().size());
-			// remove all edges linked with this node
-			for( Edge edge : node.getEachEdge()) {
-				this.streamGraph.removeEdge(edge);
-			}
-			// finally, remove the node of the Strem Graph
-			this.streamGraph.removeNode(node);
-			// remove node of the concepts register, if is the case
-			if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
-				WholeSystem.getConceptsRegister().removeConcept((String)node.getAttribute("shortblankname"));
+			if(this.deleteNode(node))
 				quantityDeletedSelectedConcepts++;
-			}
 		} 
 		return quantityDeletedSelectedConcepts;
 	}
 	
+	// delete a node and all edges linked it
+	// return true if node is a concept
+	public boolean deleteNode(Node node) {
+		this.incTotalNodesDeleted();
+		this.incTotalEdgesDeleted(node.getEdgeSet().size());
+		this.incTotalNodes(-1);
+		this.incTotalEdges(-1*node.getEdgeSet().size());
+		// remove all edges linked with this node
+		for( Edge edge : node.getEachEdge()) {
+			this.streamGraph.removeEdge(edge);
+		}
+		// finally, remove the node of the Stream Graph
+		this.streamGraph.removeNode(node);
+		// remove node of the concepts register, if is the case
+		boolean isConcept = false;
+		if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
+			WholeSystem.getConceptsRegister().removeConcept((String)node.getAttribute("shortblankname"));
+			isConcept = true;
+		}
+		return isConcept;
+	}
 	
+	// delete a node and all edges linked it
+	// return true if node is a concept
+	public void insert(Node node, ArrayList<Edge> edges) {
+		this.incTotalNodesDeleted(-1);
+		this.incTotalEdgesDeleted(-1*edges.size());
+		this.incTotalNodes();
+		this.incTotalEdges(edges.size());
+		
+		// insert node
+		Node newNode = this.streamGraph.addNode(node.getId());
+		newNode.addAttribute("shortblankname", node.getAttribute("shortblankname"));
+		newNode.addAttribute("fullname", node.getAttribute("fullname"));
+		if(node.getAttribute("homepage") != null) 
+			newNode.addAttribute("homepage", node.getAttribute("homepage"));
+		if(node.getAttribute("abstract") != null) 
+			newNode.addAttribute("abstract", node.getAttribute("abstract"));
+		if(node.getAttribute("comment") != null) 
+			newNode.addAttribute("comment", node.getAttribute("comment"));
+		if(node.getAttribute("image") != null) 
+			newNode.addAttribute("image", node.getAttribute("image"));
+		
+		// insert all edges
+		for( Edge edge : edges ) {
+			Node nodeSource = edge.getSourceNode();
+			Node nodeTarget = edge.getTargetNode();
+			this.streamGraph.addEdge(edge.getId(), nodeSource, nodeTarget, true);
+		}
+	}
+
 	public static String nodeToString(Node node) {
 		StringBuffer str = new StringBuffer();
 		str.append("\nID: ");

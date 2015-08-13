@@ -24,14 +24,14 @@ public class SystemGraphData {
 	}
 
 	public SystemGraphData(GephiGraphData gephiGraphData) {
-		this.gephiGraphData           = gephiGraphData;
-		this.nodesTableHash           = new NodesTableHash();
-		this.nodesTableArray          = null;  // will be to fill after nodeTableHash filling
-		this.connectedComponentsCount = 0;
-		this.ranks                    = null;
-		this.betweennessSortTable     = null;
-		this.closenessSortTable       = null;
-		this.eigenvectorSortTable     = null;
+		this.gephiGraphData           		= gephiGraphData;
+		this.nodesTableHash           		= new NodesTableHash();
+		this.nodesTableArray          		= null;  // will be to fill after nodeTableHash filling
+		this.connectedComponentsCount 		= 0;
+		this.ranks                    		= null;
+		this.betweennessSortTable     		= null;
+		this.closenessSortTable       		= null;
+		this.eigenvectorSortTable     		= null;
 	}
 
 	public GephiGraphData getGephiGraphData() {
@@ -39,6 +39,10 @@ public class SystemGraphData {
 	}
 	public void setGephiGraphData(GephiGraphData gephiGraphData) {
 		this.gephiGraphData = gephiGraphData;
+	}
+	// seach nodeData in TableHash
+	public NodeData getNodeData(String nodeId) {
+		return this.nodesTableHash.get(nodeId);
 	}
 	public int getConnectedComponentsCount() {
 		return this.connectedComponentsCount;
@@ -76,7 +80,6 @@ public class SystemGraphData {
 	public QuantityNodesEdges buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
 		org.graphstream.graph.Graph streamGraph = WholeSystem.getStreamGraphData().getStreamGraph();
 		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getRealTotalNodes());
-		String idNode, shortBlankName, fullName;
 		NodeData newNodeData = null;
 		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
 		Config.Status status;
@@ -84,9 +87,9 @@ public class SystemGraphData {
 		AttributeColumn labelAttributeColumn = this.getGephiGraphData().getAttributeModel().getNodeTable().getColumn("Label");
 		// first: each node, add in GephiGraph, nodesTableArray and nodesTableHash
 		for(org.graphstream.graph.Node streamNode : streamGraph.getEachNode() ) {
-			idNode         = streamNode.toString();
-			shortBlankName = streamNode.getAttribute("shortblankname");
-			fullName       = streamNode.getAttribute("fullname");
+			String idNode         = streamNode.toString();
+			String shortBlankName = streamNode.getAttribute("shortblankname");
+			String fullName       = streamNode.getAttribute("fullname");
 			// create a new gephiNode
 			Node gephiNode = this.gephiGraphData.getGraphModel().factory().newNode(idNode);
 			// add attribute "label" if the concept is selected or original
@@ -114,7 +117,7 @@ public class SystemGraphData {
 			// add node in nodesTableArray
 			this.nodesTableArray.insert(newNodeData);
 			// add node (the same) in nodesTableHash
-			this.nodesTableHash.put(idNode,  newNodeData);
+			this.nodesTableHash.put(shortBlankName,  newNodeData);
 			quantityNodesEdges.incNumNodes();
 		}
 		// second: each edge, add in gephiGraphData
@@ -135,28 +138,43 @@ public class SystemGraphData {
 	}
 	
 	// store results in NodesData set
-	// BEFORE: must calculate calculateGephiGraphDistanceMeasures() and calculateGephiGraphEigenvectorMeasure() of GephiGraphData class
-	public void storeMeasuresWholeNetwork() {
-		Double betweennessValue, closenessValue, eigenvectorValue;
-		String nodeId;
+	// BEFORE: must calculate calculateGephiGraphDistanceMeasures() from GephiGraphData class
+	public void storeDistanceMeasuresWholeNetwork() {
+		Double betweennessValue, closenessValue;
 		NodeData nodeData;		
-		// copy Betweenness, Closeness and Eigenvector values to NodesTableArray 
+		// copy Betweenness and Closeness values to NodesTableArray 
 		for(Node gephiNode: this.gephiGraphData.getGephiGraph().getNodes()) {
-			nodeId = gephiNode.getNodeData().getId();
+			String nodeId = gephiNode.getNodeData().getId();
 			betweennessValue  = (Double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getBetweennessColumn().getIndex());
 			closenessValue    = (Double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getClosenessColumn().getIndex());
-			eigenvectorValue  = (Double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getEigenvectorColumn().getIndex());
 			// put the values in NodeData by NodeTableHash
 			nodeData = this.nodesTableHash.get(nodeId);
 			nodeData.setBetweenness(betweennessValue);
 			nodeData.setCloseness(closenessValue);
+		}	
+	}
+	// store results in NodesData set
+	// BEFORE: must calculate calculateGephiGraphEigenvectorMeasure() from GephiGraphData class
+	public void storeEigenvectorMeasuresWholeNetwork() {
+		Double eigenvectorValue;
+		NodeData nodeData;		
+		// copy Eigenvector values to NodesTableArray 
+		for(Node gephiNode: this.gephiGraphData.getGephiGraph().getNodes()) {
+			String nodeId = gephiNode.getNodeData().getId();
+			eigenvectorValue  = (Double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getEigenvectorColumn().getIndex());
+			// put the values in NodeData by NodeTableHash
+			nodeData = this.nodesTableHash.get(nodeId);
 			nodeData.setEigenvector(eigenvectorValue);
 		}	
 	}
 	
-	public void sortMeasuresWholeNetwork() {
+	public void sortBetweennessWholeNetwork() {
 		this.betweennessSortTable = this.nodesTableArray.sortBetwennness();
+	}
+	public void sortClosenessWholeNetwork() {
 		this.closenessSortTable   = this.nodesTableArray.sortCloseness();
+	}
+	public void sortEigenvectorWholeNetwork() {
 		this.eigenvectorSortTable = this.nodesTableArray.sortEigenvector(); 
 	}
 	
@@ -164,13 +182,12 @@ public class SystemGraphData {
 	public void buildSubGraphRanks() throws Exception {
 		// create a array of the MeasureRank (Ranks object), size = total number of the connect components
 		this.ranks = new Ranks(this.connectedComponentsCount);
-		String nodeId;
 		NodeData nodeData;
 		int connectedComponentNumber;
 			
 		for(Node gephiNode: this.gephiGraphData.getGephiGraph().getNodes()) {
 			// get the number of connected component from Gephi
-			nodeId = gephiNode.getNodeData().getId();
+			String nodeId = gephiNode.getNodeData().getId();
 			connectedComponentNumber = (Integer)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getConnectedComponentColumn().getIndex());
 			
 			// put the number of connected component in NodeData
@@ -223,7 +240,6 @@ public class SystemGraphData {
 	
 	public void sortConnectecComponentRanks() throws Exception {
 		NodesTableArray currentNodesTableArray, sortedNodesTableArray;
-		int countOriginalConcepts = WholeSystem.getConceptsRegister().getQuantityOriginalConcept();
 		// for each group of the connected components, build the sorted NodesTableArray:
 		for(int i=0; i < this.ranks.getCount(); i++) {
 			
@@ -239,7 +255,7 @@ public class SystemGraphData {
 			sortedNodesTableArray  = currentNodesTableArray.sortEigenvector();
 			this.ranks.getMeasuresRankTable(i).setEigenvector(sortedNodesTableArray);
 			
-			int filterQuantity = (int)(countOriginalConcepts * Config.proporcionBetweenness);
+			int filterQuantity = (int)(WholeSystem.getQuantityOriginalConcepts() * Config.proporcionBetweenness);
 			sortedNodesTableArray  = currentNodesTableArray.sortBetweennessCloseness(filterQuantity);
 			this.ranks.getMeasuresRankTable(i).setBetweennessCloseness(sortedNodesTableArray);	
 		}
@@ -248,15 +264,14 @@ public class SystemGraphData {
 	// select the firt largest maxBetweennessCloseness nodes of each connected component
 	public int selectLargestNodesBetweennessCloseness(int iteration) throws Exception {
 		// quantity total of nodes to change the status (all connected components)
-		int countOriginalConcepts = WholeSystem.getConceptsRegister().getQuantityOriginalConcept();
-		int countTotalSelectNodes = (int)(countOriginalConcepts * Config.proporcionBetweennessCloseness);
+		int countTotalSelectNodes = (int)(WholeSystem.getQuantityOriginalConcepts() * Config.proporcionBetweennessCloseness);
 		int countConnectedComponentSelectNodes;
 		NodeData currentNodeData;
 		int count = 0;
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			// calculate proportionate the quantity to each connected component group  
 			countConnectedComponentSelectNodes = 
-			(int)( ( (double)countTotalSelectNodes / (double)countOriginalConcepts ) * 
+			(int)( ( (double)countTotalSelectNodes / (double)WholeSystem.getQuantityOriginalConcepts() ) * 
 					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().size() + 
 			        Config.precisionBetweennessCloseness
 			      );
@@ -282,16 +297,15 @@ public class SystemGraphData {
 	
 	// select the firt largest maxEigenvector nodes of each connected component
 	public int selectLargestNodesEigenvector(int iteration) throws Exception {
-		int countOriginalConcepts = WholeSystem.getConceptsRegister().getQuantityOriginalConcept();
 		// quantity total of nodes to change the status (all connected components)
-		int countTotalSelectNodes = (int)(countOriginalConcepts * Config.proporcionEigenvector);
+		int countTotalSelectNodes = (int)(WholeSystem.getQuantityOriginalConcepts() * Config.proporcionEigenvector);
 		int countConnectedComponentSelectNodes;
 		NodeData currentNodeData;
 		int count = 0;
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			// calculate proportionate the quantity to each connected component group  
 			countConnectedComponentSelectNodes = 
-			(int)( ( (double)countTotalSelectNodes / (double)countOriginalConcepts ) * 
+			(int)( ( (double)countTotalSelectNodes / (double)WholeSystem.getQuantityOriginalConcepts()) * 
 					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().size() + 
 			        Config.precisionEigenvector
 			      );

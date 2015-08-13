@@ -20,6 +20,14 @@ public interface Config {
 	String nameFileInput = "input\\terms"+Config.testNumber+".txt";
 	String nameFileQueryDefault = "query_model\\query.txt";
 
+	
+	// ============================================================================
+	// CONFIG - OUTPUT FILES (gexf) 
+    //
+	String nameGEXFGraph = "graph\\graph"+Config.testNumber;
+	enum time {whileIteration, afterKcore, atEnd };
+
+	
 	// ============================================================================
 	// CONFIG - RDFs 
     //
@@ -61,8 +69,6 @@ public interface Config {
 
 	enum Status {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus };
 	
-	String nameGEXFGraph = "graph\\graph"+Config.testNumber;
-
 	
 	// ============================================================================
 	// CONFIG - ANALYSIS 
@@ -95,17 +101,18 @@ public interface Config {
 	int withoutConnectedComponent = -1;
 	
 	// K-core used in all system
-	int kCoreN = 2;
+	int kCoreFilter = 2;
+	// since iteration number x to apply K-core filter trigger
+	// int iterationTriggerApplyKCoreFilterAlgorithm = 1;
 	// quantity of nodes to shoot K-core n algorithm
-	int quantityNodesToApplyKcoreN = 3000;
+	// int quantityNodesToApplyKcoreFilter = 100;
 	
 	// N-degree filter used in all system
 	int nDegreeFilter = 2;
-	// iteration number to apply n-degree filter trigger
+	// since iteration number x to apply n-degree filter trigger
 	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 2000;
-
+	int quantityNodesToApplyNdegreeFilter = 4000;
 	
 	// ============================================================================
 	// CONFIG - REPORT 
@@ -120,7 +127,7 @@ public interface Config {
 	int conceptsQuantityCalulationFactor = 18;
 	int conceptsMinMaxRange = 5;
 	
-	
-	String nameConceptMap = "conceptmap\\conceptmap"+Config.testNumber+".gext";
+	String nameConceptMapTxt = "conceptmap\\conceptmap"+Config.testNumber+".txt";
+	String nameConceptMap    = "conceptmap\\conceptmap"+Config.testNumber+".cmap";
 
 }

@@ -22,14 +22,11 @@ public class NodesTableHash {
 		this.table.put(nodeId, nodeData);
 	}
 
-	public void putBetweenness(String nodeId, double valueBetweenness) {
+	private void putBetweenness(String nodeId, double valueBetweenness) {
 		this.table.get(nodeId).setBetweenness(valueBetweenness);
 	}
-	public void putCloseness(String nodeId, double valueCloseness) {
+	private void putCloseness(String nodeId, double valueCloseness) {
 		this.table.get(nodeId).setCloseness(valueCloseness);
-	}
-	public void putEingenvector(String nodeId, double valueEigenvector) {
-		this.table.get(nodeId).setEigenvector(valueEigenvector);
 	}
 	
 	public void buildNodesTableHash(GephiGraphData gephiGraphData) {
