@@ -6,6 +6,7 @@ import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.statistics.plugin.ConnectedComponents;
+import org.graphstream.graph.Graph;
 
 import user.Concept;
 
@@ -36,6 +37,9 @@ public class SystemGraphData {
 
 	public GephiGraphData getGephiGraphData() {
 		return this.gephiGraphData;
+	}
+	public NodesTableArray getNodesTableArray() {
+		return this.nodesTableArray;
 	}
 	public void setGephiGraphData(GephiGraphData gephiGraphData) {
 		this.gephiGraphData = gephiGraphData;
@@ -373,6 +377,17 @@ public class SystemGraphData {
 		str.append("\n");
 		return str.toString();
 	}
+	
+	public void buildConceptMap() {
+		for( org.graphstream.graph.Node node : WholeSystem.getStreamGraphData().getStreamGraph().getEachNode() ) {
+			for( org.graphstream.graph.Edge edge : node.getEachEdge()) {
+				NodeData sourceConcept = this.getNodeData(node.getId());
+				NodeData targetConcept = this.getNodeData(edge.getTargetNode().getId());
+				WholeSystem.getConceptMap().insert(sourceConcept, edge.toString(), targetConcept);
+			}
+		}
+	}
+	
 	
 	public String toString() {
 		return  "\nQuantity connected component: " + this.connectedComponentsCount +

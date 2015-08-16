@@ -17,8 +17,8 @@ public class WholeSystem {
 	private static StreamGraphData streamGraphData;  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
 	private static int goalConceptsQuantity; // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
 	private static int maxConceptsQuantity;  // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
-	private static NodesTableArray sortEigenvectorSelectedConcepts; // it will be filled at algorithm final fase 
-	private ConceptMap conceptMap;
+	private static NodesTableArray sortAverageSelectedConcepts; // it will be filled at algorithm final fase 
+	private static ConceptMap conceptMap;
 	
 	public WholeSystem() {
 		WholeSystem.conceptsRegister = new GroupConcept(); 
@@ -26,7 +26,7 @@ public class WholeSystem {
 		this.listSetQuerySparql      = new LinkedList<SetQuerySparql>();
 		this.listSystemGraphData     = new LinkedList<SystemGraphData>();
 		WholeSystem.streamGraphData  = new StreamGraphData();
-		this.conceptMap              = new ConceptMap();
+		WholeSystem.conceptMap       = new ConceptMap();
 	}
 
 	public static void initQuantityOriginalConcepts(int quantity) {
@@ -59,8 +59,8 @@ public class WholeSystem {
 	public LinkedList<SystemGraphData> getListSystemGraphData() {
 		return this.listSystemGraphData;
 	}
-	public ConceptMap getConceptMap() {
-		return this.conceptMap;
+	public static ConceptMap getConceptMap() {
+		return WholeSystem.conceptMap;
 	}
 	public static int getGoalConceptsQuantity() {
 		return WholeSystem.goalConceptsQuantity; 
@@ -68,11 +68,11 @@ public class WholeSystem {
 	public static int getMaxConceptsQuantity() {
 		return WholeSystem.maxConceptsQuantity; 
 	}
-	public static NodesTableArray getSortEigenvectorSelectedConcepts() {
-		return WholeSystem.sortEigenvectorSelectedConcepts;
+	public static NodesTableArray getSortAverageSelectedConcepts() {
+		return WholeSystem.sortAverageSelectedConcepts;
 	}
-	public static void setSortEigenvectorSelectedConcepts(NodesTableArray nodesTableArray) {
-		WholeSystem.sortEigenvectorSelectedConcepts = nodesTableArray;
+	public static void setSortAverageSelectedConcepts(NodesTableArray nodesTableArray) {
+		WholeSystem.sortAverageSelectedConcepts = nodesTableArray;
 	}
 	public void insertListSetQuerySparql(SetQuerySparql setQuerySparql) {
 		this.listSetQuerySparql.add(setQuerySparql);

@@ -177,6 +177,17 @@ public class GroupConcept {
 		}		
 		return result;
 	}
+	public GroupConcept getSelectedConcepts() {
+		GroupConcept result = new GroupConcept();
+		for(Concept concept : this.list) {
+			if( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
+				concept.getStatus() == Config.Status.selectedEigenvectorConcept
+			   ) {
+			   result.add(concept);
+			}
+		}		
+		return result;
+	}
 	public GroupConcept getConcepts(int iteration) {
 		GroupConcept result = new GroupConcept();
 		for(Concept concept : this.list) {

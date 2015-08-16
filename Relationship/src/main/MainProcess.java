@@ -1,4 +1,4 @@
-// v3.10 - building k-core and deleting nodes conserving quantity connected components. It is not working.
+// v4.0 - almost finalised... It is still not working.
 
 package main;
 
@@ -34,7 +34,7 @@ public class MainProcess {
 			start();
 			parseTerms(parser);
 			do {
-				showIterationNumber();
+				indicateIterationNumber();
 				createCurrentSetQuerySparql();
 				assemblingQueries();
 				collectRDFs();
@@ -65,23 +65,30 @@ public class MainProcess {
 				prepareDataToNewIteration();
 				iteration++;
 			} while(true);
-			showAlgorithmIntermediateStage1(); // application K-core algorithm
+			indicateAlgorithmIntermediateStage1(); // application K-core algorithm
 			iteration++;
 			createCurrentSystemGraphData();
+			buildStreamGraphData_buildEdgeTable();
+			showQuantitiesStreamGraph();
+			copyAllObjectsLastIteration();
 			applyKCoreFilterTrigger();
 			buildGephiGraphData_NodesTableHash_NodesTableArray();
+Log.consoleln("\nnodesTableArray = \n"+currentSystemGraphData.getNodesTableArray());
 			calculateEigenvectorMeasureWholeNetwork();
+Log.consoleln("\nnodesTableArray = \n"+currentSystemGraphData.getNodesTableArray());
 			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
-			createSortEigenvectorSelectedConcepts();
+Log.consoleln("\nnodesTableArray = \n"+currentSystemGraphData.getNodesTableArray());
+			createSortAverageSelectedConcepts();
+Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverageSelectedConcepts());
 			classifyConnectedComponent_buildSubGraphs(); 
 			buildGexfGraphFile(Config.time.afterKcore);
-			showAlgorithmIntermediateStage2(); // selection main concepts
+			indicateAlgorithmIntermediateStage2(); // selection main concepts
 			int baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
 			int nodeDataPos = 0;
 			do {
 				// pega o selected concept de menor eigenvector dentro do conjunto de nodes
 				Log.consoleln("NodeDataPos="+nodeDataPos);
-				NodeData nodeDataWithLeastEigenvector = WholeSystem.getSortEigenvectorSelectedConcepts().getNodeData(nodeDataPos);
+				NodeData nodeDataWithLeastEigenvector = WholeSystem.getSortAverageSelectedConcepts().getNodeData(nodeDataPos);
 				Log.consoleln("nodeDataWithLeastEigenvector="+nodeDataWithLeastEigenvector.getShortName());
 				// store the current informations of node that will be deleted (because it can be recovered)
 				Node currentNode = nodeDataWithLeastEigenvector.getStreamNode();
@@ -92,6 +99,8 @@ public class MainProcess {
 				iteration++;
 				createCurrentSystemGraphData();
 				buildGephiGraphData_NodesTableHash_NodesTableArray();
+				calculateDistanceMeasuresWholeNetwork();
+				storeDistanceMeasuresWholeNetworkToMainNodeTable();
 				calculateEigenvectorMeasureWholeNetwork();
 				storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 				classifyConnectedComponent_buildSubGraphs(); 
@@ -103,14 +112,14 @@ public class MainProcess {
 					iteration--;
 					nodeDataPos++;
 				}	
-				createSortEigenvectorSelectedConcepts();
+				createSortAverageSelectedConcepts();
 				
 				// verifica se a qtde de selected concepts == goal
-				Log.consoleln("comparacao= "+WholeSystem.getSortEigenvectorSelectedConcepts().getCount()+" <= "+WholeSystem.getGoalConceptsQuantity());
-				if(WholeSystem.getSortEigenvectorSelectedConcepts().getCount() <= WholeSystem.getGoalConceptsQuantity())
+				Log.consoleln("comparacao= "+WholeSystem.getSortAverageSelectedConcepts().getCount()+" <= "+WholeSystem.getGoalConceptsQuantity());
+				if(WholeSystem.getSortAverageSelectedConcepts().getCount() <= WholeSystem.getGoalConceptsQuantity())
 					break;				
-			} while(nodeDataPos < WholeSystem.getSortEigenvectorSelectedConcepts().getCount());
-			if(WholeSystem.getSortEigenvectorSelectedConcepts().getCount() <= WholeSystem.getGoalConceptsQuantity())
+			} while(nodeDataPos < WholeSystem.getSortAverageSelectedConcepts().getCount());
+			if(WholeSystem.getSortAverageSelectedConcepts().getCount() <= WholeSystem.getGoalConceptsQuantity())
 				// ok, meta atingida;
 				Log.consoleln("- Meta atingida!");
 			else
@@ -119,10 +128,18 @@ public class MainProcess {
 				// tentar retirar seguinda a ordem de betweenness, depois de closeness
 				// mas, se mesmo assim não conseguir processa para atingir o maximo de conceitos possível, mesmo que aumente os connected component 
 			
-            buildGexfGraphFile(Config.time.atEnd);
+            buildGexfGraphFile(Config.time.lastGraph);
 			// a partir daqui ele irá construir o mapa conceitual (na verdade, proposições em formato de texto)
+			createCurrentSystemGraphData();
 
-			showAlgorithmFinalStage(); // building concept map
+			buildGephiGraphData_NodesTableHash_NodesTableArray();
+
+            
+			indicateAlgorithmFinalStage(); // building concept map
+			buildConceptMap();
+
+            buildGexfGraphFile(Config.time.lastGraph);
+            showConceptMapPropositions();
 			end();
 		}
 		catch(FileNotFoundException e) {
@@ -174,22 +191,22 @@ public class MainProcess {
                 " (file: "+Config.nameFileInput+")\n" +  
                 WholeSystem.getConceptsRegister().getOriginalConcepts().toString());
 	}
-	public static void showIterationNumber() throws Exception {
+	public static void indicateIterationNumber() throws Exception {
 		Log.consoleln("*** Iteration "+iteration+" ***");
 		Log.outFileCompleteReport(Config.starsLine+"Iteration "+iteration+Config.starsLine);
 		Log.outFileShortReport(Config.starsLine+"Iteration "+iteration+Config.starsLine);
 	}
-	public static void showAlgorithmIntermediateStage1() throws Exception {
+	public static void indicateAlgorithmIntermediateStage1() throws Exception {
 		Log.consoleln("*** Intermediate stage 1 (application K-core algorithm) ***");
 		Log.outFileCompleteReport(Config.starsLine+"Intermediate stage 1 (application K-core algorithm)"+Config.starsLine);
 		Log.outFileShortReport(Config.starsLine+"Intermediate stage 1 (application K-core algorithm)"+Config.starsLine);
 	}
-	public static void showAlgorithmIntermediateStage2() throws Exception {
+	public static void indicateAlgorithmIntermediateStage2() throws Exception {
 		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***");
 		Log.outFileCompleteReport(Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine);
 		Log.outFileShortReport(Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine);
 	}
-	public static void showAlgorithmFinalStage() throws Exception {
+	public static void indicateAlgorithmFinalStage() throws Exception {
 		Log.consoleln("*** Final stage (building concept map) ***");
 		Log.outFileCompleteReport(Config.starsLine+"Final stage (building concept map)"+Config.starsLine);
 		Log.outFileShortReport(Config.starsLine+"Final stage (building concept map)"+Config.starsLine);
@@ -239,7 +256,7 @@ public class MainProcess {
 			WholeSystem.getStreamGraphData().getStreamGraph().addSink(sender);
 		}
 	}
-	// in the firt iteration build StramGraphData and EdgeTable
+	// in the firt iteration build StreamGraphData and EdgeTable
 	// in the second iteration so foth, just add new data into StreamGraphData and EdgeTable
 	public static void buildStreamGraphData_buildEdgeTable() throws Exception {
 		Log.console("- Building Stream Graph Data");
@@ -415,12 +432,14 @@ public class MainProcess {
 			nameFileGexf = Config.nameGEXFGraph + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
 		else if(time == Config.time.afterKcore)
 	   		nameFileGexf = Config.nameGEXFGraph + "_after_kcore.gexf";
-		else if(time == Config.time.atEnd)
+		else if(time == Config.time.lastGraph)
 			nameFileGexf = Config.nameGEXFGraph + "_final.gexf";	
-		Log.consoleln("- Building Gephi Graph File (generated file: " + nameFileGexf + ").");
+		else if(time == Config.time.conceptMap)
+			nameFileGexf = Config.nameGEXFGraph + "_concept_map.gexf";	
+		Log.consoleln("- Building GEXF Graph File (generated file: " + nameFileGexf + ").");
 		currentSystemGraphData.getGephiGraphData().buildGephiGraphFile(nameFileGexf);
-		Log.outFileCompleteReport("Gephi graph file generated: " + nameFileGexf);
-		Log.outFileShortReport("Gephi graph file generated: " + nameFileGexf);
+		Log.outFileCompleteReport("GEXF graph file generated: " + nameFileGexf);
+		Log.outFileShortReport("GEXF graph file generated: " + nameFileGexf);
 	}
 	public static void buildSubGraphsTablesInConnectedComponents() throws Exception {
 		Log.consoleln("- Building sub-graphs tables belong to connected components.");
@@ -497,17 +516,31 @@ public class MainProcess {
 					newGroupConcept.size()+" concepts inserted in the set of query Sparql.\n" +
 					newGroupConcept.toString());
 	}
-	public static NodesTableArray createSortEigenvectorSelectedConcepts() throws Exception {
-		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts(iteration);
+	public static NodesTableArray createSortAverageSelectedConcepts() throws Exception {
+		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
+Log.consoleln("\nselectedConcepts="+selectedConcepts);
 		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
+Log.consoleln("\nnodesTableArray="+nodesTableArray);
 		for(int i=0; i<selectedConcepts.size(); i++) {
 			Concept concept = selectedConcepts.getConcept(i);
 			NodeData nodeData = currentSystemGraphData.getNodeData(concept.getBlankName());
 			nodesTableArray.insert(nodeData);
 		}
 		nodesTableArray.sortCrescentEigenvector();
-		WholeSystem.setSortEigenvectorSelectedConcepts(nodesTableArray);
+		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray);
 		return nodesTableArray;
+	}
+	public static void buildConceptMap()  throws Exception {
+		Log.console("- building concept map propositions");
+		currentSystemGraphData.buildConceptMap();
+		Log.consoleln(" - "+WholeSystem.getConceptMap().size()+" proposition created.");
+		Log.outFileCompleteReport(WholeSystem.getConceptMap().size() + " propositions builded to concept map");
+		Log.outFileShortReport(WholeSystem.getConceptMap().size() + " propositions builded to concept map");		
+	}
+	public static void showConceptMapPropositions() throws Exception {
+		Log.consoleln("- Showing concept map propositions.");
+		Log.outFileCompleteReport("Concept map propositions:\n" + WholeSystem.getConceptMap().toString());
+		Log.outFileShortReport("Concept map propositions:\n" + WholeSystem.getConceptMap().toString());
 	}
 	public static void end() throws Exception {
 		Log.consoleln("- Closing.");

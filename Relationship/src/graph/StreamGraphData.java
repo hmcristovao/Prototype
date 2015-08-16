@@ -362,7 +362,7 @@ public class StreamGraphData {
 		}
 		// finally, remove the node of the Stream Graph
 		this.streamGraph.removeNode(node);
-		// remove node of the concepts register, if is the case
+		// remove node of the concepts register, if it is the case
 		boolean isConcept = false;
 		if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
 			WholeSystem.getConceptsRegister().removeConcept((String)node.getAttribute("shortblankname"));

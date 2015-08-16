@@ -25,7 +25,7 @@ public interface Config {
 	// CONFIG - OUTPUT FILES (gexf) 
     //
 	String nameGEXFGraph = "graph\\graph"+Config.testNumber;
-	enum time {whileIteration, afterKcore, atEnd };
+	enum time {whileIteration, afterKcore, lastGraph, conceptMap  };
 
 	
 	// ============================================================================
@@ -127,7 +127,9 @@ public interface Config {
 	int conceptsQuantityCalulationFactor = 18;
 	int conceptsMinMaxRange = 5;
 	
-	String nameConceptMapTxt = "conceptmap\\conceptmap"+Config.testNumber+".txt";
-	String nameConceptMap    = "conceptmap\\conceptmap"+Config.testNumber+".cmap";
+	String nameVocabularyFile = "vocabulary\\vocabulary_01.txt";
+	
+	String nameConceptMapTxt =  "conceptmap\\conceptmap"+Config.testNumber+".txt";
+	String nameConceptMap    =  "conceptmap\\conceptmap"+Config.testNumber+".cmap";
 
 }

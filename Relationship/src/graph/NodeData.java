@@ -24,7 +24,8 @@ public class NodeData {
 	private double betweenness;
 	private double closeness;
 	private double eigenvector;
-	private int partitioning;
+	private int partitioning; 
+	private double average;  // arithmetic average of betweenness, closeness and eigenvector
 	
 	// constructor to permanent data
 	public NodeData(String strIdNode, 
@@ -113,18 +114,21 @@ public class NodeData {
 	}
 	public void setBetweenness(double betweenness) {
 		this.betweenness = betweenness;
+		this.average     = (this.betweenness + this.closeness + this.eigenvector)/3.0;
 	}
 	public double getCloseness() {
 		return this.closeness;
 	}
 	public void setCloseness(double closeness) {
 		this.closeness = closeness;
+		this.average     = (this.betweenness + this.closeness + this.eigenvector)/3.0;
 	}
 	public double getEigenvector() {
 		return this.eigenvector;
 	}
 	public void setEigenvector(double eigenvector) {
 		this.eigenvector = eigenvector;
+		this.average     = (this.betweenness + this.closeness + this.eigenvector)/3.0;
 	}
 	public int getPartitioning() {
 		return this.partitioning;
@@ -133,6 +137,10 @@ public class NodeData {
 		this.partitioning = partitioning;
 	}
 
+	public double getAverage() {
+		return this.average;
+	}
+	
 	public int compareTo(NodeData nodeData) {
 		return this.strIdNode.compareTo(nodeData.strIdNode);
 	}
@@ -140,12 +148,13 @@ public class NodeData {
 	@Override
 	public String toString() {
 		return  "Id: " + this.getStrIdNode() +
-				"\nFull name: " + this.getFullName() +
-				"\nStatus: " + Concept.statusToString(this.status) +
+				"\nFull name:           " + this.getFullName() +
+				"\nStatus:              " + Concept.statusToString(this.status) +
 				"\nConnected component: " + this.getConnectedComponent() +
-				"\nBetweenness: " + this.getBetweenness() +
-				"\nCloseness: " + this.getCloseness() +
-				"\nEigenvector: " + this.getEigenvector() +
-				"\nPartitioning: " + this.getPartitioning();
+				"\nBetweenness:         " + this.getBetweenness() +
+				"\nCloseness:           " + this.getCloseness() +
+				"\nEigenvector:         " + this.getEigenvector() +
+				"\nAverage:             " + this.getEigenvector() +
+				"\nPartitioning:        " + this.getPartitioning();
 	}
 }

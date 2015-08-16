@@ -109,6 +109,11 @@ public class NodesTableArray {
 		NodeData newNewTable[] = Arrays.copyOf(newTable, first);
 		return new NodesTableArray(newNewTable);
 	}
+	public NodesTableArray sortAverage() {
+		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
+		Arrays.sort(newTable, new SortAverage());
+		return new NodesTableArray(newTable);
+	}
 
 	public String toStringShort(int quantityNodes) {
 		StringBuffer str = new StringBuffer();
@@ -164,6 +169,16 @@ class SortCrescentEigenvector implements Comparator<NodeData> {
 		if(nodeData1.getEigenvector() > nodeData2.getEigenvector())
 			return 1;
 		else if(nodeData1.getEigenvector() < nodeData2.getEigenvector())
+			return -1;
+		else
+			return 0;
+	}
+}
+class SortAverage implements Comparator<NodeData> {
+	public int compare(NodeData nodeData1, NodeData nodeData2) {
+		if(nodeData1.getAverage() < nodeData2.getAverage())
+			return 1;
+		else if(nodeData1.getAverage() > nodeData2.getAverage())
 			return -1;
 		else
 			return 0;
