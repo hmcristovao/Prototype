@@ -11,11 +11,17 @@ public interface WraptermsConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int CHARACTER = 1;
+  int CHARACTER_TERM = 1;
   /** RegularExpression Id. */
-  int TERM = 2;
+  int USER_TERM = 2;
   /** RegularExpression Id. */
   int SEPARATORS = 3;
+  /** RegularExpression Id. */
+  int CHARACTER_VOCABULARY = 4;
+  /** RegularExpression Id. */
+  int TERM_VOCABULARY = 5;
+  /** RegularExpression Id. */
+  int ARROW = 6;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -23,9 +29,12 @@ public interface WraptermsConstants {
   /** Literal token values. */
   String[] tokenImage = {
     "<EOF>",
-    "<CHARACTER>",
-    "<TERM>",
+    "<CHARACTER_TERM>",
+    "<USER_TERM>",
     "<SEPARATORS>",
+    "<CHARACTER_VOCABULARY>",
+    "<TERM_VOCABULARY>",
+    "\"->\"",
   };
 
 }

@@ -10,7 +10,8 @@ package basic;
 import java.io.*;
 import main.*;
 import user.*;
-import rdf.*; 
+import rdf.*;
+import map.*; 
 
 public class Wrapterms {
    public static void main(String args[])  throws Exception {
@@ -20,31 +21,58 @@ public class Wrapterms {
 }
 PARSER_END(Wrapterms)
 TOKEN : {
-      < CHARACTER:  ["a"-"z","A"-"Z","0"-"9","-","_",":"] > |
-      < TERM:       < CHARACTER > 
-                    (
-                      ( < CHARACTER > | " " )*
-                      < CHARACTER >
-                    )?
+      < CHARACTER_TERM: ["a"-"z","A"-"Z","0"-"9","-","_",":"] > |
+      < USER_TERM:      < CHARACTER_TERM > 
+                        (
+                          ( < CHARACTER_TERM > | " " )*
+                            < CHARACTER_TERM >
+                        )?
       > |
-      < SEPARATORS:  ( "\n" | "\r" | "," | ";" | "/" | " " )+ >
+      < SEPARATORS:  ( "\n" | "\r" | "," | ";" | "/" | " " )+ > |
+      < CHARACTER_VOCABULARY:  ["a"-"z","A"-"Z","0"-"9","-","_",":","#","@","!","$","%","&","*","(",")","+","="] > |
+      < TERM_VOCABULARY: < CHARACTER_VOCABULARY > 
+                        (
+                           ( < CHARACTER_VOCABULARY > | " " )*
+                             < CHARACTER_VOCABULARY >
+                        )?
+      > |
+      < ARROW:          "->" >
 }
-/* Grammar:
-start   ->  ( element() )*  < EOF > 
-element ->  < TERM > ( < SEPARATORS > )*
+/*
+Grammar (read of user terms):
+parseUserTerms        ->  ( element() )*  < EOF > 
+element               ->  < USER_TERM > ( < SEPARATORS > )*
+
+Grammar (read of link vocabulary):
+parseSystemVocabulary ->  ( line() )*  < EOF >
+line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < SEPARATORS > )*
+
 */
 
-void start(SetQuerySparql originalSetQuerySparql) : {} 
+void parseUserTerms(SetQuerySparql originalSetQuerySparql) : {} 
 {
    ( element(originalSetQuerySparql) )* < EOF >
 }
 void element(SetQuerySparql originalSetQuerySparql) : {Token token; Concept concept;}  
 {
-	token = < TERM >
+	token = < USER_TERM >
     {		concept = new Concept(token);
 		originalSetQuerySparql.insertQuerySparql(concept);
 		// copy the concept to static attribute in root class:
 		WholeSystem.getConceptsRegister().add(concept);			
+    }
+    ( < SEPARATORS > )*
+}
+
+void parseSystemVocabulary(VocabularyTable vocabularyTable) : {} 
+{
+   ( line(vocabularyTable) )* < EOF >
+}
+void line(VocabularyTable vocabularyTable) : {Token tokenLeft; Token tokenRight;}  
+{
+	tokenLeft = < TERM_VOCABULARY > < ARROW >  tokenRight = < TERM_VOCABULARY > 
+    {
+		vocabularyTable.put(tokenLeft,tokenRight);
     }
     ( < SEPARATORS > )*
 }

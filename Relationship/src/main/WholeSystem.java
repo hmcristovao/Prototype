@@ -18,6 +18,7 @@ public class WholeSystem {
 	private static int goalConceptsQuantity; // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
 	private static int maxConceptsQuantity;  // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
 	private static NodesTableArray sortAverageSelectedConcepts; // it will be filled at algorithm final fase 
+	private static VocabularyTable vocabularyTable;
 	private static ConceptMap conceptMap;
 	
 	public WholeSystem() {
@@ -26,6 +27,7 @@ public class WholeSystem {
 		this.listSetQuerySparql      = new LinkedList<SetQuerySparql>();
 		this.listSystemGraphData     = new LinkedList<SystemGraphData>();
 		WholeSystem.streamGraphData  = new StreamGraphData();
+		WholeSystem.vocabularyTable  = new VocabularyTable();
 		WholeSystem.conceptMap       = new ConceptMap();
 	}
 
@@ -61,6 +63,9 @@ public class WholeSystem {
 	}
 	public static ConceptMap getConceptMap() {
 		return WholeSystem.conceptMap;
+	}
+	public static VocabularyTable getVocabularyTable() {
+		return WholeSystem.vocabularyTable;
 	}
 	public static int getGoalConceptsQuantity() {
 		return WholeSystem.goalConceptsQuantity; 

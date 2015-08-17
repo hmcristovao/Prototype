@@ -123,10 +123,10 @@ public class StreamGraphData {
 		return this.streamGraph.getEdgeCount();
 	}	
 		
-	// in the firt iteration build StramGraphData and EdgeTable
-	// in the second iteration so foth, just add new data into StreamGraphData and EdgeTable
+	// in the firt iteration build StreamGraphData and EdgeTable from RDFs
+	// in the second iteration so foth, just add new data (RDFs) into StreamGraphData and EdgeTable
     // (build stream graph from rdfs in set query Sparql)
-	public QuantityNodesEdges buildStreamGraphData_buildEdgeTable(SetQuerySparql setQuerySparql) {
+	public QuantityNodesEdges buildStreamGraphData_buildEdgeTable_fromRdfs(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
 		OneRDF oneRDF;
@@ -400,6 +400,15 @@ public class StreamGraphData {
 		}
 	}
 
+	public void deleteCommonNodesRemainOriginalAndSelectedConcepts() {
+		for(Node node : this.streamGraph) {
+			// if it is not original or selected concepts, delete it and all its edges
+			if(!WholeSystem.getConceptsRegister().isConcept(node.getId())) {
+				this.deleteNode(node);
+			}
+		}
+	}
+	
 	public static String nodeToString(Node node) {
 		StringBuffer str = new StringBuffer();
 		str.append("\nID: ");

@@ -17,15 +17,16 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - INPUT FILES 
     //
-	String nameFileInput = "input\\terms"+Config.testNumber+".txt";
-	String nameFileQueryDefault = "query_model\\query.txt";
-
+	String nameUserTermsFile    = "userterms\\terms"+Config.testNumber+".txt";
+	String nameQueryDefaultFile = "query_model\\query.txt";
+	String nameVocabularyFile   = "vocabulary\\vocabulary_01.txt";
+	
 	
 	// ============================================================================
 	// CONFIG - OUTPUT FILES (gexf) 
     //
 	String nameGEXFGraph = "graph\\graph"+Config.testNumber;
-	enum time {whileIteration, afterKcore, lastGraph, conceptMap  };
+	enum time {whileIteration, afterIteration, lastGraph, conceptMap  };
 
 	
 	// ============================================================================
@@ -74,8 +75,8 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 4;
-	int maxIteration = 5;
+	int minIteration = 3;   // better set: 8
+	int maxIteration = 5;  // better set: 12
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;
@@ -103,16 +104,16 @@ public interface Config {
 	// K-core used in all system
 	int kCoreFilter = 2;
 	// since iteration number x to apply K-core filter trigger
-	// int iterationTriggerApplyKCoreFilterAlgorithm = 1;
+	int iterationTriggerApplyKCoreFilterAlgorithm = 3;  // better set: 5
 	// quantity of nodes to shoot K-core n algorithm
 	// int quantityNodesToApplyKcoreFilter = 100;
 	
 	// N-degree filter used in all system
 	int nDegreeFilter = 2;
 	// since iteration number x to apply n-degree filter trigger
-	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;
+	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 4000;
+	int quantityNodesToApplyNdegreeFilter = 1000;  // better set: 5000
 	
 	// ============================================================================
 	// CONFIG - REPORT 
@@ -126,8 +127,6 @@ public interface Config {
 	// to calculate min and max concepts to map
 	int conceptsQuantityCalulationFactor = 18;
 	int conceptsMinMaxRange = 5;
-	
-	String nameVocabularyFile = "vocabulary\\vocabulary_01.txt";
 	
 	String nameConceptMapTxt =  "conceptmap\\conceptmap"+Config.testNumber+".txt";
 	String nameConceptMap    =  "conceptmap\\conceptmap"+Config.testNumber+".cmap";

@@ -10,7 +10,7 @@ public class Log {
 	public static BufferedWriter fileConsoleReport;
 	public static PrintStream printStreamError;
 
-	public static void init() throws Exception {
+	public static void initFiles() throws Exception {
 		fileCompleteReport = new BufferedWriter(new FileWriter(Config.nameFileCompletReport));
 		fileShortReport    = new BufferedWriter(new FileWriter(Config.nameFileShortReport));
 		fileConsoleReport  = new BufferedWriter(new FileWriter(Config.nameFileConsoleReport));

@@ -109,8 +109,8 @@ public class GephiGraphData {
 	public void calculateGephiGraphEigenvectorMeasure() {
 		EigenvectorCentrality ec = new EigenvectorCentrality();
 		ec.execute(this.graphModel, this.attributeModel);
-		this.attributeTable = this.attributeModel.getNodeTable();
-		this.eigenvectorColumn        = this.attributeTable.getColumn(EigenvectorCentrality.EIGENVECTOR);		
+		this.attributeTable 	= this.attributeModel.getNodeTable();
+		this.eigenvectorColumn  = this.attributeTable.getColumn(EigenvectorCentrality.EIGENVECTOR);		
 	}
 	
 	// classify connected components

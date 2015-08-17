@@ -1,4 +1,4 @@
-// v4.0 - almost finalised... It is still not working.
+// v4.1 - finalised, but it is still not working.
 
 package main;
 
@@ -6,7 +6,6 @@ import graph.NodeData;
 import graph.NodesTableArray;
 import graph.QuantityNodesEdges;
 import graph.SystemGraphData;
-import graph.StreamGraphData;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -40,14 +39,16 @@ public class MainProcess {
 				collectRDFs();
 				createCurrentSystemGraphData();
 				connectStreamVisualization();
-				buildStreamGraphData_buildEdgeTable();
+				buildStreamGraphData_buildEdgeTable_fromRdfs();
 				showQuantitiesStreamGraph();
 				if(iteration >= 1) 
 					copyAllObjectsLastIteration();
 				if(iteration >= Config.iterationTriggerApplyNDegreeFilterAlgorithm 
 				   && WholeSystem.getStreamGraphData().getTotalNodes() > Config.quantityNodesToApplyNdegreeFilter) 
  					applyNDegreeFilterTrigger();
-				buildGephiGraphData_NodesTableHash_NodesTableArray();
+				if(iteration >= Config.iterationTriggerApplyKCoreFilterAlgorithm) 
+					applyKCoreFilterTrigger();
+				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
 				calculateDistanceMeasuresWholeNetwork();
 				storeDistanceMeasuresWholeNetworkToMainNodeTable();
@@ -65,40 +66,37 @@ public class MainProcess {
 				prepareDataToNewIteration();
 				iteration++;
 			} while(true);
-			indicateAlgorithmIntermediateStage1(); // application K-core algorithm
+			indicateAlgorithmIntermediateStage1(); // after iterations loop
 			iteration++;
+			deleteCommonNodesRemainOriginalAndSelectedConcepts();
 			createCurrentSystemGraphData();
-			buildStreamGraphData_buildEdgeTable();
-			showQuantitiesStreamGraph();
-			copyAllObjectsLastIteration();
-			applyKCoreFilterTrigger();
-			buildGephiGraphData_NodesTableHash_NodesTableArray();
-Log.consoleln("\nnodesTableArray = \n"+currentSystemGraphData.getNodesTableArray());
+			buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
+			calculateDistanceMeasuresWholeNetwork();
+			storeDistanceMeasuresWholeNetworkToMainNodeTable();
 			calculateEigenvectorMeasureWholeNetwork();
-Log.consoleln("\nnodesTableArray = \n"+currentSystemGraphData.getNodesTableArray());
 			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 Log.consoleln("\nnodesTableArray = \n"+currentSystemGraphData.getNodesTableArray());
 			createSortAverageSelectedConcepts();
-Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverageSelectedConcepts());
+Log.consoleln("\nsortAverageSelectedConcepts = \n"+WholeSystem.getSortAverageSelectedConcepts());
 			classifyConnectedComponent_buildSubGraphs(); 
-			buildGexfGraphFile(Config.time.afterKcore);
+			buildGexfGraphFile(Config.time.afterIteration);
 			indicateAlgorithmIntermediateStage2(); // selection main concepts
 			int baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
 			int nodeDataPos = 0;
 			do {
-				// pega o selected concept de menor eigenvector dentro do conjunto de nodes
+				// pega o selected concept de menor average dentro do conjunto de nodes
 				Log.consoleln("NodeDataPos="+nodeDataPos);
-				NodeData nodeDataWithLeastEigenvector = WholeSystem.getSortAverageSelectedConcepts().getNodeData(nodeDataPos);
-				Log.consoleln("nodeDataWithLeastEigenvector="+nodeDataWithLeastEigenvector.getShortName());
+				NodeData nodeDataWithLeastAverage = WholeSystem.getSortAverageSelectedConcepts().getNodeData(nodeDataPos);
+				Log.consoleln("nodeDataWithLeastEigenvector="+nodeDataWithLeastAverage.getShortName());
 				// store the current informations of node that will be deleted (because it can be recovered)
-				Node currentNode = nodeDataWithLeastEigenvector.getStreamNode();
+				Node currentNode = nodeDataWithLeastAverage.getStreamNode();
 				ArrayList<Edge> currentEdgeSet = (ArrayList<Edge>)currentNode.getEdgeSet();
 				// deleta o node do stream graph
 				WholeSystem.getStreamGraphData().deleteNode(currentNode);
 				// cria novo systemGraphData
 				iteration++;
 				createCurrentSystemGraphData();
-				buildGephiGraphData_NodesTableHash_NodesTableArray();
+				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				calculateDistanceMeasuresWholeNetwork();
 				storeDistanceMeasuresWholeNetworkToMainNodeTable();
 				calculateEigenvectorMeasureWholeNetwork();
@@ -129,13 +127,20 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 				// mas, se mesmo assim não conseguir processa para atingir o maximo de conceitos possível, mesmo que aumente os connected component 
 			
             buildGexfGraphFile(Config.time.lastGraph);
-			// a partir daqui ele irá construir o mapa conceitual (na verdade, proposições em formato de texto)
+			
+            // a partir daqui ele irá construir o mapa conceitual (na verdade, proposições em formato de texto)
+            indicateAlgorithmFinalStage(); // building concept map
 			createCurrentSystemGraphData();
+			
+			
+			buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
+			calculateDistanceMeasuresWholeNetwork();
+			storeDistanceMeasuresWholeNetworkToMainNodeTable();
+			calculateEigenvectorMeasureWholeNetwork();
+			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
+			classifyConnectedComponent_buildSubGraphs(); 
 
-			buildGephiGraphData_NodesTableHash_NodesTableArray();
-
-            
-			indicateAlgorithmFinalStage(); // building concept map
+			parseVocabulary(parser);
 			buildConceptMap();
 
             buildGexfGraphFile(Config.time.lastGraph);
@@ -172,23 +177,23 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 	}
 	
 	public static void start() throws Exception {
-		Log.init();
+		Log.initFiles();
 		Log.consoleln("- Starting.");
 	}
 	public static void parseTerms(Wrapterms parser) throws Exception {
-		Log.consoleln("- Parsing terms.");
-		parser = new Wrapterms(new FileInputStream(Config.nameFileInput));
+		Log.consoleln("- Parsing user terms.");
+		parser = new Wrapterms(new FileInputStream(Config.nameUserTermsFile));
 		wholeSystem.insertListSetQuerySparql(new SetQuerySparql());
-		parser.start(wholeSystem.getListSetQuerySparql().getFirst());
+		parser.parseUserTerms(wholeSystem.getListSetQuerySparql().getFirst());
 		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
 		WholeSystem.initGoalMaxConceptsQuantity();
 		Log.outFileCompleteReport("Quantity of terms parsed: " + 
 		        WholeSystem.getQuantityOriginalConcepts() +   
-                " (file: "+Config.nameFileInput+")\n" +  
+                " (file: "+Config.nameUserTermsFile+")\n" +  
 		        WholeSystem.getConceptsRegister().getOriginalConcepts().toStringLong());
 		Log.outFileShortReport("Quantity of terms parsed: " + 
                 WholeSystem.getConceptsRegister().size() + 
-                " (file: "+Config.nameFileInput+")\n" +  
+                " (file: "+Config.nameUserTermsFile+")\n" +  
                 WholeSystem.getConceptsRegister().getOriginalConcepts().toString());
 	}
 	public static void indicateIterationNumber() throws Exception {
@@ -197,9 +202,9 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 		Log.outFileShortReport(Config.starsLine+"Iteration "+iteration+Config.starsLine);
 	}
 	public static void indicateAlgorithmIntermediateStage1() throws Exception {
-		Log.consoleln("*** Intermediate stage 1 (application K-core algorithm) ***");
-		Log.outFileCompleteReport(Config.starsLine+"Intermediate stage 1 (application K-core algorithm)"+Config.starsLine);
-		Log.outFileShortReport(Config.starsLine+"Intermediate stage 1 (application K-core algorithm)"+Config.starsLine);
+		Log.consoleln("*** Intermediate stage 1 (work only with selected and original concepts) ***");
+		Log.outFileCompleteReport(Config.starsLine+"Intermediate stage 1 (work only with selected and original concepts)"+Config.starsLine);
+		Log.outFileShortReport(Config.starsLine+"Intermediate stage 1 (work only with selected and original concepts)"+Config.starsLine);
 	}
 	public static void indicateAlgorithmIntermediateStage2() throws Exception {
 		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***");
@@ -217,7 +222,7 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 	public static void assemblingQueries() throws Exception {
 		Log.console("- Assembling queries");
 		int num = currentSetQuerySparql.fillQuery();
-		Log.consoleln(" - "+num+" new querys assembled.");
+		Log.consoleln(" - "+num+" new queries assembled.");
 		Log.outFileCompleteReport("Queries assembled: " + num + "\n\n" + 
 				currentSetQuerySparql.toString());
 		Log.outFileShortReport("Queries assembled: " + num + "\n\n" + 
@@ -258,9 +263,9 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 	}
 	// in the firt iteration build StreamGraphData and EdgeTable
 	// in the second iteration so foth, just add new data into StreamGraphData and EdgeTable
-	public static void buildStreamGraphData_buildEdgeTable() throws Exception {
+	public static void buildStreamGraphData_buildEdgeTable_fromRdfs() throws Exception {
 		Log.console("- Building Stream Graph Data");
-		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData_buildEdgeTable(currentSetQuerySparql);
+		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData_buildEdgeTable_fromRdfs(currentSetQuerySparql);
 		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" new nodes, "+quantityNodesEdges.getNumEdges()+" new edges in the visualization graph.");
 		Log.consoleln("- Creating edge hash table - "+WholeSystem.getEdgesTable().size()+" edges.");
 		Log.outFileCompleteReport("Stream Graph Data created (graph used in the preview): \n" + 
@@ -285,7 +290,7 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 		Log.consoleln("- Quantities Stream Graph built: "+WholeSystem.getStreamGraphData().getRealTotalNodes()+
 				" nodes, "+WholeSystem.getStreamGraphData().getRealTotalEdges()+" edges.");
 	}
-	// if it is second iteration so forth, copy all objects of the last iteration
+	// if it is second iteration so forth, copy all objects (ListQuerySparql) of the last iteration
 	public static void copyAllObjectsLastIteration() throws Exception {
 		Log.console("- Second iteration or more: copying old elements of the last iteration");
 		int n = currentSetQuerySparql.insertListQuerySparql(wholeSystem.getListSetQuerySparql().get(iteration-1).getListQuerySparql());
@@ -356,9 +361,9 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
 	}
 			
-	public static void buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
+	public static void buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph() throws Exception {
 		Log.console("- Building Gephi Graph Data, Nodes Table Hash and Nodes Table Array from Stream Graph");
-		QuantityNodesEdges quantityNodesEdges = currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray();
+		QuantityNodesEdges quantityNodesEdges = currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" nodes, "+quantityNodesEdges.getNumEdges()+" edges in the graph structure.");
 		Log.outFileCompleteReport("Built Gephi Graph Data, Nodes Table Hash and Nodes Table Array from Stram Graph\n"+
 				quantityNodesEdges.getNumNodes()+" nodes, "+quantityNodesEdges.getNumEdges()+" edges in the graph structure." +
@@ -430,8 +435,8 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 		String nameFileGexf = null;
 		if(time == Config.time.whileIteration) 
 			nameFileGexf = Config.nameGEXFGraph + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
-		else if(time == Config.time.afterKcore)
-	   		nameFileGexf = Config.nameGEXFGraph + "_after_kcore.gexf";
+		else if(time == Config.time.afterIteration)
+	   		nameFileGexf = Config.nameGEXFGraph + "_after_iterations.gexf";
 		else if(time == Config.time.lastGraph)
 			nameFileGexf = Config.nameGEXFGraph + "_final.gexf";	
 		else if(time == Config.time.conceptMap)
@@ -516,6 +521,30 @@ Log.consoleln("\nsortEigenvectorSelectedConcepts = \n"+WholeSystem.getSortAverag
 					newGroupConcept.size()+" concepts inserted in the set of query Sparql.\n" +
 					newGroupConcept.toString());
 	}
+	public static void deleteCommonNodesRemainOriginalAndSelectedConcepts() throws Exception {
+		Log.console("- Deleting common nodes, remain only original and selected concepts");
+		int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
+		int numOldEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
+		// call algorithm:
+		WholeSystem.getStreamGraphData().deleteCommonNodesRemainOriginalAndSelectedConcepts();
+		int numCurrentNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
+		int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
+		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes ");
+		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges.");
+		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
+		Log.outFileCompleteReport("Deleted all common nodes (remain only original and selected concepts) \n" +
+				(numOldNodes - numCurrentNodes) +" deleted nodes" +
+				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
+				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges." +
+				"\n\n" + WholeSystem.getStreamGraphData().toString() );
+		Log.outFileShortReport("Deleted all common nodes (remain only original and selected concepts) \n" +
+				(numOldNodes - numCurrentNodes) +" deleted nodes" +
+				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
+				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
+	}
+	
 	public static NodesTableArray createSortAverageSelectedConcepts() throws Exception {
 		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
 Log.consoleln("\nselectedConcepts="+selectedConcepts);
@@ -529,6 +558,16 @@ Log.consoleln("\nnodesTableArray="+nodesTableArray);
 		nodesTableArray.sortCrescentEigenvector();
 		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray);
 		return nodesTableArray;
+	}
+	public static void parseVocabulary(Wrapterms parser) throws Exception {
+		Log.consoleln("- Parsing vocabulary");
+		parser = new Wrapterms(new FileInputStream(Config.nameVocabularyFile));
+		parser.parseSystemVocabulary(WholeSystem.getVocabularyTable());
+		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " sentences parsed.");
+		Log.outFileCompleteReport("Quantity of vocabulary sententes parsed: " + WholeSystem.getVocabularyTable().size() +   
+                " (file: "+Config.nameVocabularyFile+")\n");
+		Log.outFileShortReport("Quantity of vocabulary sententes parsed: " + WholeSystem.getVocabularyTable().size() +   
+                " (file: "+Config.nameVocabularyFile+")\n");
 	}
 	public static void buildConceptMap()  throws Exception {
 		Log.console("- building concept map propositions");

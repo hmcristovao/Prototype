@@ -98,7 +98,7 @@ public class SetQuerySparql {
 	}
 
 	private StringBuffer readFileQueryDefault() throws IOException {
-		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(Config.nameFileQueryDefault));
+		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(Config.nameQueryDefaultFile));
 		StringBuffer queryDefault = new StringBuffer();
 		String linhaAux = null;
 	    while (true) {

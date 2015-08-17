@@ -81,7 +81,7 @@ public class SystemGraphData {
 	
 	// It copies all graph from StreamGraph format to GephiGraph format.
 	// It also builds nodesTableHash and nodesTableArray
-	public QuantityNodesEdges buildGephiGraphData_NodesTableHash_NodesTableArray() throws Exception {
+	public QuantityNodesEdges buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph() throws Exception {
 		org.graphstream.graph.Graph streamGraph = WholeSystem.getStreamGraphData().getStreamGraph();
 		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getRealTotalNodes());
 		NodeData newNodeData = null;
@@ -378,6 +378,7 @@ public class SystemGraphData {
 		return str.toString();
 	}
 	
+	// create the final map concept from Stream Graph
 	public void buildConceptMap() {
 		for( org.graphstream.graph.Node node : WholeSystem.getStreamGraphData().getStreamGraph().getEachNode() ) {
 			for( org.graphstream.graph.Edge edge : node.getEachEdge()) {

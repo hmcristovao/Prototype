@@ -5,6 +5,8 @@ import graph.NodeData;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.WholeSystem;
+
 public class ConceptMap {
 	private List<Proposition> propositions;
 
@@ -21,15 +23,9 @@ public class ConceptMap {
 	}
 	
 	public void insert(NodeData sourceConcept, String rawLink, NodeData targetConcept) {
-		String link = this.vocabulary(rawLink);
-		Proposition proposition = new Proposition( sourceConcept, link, targetConcept);
+		String formatedLink = WholeSystem.getVocabularyTable().get(rawLink);
+		Proposition proposition = new Proposition( sourceConcept, formatedLink, targetConcept);
 		this.propositions.add(proposition);
-	}
-	
-	public String vocabulary(String rawLink) {
-		===> criar um arquivo, ler esse arquivo para uma hash <String,String>
-		
-		return link;
 	}
 	
 	public String toString() {
