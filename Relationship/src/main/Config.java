@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "20"; 
+	String  testNumber = "21"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
@@ -68,15 +68,17 @@ public interface Config {
 	boolean edgeLabelFileGephi   = true;
 	boolean nodeLabelFileGephi   = false; // original concepts always have label in Stream Gephi
 
-	enum Status {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus };
+	enum Status {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus};
+	
+	enum Category {no, yes, was};
 	
 	
 	// ============================================================================
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 3;   // better set: 8
-	int maxIteration = 5;  // better set: 12
+	int minIteration = 2;   // better set: 8
+	int maxIteration = 2;  // better set: 12
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;

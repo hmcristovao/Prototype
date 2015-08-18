@@ -16,18 +16,18 @@ public class Wrapterms implements WraptermsConstants {
 /*
 Grammar (read of user terms):
 parseUserTerms        ->  ( element() )*  < EOF > 
-element               ->  < USER_TERM > ( < SEPARATORS > )*
+element               ->  < TERM > ( < SEPARATORS > )*
 
 Grammar (read of link vocabulary):
 parseSystemVocabulary ->  ( line() )*  < EOF >
-line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < SEPARATORS > )*
+line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
 
 */
   final public void parseUserTerms(SetQuerySparql originalSetQuerySparql) throws ParseException {
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case USER_TERM:
+      case TERM:
         ;
         break;
       default:
@@ -41,7 +41,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
 
   final public void element(SetQuerySparql originalSetQuerySparql) throws ParseException {
                                                        Token token; Concept concept;
-    token = jj_consume_token(USER_TERM);
+    token = jj_consume_token(TERM);
                 concept = new Concept(token);
                 originalSetQuerySparql.insertQuerySparql(concept);
                 // copy the concept to static attribute in root class:
@@ -64,7 +64,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
     label_3:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TERM_VOCABULARY:
+      case TERM:
         ;
         break;
       default:
@@ -78,10 +78,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
 
   final public void line(VocabularyTable vocabularyTable) throws ParseException {
                                               Token tokenLeft; Token tokenRight;
-    tokenLeft = jj_consume_token(TERM_VOCABULARY);
-    jj_consume_token(ARROW);
-    tokenRight = jj_consume_token(TERM_VOCABULARY);
-                vocabularyTable.put(tokenLeft,tokenRight);
+    tokenLeft = jj_consume_token(TERM);
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -91,6 +88,33 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
       default:
         jj_la1[3] = jj_gen;
         break label_4;
+      }
+      jj_consume_token(SEPARATORS);
+    }
+    jj_consume_token(ARROW);
+    label_5:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[4] = jj_gen;
+        break label_5;
+      }
+      jj_consume_token(SEPARATORS);
+    }
+    tokenRight = jj_consume_token(TERM);
+                vocabularyTable.put(tokenLeft,tokenRight);
+    label_6:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[5] = jj_gen;
+        break label_6;
       }
       jj_consume_token(SEPARATORS);
     }
@@ -105,13 +129,13 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[4];
+  final private int[] jj_la1 = new int[6];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x4,0x8,0x20,0x8,};
+      jj_la1_0 = new int[] {0x8,0x10,0x8,0x10,0x10,0x10,};
    }
 
   /** Constructor with InputStream. */
@@ -125,7 +149,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 4; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -139,7 +163,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 4; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -149,7 +173,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 4; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -159,7 +183,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 4; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -168,7 +192,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 4; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -177,7 +201,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 4; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -228,12 +252,12 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[7];
+    boolean[] la1tokens = new boolean[5];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 6; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -242,7 +266,7 @@ line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < 
         }
       }
     }
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 5; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

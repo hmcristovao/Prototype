@@ -9,28 +9,18 @@ import map.*;
 import java.util.LinkedList;
 
 public class WholeSystem {
-	private static GroupConcept conceptsRegister;
+	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
+	private static GroupConcept conceptsRegister = new GroupConcept();
 	private static int quantityOriginalConcepts;  // it will be filled from method MainProcess.parseTerms()
-	private static EdgesTableHash edgesTable;
-	private LinkedList<SetQuerySparql> listSetQuerySparql;
-	private LinkedList<SystemGraphData> listSystemGraphData;
-	private static StreamGraphData streamGraphData;  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
+	private static EdgesTableHash edgesTable = new EdgesTableHash(); 
+	private static LinkedList<SetQuerySparql> listSetQuerySparql = new LinkedList<SetQuerySparql>();
+	private static LinkedList<SystemGraphData> listSystemGraphData = new LinkedList<SystemGraphData>();;
 	private static int goalConceptsQuantity; // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
 	private static int maxConceptsQuantity;  // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
 	private static NodesTableArray sortAverageSelectedConcepts; // it will be filled at algorithm final fase 
-	private static VocabularyTable vocabularyTable;
-	private static ConceptMap conceptMap;
+	private static VocabularyTable vocabularyTable = new VocabularyTable();;
+	private static ConceptMap conceptMap = new ConceptMap();;
 	
-	public WholeSystem() {
-		WholeSystem.conceptsRegister = new GroupConcept(); 
-		WholeSystem.edgesTable       = new EdgesTableHash(); 
-		this.listSetQuerySparql      = new LinkedList<SetQuerySparql>();
-		this.listSystemGraphData     = new LinkedList<SystemGraphData>();
-		WholeSystem.streamGraphData  = new StreamGraphData();
-		WholeSystem.vocabularyTable  = new VocabularyTable();
-		WholeSystem.conceptMap       = new ConceptMap();
-	}
-
 	public static void initQuantityOriginalConcepts(int quantity) {
 		WholeSystem.quantityOriginalConcepts = quantity;
 	}
@@ -55,11 +45,11 @@ public class WholeSystem {
 		return WholeSystem.edgesTable;
 	}
 
-	public LinkedList<SetQuerySparql> getListSetQuerySparql() {
-		return this.listSetQuerySparql;
+	public static LinkedList<SetQuerySparql> getListSetQuerySparql() {
+		return WholeSystem.listSetQuerySparql;
 	}
-	public LinkedList<SystemGraphData> getListSystemGraphData() {
-		return this.listSystemGraphData;
+	public static LinkedList<SystemGraphData> getListSystemGraphData() {
+		return WholeSystem.listSystemGraphData;
 	}
 	public static ConceptMap getConceptMap() {
 		return WholeSystem.conceptMap;
@@ -79,10 +69,10 @@ public class WholeSystem {
 	public static void setSortAverageSelectedConcepts(NodesTableArray nodesTableArray) {
 		WholeSystem.sortAverageSelectedConcepts = nodesTableArray;
 	}
-	public void insertListSetQuerySparql(SetQuerySparql setQuerySparql) {
-		this.listSetQuerySparql.add(setQuerySparql);
+	public static void insertListSetQuerySparql(SetQuerySparql setQuerySparql) {
+		WholeSystem.listSetQuerySparql.add(setQuerySparql);
 	}
-	public void insertListSystemGraphData(SystemGraphData systemGraphData) {
-		this.listSystemGraphData.add(systemGraphData);
+	public static void insertListSystemGraphData(SystemGraphData systemGraphData) {
+		WholeSystem.listSystemGraphData.add(systemGraphData);
 	}
 }

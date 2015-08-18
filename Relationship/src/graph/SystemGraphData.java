@@ -184,7 +184,7 @@ public class SystemGraphData {
 	
 	// create rank of MeasuresRanks objects
 	public void buildSubGraphRanks() throws Exception {
-		// create a array of the MeasureRank (Ranks object), size = total number of the connect components
+		// create an array of the MeasureRank (Ranks object), size = total number of the connect components
 		this.ranks = new Ranks(this.connectedComponentsCount);
 		NodeData nodeData;
 		int connectedComponentNumber;
@@ -194,11 +194,12 @@ public class SystemGraphData {
 			String nodeId = gephiNode.getNodeData().getId();
 			connectedComponentNumber = (Integer)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getConnectedComponentColumn().getIndex());
 			
-			// put the number of connected component in NodeData
+			// put the number of the connected component in NodeData
 			nodeData = this.nodesTableHash.get(nodeId);
 			nodeData.setConnectedComponent(connectedComponentNumber);
 			
-			// create a GephiNode object (from current Gephi node) and put it into the GephiGraphData object (belongs to MeasureRank object), by connected component number
+			// create a GephiNode object (from current Gephi node) and put it into the GephiGraphData object (belongs to MeasureRank object), 
+			// by connected component number
 			org.gephi.graph.api.Graph currentGephiGraph;
 			Node newGephiNode = this.gephiGraphData.getGraphModel().factory().newNode(nodeId);
 			currentGephiGraph = ranks.getMeasuresRankTable(connectedComponentNumber).getGephiGraphData().getGephiGraph();
@@ -215,7 +216,7 @@ public class SystemGraphData {
 
 	// build the basic table to each connected component
 	// and build the group of the original concepts
-	public void buildBasicTableGroupOriginalConceptsSubGraph() throws Exception {
+	public void buildSubGraphsTablesInConnectedComponents() throws Exception {
 		org.gephi.graph.api.Graph currentGephiGraph;
 		int connectedComponentNodesQuantity;
 		NodesTableArray newBasicTable;
@@ -233,7 +234,8 @@ public class SystemGraphData {
 				nodeData = this.nodesTableHash.get(gephiNode.toString());
 				newBasicTable.insert(nodeData);
 				// fill the Group Original Concepts
-				concept = new Concept(nodeData.getFullName(),nodeData.getShortName(), nodeData.getStatus(), 0, Config.withoutConnectedComponent);
+				// concept = WholeSystem.getConceptsRegister().getConcept(nodeData.getShortName());
+				concept = new Concept(nodeData.getFullName(),nodeData.getShortName(), nodeData.getStatus(), 0, Config.Category.no, 0, Config.withoutConnectedComponent);
 				if(concept.getStatus() == Config.Status.originalConcept)
 					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().add(concept);
 			}
@@ -290,7 +292,8 @@ public class SystemGraphData {
 					this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).setStatus(Config.Status.selectedBetweennessClosenessConcept);
 					k++;
 					// add this node in the general register concepts
-					Concept concept = new Concept(currentNodeData.getFullName(),currentNodeData.getShortName(), Config.Status.selectedBetweennessClosenessConcept, iteration, i);
+					Concept concept = new Concept(currentNodeData.getFullName(),currentNodeData.getShortName(), 
+							                      Config.Status.selectedBetweennessClosenessConcept, iteration, Config.Category.no, 0, i);
 					WholeSystem.getConceptsRegister().add(concept);
 					count++;
 				}
@@ -324,7 +327,8 @@ public class SystemGraphData {
 					this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).setStatus(Config.Status.selectedEigenvectorConcept);
 					k++;
 					// add this node in the general register concepts
-					Concept concept = new Concept(currentNodeData.getFullName(),currentNodeData.getShortName(), Config.Status.selectedEigenvectorConcept, iteration, i);
+					Concept concept = new Concept(currentNodeData.getFullName(),currentNodeData.getShortName(), 
+							                      Config.Status.selectedEigenvectorConcept, iteration, Config.Category.no, 0, i);
 					WholeSystem.getConceptsRegister().add(concept);
 					count++;
 				}

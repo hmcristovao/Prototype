@@ -4,28 +4,32 @@ import main.*;
 import basic.Token;
 
 public class Concept {
-	private String        fullName;  // with address and underline
-	private String        blankName;
-	private String        underlineName; // with underline
-	private Config.Status status;
-	private int           iteration;
-	private boolean       isCategory;
-	private int           registerConnectedComponent[];  // indexed by iteration number
+	private String           fullName;  // with address and underline
+	private String           blankName;
+	private String           underlineName; // with underline
+	private Config.Status    status;
+	private int              iteration;
+	private Config.Category  category;
+	private boolean          wasCategory;
+	private int              quantityRdfs;
+	private int              registerConnectedComponent[];  // indexed by iteration number
 
-	public Concept(String fullName, String blankName, Config.Status status, int iteration, int connectedComponent) {
+	public Concept(String fullName, String blankName, Config.Status status, int iteration, Config.Category category, int quantityRdfs, int connectedComponent) {
 		this.fullName                   = fullName;
 		this.blankName                  = blankName.trim();
 		this.underlineName              = Concept.blankToUnderline(this.blankName);
 		this.status                     = status;
 		this.iteration                  = iteration;
-		this.isCategory                 = Concept.verifyIfCategory(this.blankName);
+		this.category                   = (Concept.verifyIfCategory(this.blankName)==true) ? Config.Category.yes : Config.Category.no;
+		this.quantityRdfs               = quantityRdfs;
 		this.registerConnectedComponent = new int[Config.maxIteration];
 		for(int i=0; i<Config.maxIteration; i++)
 			this.registerConnectedComponent[i] = Config.withoutConnectedComponent;
 		this.registerConnectedComponent[iteration] = connectedComponent;
 	}
 	public Concept(Token token) {
-		this(Config.originalConceptAddress+Concept.blankToUnderline(token.image), token.image, Config.Status.originalConcept, 0, Config.withoutConnectedComponent);  // this is before the first iteration
+		// it is before the first iteration
+		this(Config.originalConceptAddress+Concept.blankToUnderline(token.image), token.image, Config.Status.originalConcept, 0, Config.Category.no, 0, Config.withoutConnectedComponent);  
 	}
 		
 	public String getFullName() {
@@ -46,8 +50,27 @@ public class Concept {
 	public String getUnderlineConcept() {
 		return this.underlineName;
 	}
-	public boolean getIsCategory() {
-		return this.isCategory;
+	public Config.Category getCategory() {
+		return this.category;
+	}
+	public static String categoryToString(Config.Category category) {
+		if(category == Config.Category.no)
+			return "no";
+		else if(category == Config.Category.yes)
+			return "yes";
+		else if(category == Config.Category.was)
+			return "was";
+		else
+			return "error";
+	}
+	public String strCategory() {
+		return Concept.categoryToString(this.category);
+	}
+	public int getQuantityRdfs() {
+		return this.quantityRdfs;
+	}
+	public void setQuantityRdfs(int n) {
+		this.quantityRdfs = n;
 	}
 	
 	public int[] getRegisterNodeData() {
@@ -144,7 +167,7 @@ public class Concept {
 		String out = "[fullName: "  + this.fullName +    "]" +
 					 "[blankName: " + this.blankName +    "]" +
 					 "[underline: " + this.underlineName +"]" + 
-				     "[category: "  + (this.isCategory ? "true" : "false") + "]" +
+				     "[category: "  + this.strCategory() + "]" +
 					 "[status: "    + Concept.statusToString(this.status) + "]" +
 				     "[iteration: " + this.iteration + "]" +
 					 "[connected components: ";
@@ -159,8 +182,8 @@ public class Concept {
 				     " / "  + this.blankName +
 		             " - "  + Concept.statusToString(this.status) +
 		             " (i: " + this.iteration + ")";
-		if(this.isCategory)
-			out += " - (category)";
+		if(this.category == Config.Category.yes || this.category == Config.Category.was)
+			out += " - (category: " + this.strCategory() + ")";
 		return out;
 	}
 }

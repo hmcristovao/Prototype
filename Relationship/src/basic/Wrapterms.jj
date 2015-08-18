@@ -21,31 +21,24 @@ public class Wrapterms {
 }
 PARSER_END(Wrapterms)
 TOKEN : {
-      < CHARACTER_TERM: ["a"-"z","A"-"Z","0"-"9","-","_",":"] > |
-      < USER_TERM:      < CHARACTER_TERM > 
+      < ARROW:          "->" > |
+      < #CHARACTER:      ["a"-"z","A"-"Z","0"-"9","_",":","#",",","."] > |
+      < TERM:           < CHARACTER > 
                         (
-                          ( < CHARACTER_TERM > | " " )*
-                            < CHARACTER_TERM >
+                          ( < CHARACTER > | " " | < CHARACTER > "-" )*
+                            < CHARACTER >
                         )?
       > |
-      < SEPARATORS:  ( "\n" | "\r" | "," | ";" | "/" | " " )+ > |
-      < CHARACTER_VOCABULARY:  ["a"-"z","A"-"Z","0"-"9","-","_",":","#","@","!","$","%","&","*","(",")","+","="] > |
-      < TERM_VOCABULARY: < CHARACTER_VOCABULARY > 
-                        (
-                           ( < CHARACTER_VOCABULARY > | " " )*
-                             < CHARACTER_VOCABULARY >
-                        )?
-      > |
-      < ARROW:          "->" >
-}
+      < SEPARATORS:  ( "\n" | "\r" | "\t" | "," | ";" | "/" | " " )+ > 
+ }
 /*
 Grammar (read of user terms):
 parseUserTerms        ->  ( element() )*  < EOF > 
-element               ->  < USER_TERM > ( < SEPARATORS > )*
+element               ->  < TERM > ( < SEPARATORS > )*
 
 Grammar (read of link vocabulary):
 parseSystemVocabulary ->  ( line() )*  < EOF >
-line                  ->  < TERM_VOCABULARY > < ARROW > < TERM_VOCABULARY > ( < SEPARATORS > )*
+line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
 
 */
 
@@ -55,7 +48,7 @@ void parseUserTerms(SetQuerySparql originalSetQuerySparql) : {}
 }
 void element(SetQuerySparql originalSetQuerySparql) : {Token token; Concept concept;}  
 {
-	token = < USER_TERM >
+	token = < TERM >
     {		concept = new Concept(token);
 		originalSetQuerySparql.insertQuerySparql(concept);
 		// copy the concept to static attribute in root class:
@@ -70,7 +63,7 @@ void parseSystemVocabulary(VocabularyTable vocabularyTable) : {}
 }
 void line(VocabularyTable vocabularyTable) : {Token tokenLeft; Token tokenRight;}  
 {
-	tokenLeft = < TERM_VOCABULARY > < ARROW >  tokenRight = < TERM_VOCABULARY > 
+	tokenLeft = < TERM > (< SEPARATORS >)* < ARROW > (< SEPARATORS >)* tokenRight = < TERM > 
     {
 		vocabularyTable.put(tokenLeft,tokenRight);
     }

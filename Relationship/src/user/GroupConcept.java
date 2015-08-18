@@ -27,14 +27,16 @@ public class GroupConcept {
 			this.hash.put(concept.getBlankName(), concept);
 			this.list.add(concept);
 			// if is concept "Category", add pure concept too (if is also the configuration true)
-			if(Config.additionNewConceptWithoutCategory && concept.getIsCategory()) {
+			if(Config.additionNewConceptWithoutCategory && concept.getCategory() == Config.Category.yes) {
 				// create new concept without "Category"
 				Concept newConceptWithoutCategory = new Concept(Concept.extractCategoryFullName(concept.getFullName()),
 						                                        Concept.extractCategory(concept.getBlankName()), 
 						                                        concept.getStatus(), 
 						                                        concept.getIteration(),
+						                                        Config.Category.was,
+						                                        0, // still is not possible to know the quantity RDFs
 						                                        concept.getConnectedComponent(concept.getIteration()));
-				this.hash.put(newConceptWithoutCategory.getBlankName(), concept);
+				this.hash.put(newConceptWithoutCategory.getBlankName(), newConceptWithoutCategory);
 				this.list.add(newConceptWithoutCategory);				
 			}
 			return true;

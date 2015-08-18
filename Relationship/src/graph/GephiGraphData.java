@@ -8,7 +8,6 @@ import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.data.attributes.api.AttributeController;
 import org.gephi.data.attributes.api.AttributeModel;
 import org.gephi.data.attributes.api.AttributeTable;
-import org.gephi.data.attributes.api.AttributeType;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Graph;
 import org.gephi.graph.api.GraphController;
@@ -116,7 +115,6 @@ public class GephiGraphData {
 	// classify connected components
 	public int classifyConnectedComponent() {
 		ConnectedComponents connectedComponents = new ConnectedComponents();
-		//AttributeColumn attributeColumn = gephiGraphData.getAttributeModel().getNodeTable().getColumn(ConnectedComponents.WEAKLY); - coloquei como campo da classe
 		connectedComponents.execute(this.graphModel, this.attributeModel);
 		int count = connectedComponents.getConnectedComponentsCount();
 		this.connectedComponentColumn = this.attributeModel.getNodeTable().getColumn(ConnectedComponents.WEAKLY);
@@ -135,11 +133,6 @@ public class GephiGraphData {
 	    exportController.exportFile(new File(fileGexf), exporter);
 	}
 	
-	public void filterDegree(int degree) {
-		// olhar código em:
-		// https://github.com/gephi/gephi/wiki/How-to-use-filters
-				
-	}
 	public String toString() {
 		StringBuffer str = new StringBuffer();
 		str.append("\nGephi Graph:\n\n");

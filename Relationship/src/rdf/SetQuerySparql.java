@@ -9,6 +9,7 @@ import org.apache.jena.riot.WebContent;
 
 import main.Config;
 import main.Log;
+import main.WholeSystem;
 import user.Concept;
 import user.GroupConcept;
 
@@ -50,6 +51,17 @@ public class SetQuerySparql {
 	public void insertQuerySparql(QuerySparql querySparql) {
 		this.listQuerySparql.add(querySparql);  
 	}
+	
+	// get total RDFs of an especifc concept
+	public int getTotalRdfsEspecificConcept(String blankName) {
+		for(QuerySparql querySparql : this.listQuerySparql) {
+			if(querySparql.getConcept().getBlankName().equals(blankName))
+				return querySparql.sizeListRDF();
+		}
+		// it did not find concept
+		return 0;
+	}
+	
 	// create a QuerySparql object, fill it with concept, and insert it into listQuerySparql
 	public void insertQuerySparql(Concept concept) {
 		QueryString auxQuery = new QueryString();
@@ -120,7 +132,7 @@ public class SetQuerySparql {
 		return newQueryDefault;
 	}
 	
-	public int fillQuery() throws IOException {	
+	public int assemblyQueries() throws IOException {	
 	    StringBuffer queryDefault = this.readFileQueryDefault();
 	    StringBuffer newQueryDefault = null;
 	    String newConcept = null;
@@ -136,9 +148,9 @@ public class SetQuerySparql {
 		return n;
 	}
 	
-	//  read all RDF triples belongs to one query concept 
-	public int fillRDFs() throws Exception {
-		int n = 0;
+	//  read all RDF triples belongs to each query concept 
+	public int collectRDFs() throws Exception {
+		int total = 0, subTotal;
 		for(int i=0; i < this.getListQuerySparql().size(); i++) {
 			QuerySparql querySparql = this.getListQuerySparql().get(i);
 			String queryStr = querySparql.getQueryString().getQueryStrString();
@@ -152,6 +164,7 @@ public class SetQuerySparql {
 			ListRDF listRDF = querySparql.getListRDF();
 			StmtIterator stmtIterator = model.listStatements();
 
+			subTotal = 0;
 			while (stmtIterator.hasNext()) {
 				// read elements of the model
 				Statement statement = stmtIterator.nextStatement();  
@@ -167,13 +180,18 @@ public class SetQuerySparql {
 				
 				// insert complete item into listQuerySparql of the RDFs
 				listRDF.getList().add(oneRDF);
-				n++;
+				total++;
+				subTotal++;
 				
 				this.incTotalRDFs();
 			}
 			queryEngineHTTP.close();
+			// update rdfs quantity in concept
+			querySparql.getConcept().setQuantityRdfs(subTotal);
+			// if exist concept into WholeSystem then update its quantity
+			WholeSystem.getConceptsRegister().getConcept(querySparql.getConcept().getBlankName()).setQuantityRdfs(subTotal);
 		}
-		return n;
+		return total;
 	}
 	
 	// consider basicConcept without underline character

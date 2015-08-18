@@ -1,6 +1,7 @@
 package graph;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 
 import main.Config;
 import main.Log;
@@ -123,8 +124,9 @@ public class StreamGraphData {
 		return this.streamGraph.getEdgeCount();
 	}	
 		
-	// in the firt iteration build StreamGraphData and EdgeTable from RDFs
-	// in the second iteration so foth, just add new data (RDFs) into StreamGraphData and EdgeTable
+	// get RDFs and convert them to StreamGraph, but this fucntion is call: 
+	//    in the firt iteration build StreamGraphData and EdgeTable from RDFs
+	//    in the second iteration so foth, just add new data (RDFs) into StreamGraphData and EdgeTable
     // (build stream graph from rdfs in set query Sparql)
 	public QuantityNodesEdges buildStreamGraphData_buildEdgeTable_fromRdfs(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
@@ -351,7 +353,12 @@ public class StreamGraphData {
 	
 	// delete a node and all edges linked it
 	// return true if node is a concept
-	public boolean deleteNode(Node node) {
+	// NEVER it delete an original concept
+	public void deleteNode(Node node) {
+		// if original concept, do not delete
+		if(WholeSystem.getConceptsRegister().isOriginalConcept((String)node.getAttribute("shortblankname"))) 
+		   //return false
+			;
 		this.incTotalNodesDeleted();
 		this.incTotalEdgesDeleted(node.getEdgeSet().size());
 		this.incTotalNodes(-1);
@@ -368,12 +375,12 @@ public class StreamGraphData {
 			WholeSystem.getConceptsRegister().removeConcept((String)node.getAttribute("shortblankname"));
 			isConcept = true;
 		}
-		return isConcept;
+		//return isConcept;
 	}
 	
 	// delete a node and all edges linked it
 	// return true if node is a concept
-	public void insert(Node node, ArrayList<Edge> edges) {
+	public void insert(Node node, List<Edge> edges) {
 		this.incTotalNodesDeleted(-1);
 		this.incTotalEdgesDeleted(-1*edges.size());
 		this.incTotalNodes();
@@ -400,11 +407,13 @@ public class StreamGraphData {
 		}
 	}
 
-	public void deleteCommonNodesRemainOriginalAndSelectedConcepts() {
+	public void deleteCommonNodes_remainOriginalAndSelectedConcepts() {
+Log.consoleln("\n\nDeletados:\n\n");
 		for(Node node : this.streamGraph) {
+Log.console(node.getId() + " - selected or original: " + WholeSystem.getConceptsRegister().isConcept(node.getId()));
 			// if it is not original or selected concepts, delete it and all its edges
 			if(!WholeSystem.getConceptsRegister().isConcept(node.getId())) {
-				this.deleteNode(node);
+				Log.consoleln(" - deletado: " + this.deleteNode(node));
 			}
 		}
 	}

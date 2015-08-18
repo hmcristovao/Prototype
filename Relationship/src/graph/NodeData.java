@@ -154,7 +154,7 @@ public class NodeData {
 				"\nBetweenness:         " + this.getBetweenness() +
 				"\nCloseness:           " + this.getCloseness() +
 				"\nEigenvector:         " + this.getEigenvector() +
-				"\nAverage:             " + this.getEigenvector() +
+				"\nAverage:             " + this.getAverage() +
 				"\nPartitioning:        " + this.getPartitioning();
 	}
 }

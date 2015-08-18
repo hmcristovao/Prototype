@@ -49,9 +49,10 @@ public class NodesTableArray {
 	public GroupConcept getGroupOriginalConcepts() {
 		GroupConcept groupConcept = new GroupConcept();
 		Concept concept;
-		for(int i=0; i<this.max; i++) {
+		for(int i=0; i<this.count; i++) {
 			if(this.table[i].getStatus() == Config.Status.originalConcept) {
-				concept = new Concept(this.table[i].getStrIdNode(), this.table[i].getShortName(), this.table[i].getStatus(), 0, Config.withoutConnectedComponent);  
+				concept = WholeSystem.getConceptsRegister().getConcept(this.table[i].getShortName());
+				// concept = new Concept(this.table[i].getStrIdNode(), this.table[i].getShortName(), this.table[i].getStatus(), 0, Config.Category.no, 0, Config.withoutConnectedComponent);  
 				groupConcept.add(concept);
 			}
 		}
@@ -96,11 +97,6 @@ public class NodesTableArray {
 		Arrays.sort(newTable, new SortEigenvector());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortCrescentEigenvector() {
-		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
-		Arrays.sort(newTable, new SortCrescentEigenvector());
-		return new NodesTableArray(newTable);
-	}
 	public NodesTableArray sortBetweennessCloseness(int first) {
 		if(first > this.max)
 			first = this.max;
@@ -109,9 +105,9 @@ public class NodesTableArray {
 		NodeData newNewTable[] = Arrays.copyOf(newTable, first);
 		return new NodesTableArray(newNewTable);
 	}
-	public NodesTableArray sortAverage() {
-		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
-		Arrays.sort(newTable, new SortAverage());
+	public NodesTableArray sortCrescentAverage(int quantity) {
+		NodeData newTable[] = Arrays.copyOf(this.table, quantity);
+		Arrays.sort(newTable, new SortCrescentAverage());
 		return new NodesTableArray(newTable);
 	}
 
@@ -164,17 +160,7 @@ class SortEigenvector implements Comparator<NodeData> {
 			return 0;
 	}
 }
-class SortCrescentEigenvector implements Comparator<NodeData> {
-	public int compare(NodeData nodeData1, NodeData nodeData2) {
-		if(nodeData1.getEigenvector() > nodeData2.getEigenvector())
-			return 1;
-		else if(nodeData1.getEigenvector() < nodeData2.getEigenvector())
-			return -1;
-		else
-			return 0;
-	}
-}
-class SortAverage implements Comparator<NodeData> {
+class SortCrescentAverage implements Comparator<NodeData> {
 	public int compare(NodeData nodeData1, NodeData nodeData2) {
 		if(nodeData1.getAverage() < nodeData2.getAverage())
 			return 1;

@@ -16,7 +16,7 @@ public class VocabularyTable {
 		this.put(rdfToken.image.trim(), mapToken.image.trim());
 	}
 	public void put(String rdfString, String mapLinkString) {
-		this.put(rdfString, mapLinkString);
+		this.table.put(rdfString, mapLinkString);
 	}
 	public String get(String rdfString) {
 		return this.table.get(rdfString);
@@ -30,6 +30,7 @@ public class VocabularyTable {
 		while(i.hasNext()) {
 		   String rdfString     = (String)i.next(); 
 		   String mapLinkString = this.table.get(rdfString);
+		   out.append("   ");
 		   out.append(rdfString);
 		   out.append(" -> ");
 		   out.append(mapLinkString);
