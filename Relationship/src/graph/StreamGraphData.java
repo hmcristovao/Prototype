@@ -27,6 +27,8 @@ import rdf.SetQuerySparql;
 import user.Concept;
 import user.GroupConcept;
 
+enum Deleted { yes, no, yesConcept}; 
+
 public class StreamGraphData {
 	private Graph streamGraph;
 	private QuantityNodesEdges total;
@@ -345,7 +347,7 @@ public class StreamGraphData {
 		// second: delete the selected nodes and their respectives edges
 		int quantityDeletedSelectedConcepts = 0;
 		for( Node node : auxList ) {
-			if(this.deleteNode(node))
+			if(this.deleteNode(node) == Deleted.yesConcept)
 				quantityDeletedSelectedConcepts++;
 		} 
 		return quantityDeletedSelectedConcepts;
@@ -354,11 +356,10 @@ public class StreamGraphData {
 	// delete a node and all edges linked it
 	// return true if node is a concept
 	// NEVER it delete an original concept
-	public void deleteNode(Node node) {
+	public Deleted deleteNode(Node node) {
 		// if original concept, do not delete
 		if(WholeSystem.getConceptsRegister().isOriginalConcept((String)node.getAttribute("shortblankname"))) 
-		   //return false
-			;
+		   return Deleted.no;
 		this.incTotalNodesDeleted();
 		this.incTotalEdgesDeleted(node.getEdgeSet().size());
 		this.incTotalNodes(-1);
@@ -370,12 +371,11 @@ public class StreamGraphData {
 		// finally, remove the node of the Stream Graph
 		this.streamGraph.removeNode(node);
 		// remove node of the concepts register, if it is the case
-		boolean isConcept = false;
 		if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
 			WholeSystem.getConceptsRegister().removeConcept((String)node.getAttribute("shortblankname"));
-			isConcept = true;
+			return Deleted.yesConcept;
 		}
-		//return isConcept;
+		return Deleted.yes;
 	}
 	
 	// delete a node and all edges linked it
@@ -408,14 +408,14 @@ public class StreamGraphData {
 	}
 
 	public void deleteCommonNodes_remainOriginalAndSelectedConcepts() {
-Log.consoleln("\n\nDeletados:\n\n");
-		for(Node node : this.streamGraph) {
-Log.console(node.getId() + " - selected or original: " + WholeSystem.getConceptsRegister().isConcept(node.getId()));
-			// if it is not original or selected concepts, delete it and all its edges
-			if(!WholeSystem.getConceptsRegister().isConcept(node.getId())) {
-				Log.consoleln(" - deletado: " + this.deleteNode(node));
-			}
+		ArrayList<Node> lista = new ArrayList<Node>();
+		for(Node node : this.streamGraph.getNodeSet()) {
+			// if it is not original or selected concepts, separate it to delete it and all its edges
+			if(!WholeSystem.getConceptsRegister().isConcept(node.getId())) 
+				lista.add(node);  // it's ok because it is not possible remove directly of streamGraph (there is a bug in this operation)
 		}
+		for(Node node: lista)
+			this.deleteNode(node);
 	}
 	
 	public static String nodeToString(Node node) {

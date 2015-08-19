@@ -19,7 +19,7 @@ public interface Config {
     //
 	String nameUserTermsFile    = "userterms\\terms"+Config.testNumber+".txt";
 	String nameQueryDefaultFile = "query_model\\query.txt";
-	String nameVocabularyFile   = "vocabulary\\vocabulary_01.txt";
+	String nameVocabularyFile   = "vocabulary\\linkvocabulary.txt";
 	
 	
 	// ============================================================================

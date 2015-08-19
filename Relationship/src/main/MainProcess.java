@@ -1,4 +1,4 @@
-// v4.2 - finalised, but it is still not working.
+// v4.3 - finalised but need adjust. 
 
 package main;
 
@@ -22,6 +22,7 @@ import rdf.SetQuerySparql;
 import basic.*;
 import user.*;
 
+// this class manages the main process and it does system logs
 public class MainProcess {	
 	public static int iteration = 0;
 	public static SetQuerySparql  currentSetQuerySparql;
@@ -70,22 +71,23 @@ public class MainProcess {
 				iteration++;
 			} while(true);
 			indicateAlgorithmIntermediateStage1(); // after iterations loop
-			iteration++;
 			deleteCommonNodes_remainOriginalAndSelectedConcepts();
+			iteration++;
 			createCurrentSystemGraphData();
 			buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 			calculateDistanceMeasuresWholeNetwork();
 			storeDistanceMeasuresWholeNetworkToMainNodeTable();
 			calculateEigenvectorMeasureWholeNetwork();
 			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
-			createSortAverageOnlySelectedConcepts();
-			classifyConnectedComponent_buildSubGraphs(); 
-			buildGexfGraphFile(Config.time.afterIteration);
+			classifyConnectedComponent_buildSubGraphs();
+ 			buildGexfGraphFile(Config.time.afterIteration);
 			indicateAlgorithmIntermediateStage2(); // selection main concepts
+			createSortAverageOnlySelectedConcepts();
 			int baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
 			int nodeDataPos = 0;
 			do {
 				// pega o selected concept de menor average dentro do conjunto de nodes
+				
 				NodeData nodeDataWithLeastAverage = WholeSystem.getSortAverageSelectedConcepts().getNodeData(nodeDataPos);
 				// store the current informations of node that will be deleted (because it can be recovered)
 				Node currentNode = nodeDataWithLeastAverage.getStreamNode();
@@ -145,11 +147,13 @@ public class MainProcess {
 			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 			classifyConnectedComponent_buildSubGraphs(); 
 
-			parseVocabulary(parser);
-			buildConceptMap();
-
             buildGexfGraphFile(Config.time.lastGraph);
-            showConceptMapPropositions();
+
+            parseVocabulary(parser);
+			buildRawConceptMap();
+			upgradeConceptMap_withLinkVocabularyTable();
+			upgradeConceptMap_withHeuristic_1();
+			
 			end();
 		}
 		catch(FileNotFoundException e) {
@@ -319,7 +323,7 @@ public class MainProcess {
 		int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes");
 		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
-		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges");
+		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges.");
 		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
 		Log.outFileCompleteReport("Runned "+Config.nDegreeFilter+"-degree filter algorithm "+
 				"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " + 
@@ -372,13 +376,11 @@ public class MainProcess {
 		// call function:
 		QuantityNodesEdges quantityNodesEdges = currentSystemGraphData.buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" nodes, "+quantityNodesEdges.getNumEdges()+" edges in the graph structure.");
-		Log.outFileCompleteReport("Built Gephi Graph Data, Nodes Table Hash and Nodes Table Array from Stram Graph\n"+
+		String sameReport = "Built Gephi Graph Data, Nodes Table Hash and Nodes Table Array from Stream Graph\n"+
 				quantityNodesEdges.getNumNodes()+" nodes, "+quantityNodesEdges.getNumEdges()+" edges in the graph structure." +
-				"\nReal quantities: "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString() + 
-				"\n" + currentSystemGraphData.getGephiGraphData().toString());
-		Log.outFileShortReport("Built Gephi Graph Data, Nodes Table Hash and Nodes Table Array from Stram Graph\n"+
-				quantityNodesEdges.getNumNodes()+" nodes, "+quantityNodesEdges.getNumEdges()+" edges in the graph structure." +
-				"\nReal quantities: "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString() );
+				"\nReal quantities: "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString();
+		Log.outFileCompleteReport(sameReport + "\n" + currentSystemGraphData.getGephiGraphData().toString());
+		Log.outFileShortReport(sameReport);
 	}
 	public static void clearStreamGraphSink() throws Exception {
 		if(Config.gephiVisualization)  
@@ -387,7 +389,7 @@ public class MainProcess {
 	public static void calculateDistanceMeasuresWholeNetwork() throws Exception {
 		Log.console("- Calculating distance measures of the whole network");
 		currentSystemGraphData.getGephiGraphData().calculateGephiGraphDistanceMeasures();
-		Log.consoleln(" - "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString());
+		Log.consoleln(" - "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString() + ".");
 		Log.outFileCompleteReport("Distance measures of the whole network calculated." + 
 				"\n(betweenness and closeness to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
 		Log.outFileShortReport("Distance measures of the whole network calculated." + 
@@ -396,7 +398,7 @@ public class MainProcess {
 	public static void calculateEigenvectorMeasureWholeNetwork() throws Exception {
 		Log.console("- Calculating eigenvector measure of the whole network");
 		currentSystemGraphData.getGephiGraphData().calculateGephiGraphEigenvectorMeasure();
-		Log.consoleln(" - "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString());
+		Log.consoleln(" - "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString() + ".");
 		Log.outFileCompleteReport("Eigenvector measure of the whole network calculated." + 
 				"\n(eigenvector to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
 		Log.outFileShortReport("Eigenvector measure of the whole network calculated." + 
@@ -520,7 +522,7 @@ public class MainProcess {
 		SetQuerySparql newSetQuerySparql = new SetQuerySparql();
 		newSetQuerySparql.insertListConcept(newGroupConcept);
 		WholeSystem.insertListSetQuerySparql(newSetQuerySparql);
-		Log.consoleln(" - "+newGroupConcept.size()+" concepts inserted in the set of query Sparql");
+		Log.consoleln(" - "+newGroupConcept.size()+" concepts inserted in the set of query Sparql.");
 		Log.outFileCompleteReport("Data to new iteration prepared.\n" +
 					newGroupConcept.size()+" concepts inserted in the set of query Sparql.\n" +
 					newGroupConcept.toStringLong());
@@ -539,58 +541,68 @@ public class MainProcess {
 		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes ");
 		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges.");
 		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
-		Log.outFileCompleteReport("Deleted all common nodes (remain only original and selected concepts) \n" +
+		String sameReport = "Deleted all common nodes (remain only original and selected concepts) \n" +
 				(numOldNodes - numCurrentNodes) +" deleted nodes" +
 				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
 				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
-				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges." +
-				"\n\n" + WholeSystem.getStreamGraphData().toString() );
-		Log.outFileShortReport("Deleted all common nodes (remain only original and selected concepts) \n" +
-				(numOldNodes - numCurrentNodes) +" deleted nodes" +
-				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
-				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
-				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.";
+		Log.outFileCompleteReport(sameReport + "\n\n" + WholeSystem.getStreamGraphData().toString() );
+		Log.outFileShortReport(sameReport);
 	}
 	
-	// original concepts do not enter
-	public static NodesTableArray createSortAverageOnlySelectedConcepts() throws Exception {
-		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
-		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
-		int quantity = 0;
-		for(int i=0; i<selectedConcepts.size(); i++) {
-			Concept concept = selectedConcepts.getConcept(i);
-			if(concept.getCategory() != Config.Category.was && concept.getQuantityRdfs() != 0) {	
-				NodeData nodeData = currentSystemGraphData.getNodeData(concept.getBlankName());
-				nodesTableArray.insert(nodeData);
-				quantity++;
-			}
+	// get group of selected concepts and copy them to a new NodesTableArray
+	// sort this table e store it in WholeSystem.sortAverageSelectedConcepts
+	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
+	public static void createSortAverageOnlySelectedConcepts() throws Exception {
+		Log.console("- Creating sort table (average) of selected concepts");
+		currentSystemGraphData.createSortAverageOnlySelectedConcepts();
+		Log.consoleln(" - "+WholeSystem.getSortAverageSelectedConcepts().getCount()+" nodes stored and sorted.");
+		String sameReport = "Table of selected nodes created and sorted (average):\n\n"+WholeSystem.getSortAverageSelectedConcepts().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);	
+		// zero remain concepts: stop right now
+		if(WholeSystem.getSortAverageSelectedConcepts().getCount() == 0) {
+			Log.consoleln("- Stoping. It's not possible to continue with zero selected concepts.");
+			Log.outFileCompleteReport("Algorithm stoped. It's not possible to continue with zero selected concepts.");
+			Log.outFileShortReport("Algorithm stoped. It's not possible to continue with zero selected concepts.");	
+			end();
+			System.exit(0);
 		}
-		nodesTableArray.sortCrescentAverage(quantity);
-		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray);
-		return nodesTableArray;
 	}
 	public static void parseVocabulary(Wrapterms parser) throws Exception {
-		Log.consoleln("- Parsing vocabulary");
+		Log.console("- Parsing vocabulary");
 		parser = new Wrapterms(new FileInputStream(Config.nameVocabularyFile));
 		parser.parseSystemVocabulary(WholeSystem.getVocabularyTable());
 		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " sentences parsed.");
-		String sameReport = "Quantity of vocabulary sententes parsed: " + WholeSystem.getVocabularyTable().size() +   
+		String sameReport = "Quantity of vocabulary sentences parsed: " + WholeSystem.getVocabularyTable().size() +   
                 " (file: "+Config.nameVocabularyFile+")\n" +
 				"\nVocabulary table parsed:\n" + WholeSystem.getVocabularyTable().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
-	public static void buildConceptMap()  throws Exception {
-		Log.console("- building concept map propositions");
-		currentSystemGraphData.buildConceptMap();
+	public static void buildRawConceptMap()  throws Exception {
+		Log.console("- Building raw propositions of the concept map");
+		currentSystemGraphData.buildRawConceptMap();
 		Log.consoleln(" - "+WholeSystem.getConceptMap().size()+" proposition created.");
-		Log.outFileCompleteReport(WholeSystem.getConceptMap().size() + " propositions built to concept map");
-		Log.outFileShortReport(WholeSystem.getConceptMap().size() + " propositions built to concept map");		
+		String sameReport = "Built "+WholeSystem.getConceptMap().size()+" raw propositions of the concept map:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
 	}
-	public static void showConceptMapPropositions() throws Exception {
-		Log.consoleln("- Showing concept map propositions.");
-		Log.outFileCompleteReport("Concept map propositions:\n" + WholeSystem.getConceptMap().toString());
-		Log.outFileShortReport("Concept map propositions:\n" + WholeSystem.getConceptMap().toString());
+	public static void upgradeConceptMap_withLinkVocabularyTable()  throws Exception {
+		Log.console("- Upgrading the concept map propositions with link vocabulary table");
+		int n = currentSystemGraphData.upgradeConceptMap_withLinkVocabularyTable();
+		Log.consoleln(" - " + n + " links name changed.");
+		String sameReport = "Upgraded "+n+" concept map propositions with link vocabulary table:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	public static void upgradeConceptMap_withHeuristic_1()  throws Exception {
+		Log.console("- Upgrading the concept map with first heuristic");
+		int n = currentSystemGraphData.upgradeConceptMap_withHeuristic_1();
+		Log.consoleln(" - " + n + " propositions changed.");
+		String sameReport = "Upgraded the concept map with firs heuristic (" + n + " elements changed):\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
 	}
 	public static void end() throws Exception {
 		Log.consoleln("- Closing.");

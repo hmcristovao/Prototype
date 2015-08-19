@@ -23,8 +23,7 @@ public class ConceptMap {
 	}
 	
 	public void insert(NodeData sourceConcept, String rawLink, NodeData targetConcept) {
-		String formatedLink = WholeSystem.getVocabularyTable().get(rawLink);
-		Proposition proposition = new Proposition( sourceConcept, formatedLink, targetConcept);
+		Proposition proposition = new Proposition( sourceConcept, rawLink, targetConcept);
 		this.propositions.add(proposition);
 	}
 	

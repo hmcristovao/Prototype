@@ -1,6 +1,7 @@
 package graph;
 
 import main.*;
+import map.Proposition;
 
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Edge;
@@ -9,6 +10,7 @@ import org.gephi.statistics.plugin.ConnectedComponents;
 import org.graphstream.graph.Graph;
 
 import user.Concept;
+import user.GroupConcept;
 
 public class SystemGraphData {
 	private GephiGraphData gephiGraphData;
@@ -382,18 +384,66 @@ public class SystemGraphData {
 		return str.toString();
 	}
 	
-	// create the final map concept from Stream Graph
-	public void buildConceptMap() {
+	// copy selected concepts to a NodesTableArray
+	// sort this table e store it in WholeSystem.sortAverageSelectedConcepts
+	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
+	public void createSortAverageOnlySelectedConcepts() throws Exception {
+		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
+		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
+		int quantity = 0;
+		for(int i=0; i<selectedConcepts.size(); i++) {
+			Concept concept = selectedConcepts.getConcept(i);
+			if(concept.getCategory() != Config.Category.was && concept.getQuantityRdfs() != 0) {	
+				NodeData nodeData = this.getNodeData(concept.getBlankName());
+				nodesTableArray.insert(nodeData);
+				quantity++;
+			}
+		}
+		nodesTableArray.sortCrescentAverage(quantity);
+		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray);
+	}
+
+		
+	// create a raw map concept from Stream Graph
+	public void buildRawConceptMap() {
 		for( org.graphstream.graph.Node node : WholeSystem.getStreamGraphData().getStreamGraph().getEachNode() ) {
 			for( org.graphstream.graph.Edge edge : node.getEachEdge()) {
 				NodeData sourceConcept = this.getNodeData(node.getId());
 				NodeData targetConcept = this.getNodeData(edge.getTargetNode().getId());
-				WholeSystem.getConceptMap().insert(sourceConcept, edge.toString(), targetConcept);
+				WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept);
 			}
 		}
 	}
+	// create the final map concept
+	// it only changes the links from vocabularyTable
+	public int upgradeConceptMap_withLinkVocabularyTable() {
+		int n = 0;
+		for( Proposition proposition : WholeSystem.getConceptMap().getPropositions()) {
+			String newLink = WholeSystem.getVocabularyTable().get(proposition.getLink());
+			if(newLink != null) {
+				proposition.setLink(newLink);
+				n++;
+			}
+		}
+		return n;
+	}
 	
-	
+	// the prefix "Category:" in target concept is changed to:
+	// link: "belongs to"
+	// target concept: "... category"
+	public int upgradeConceptMap_withHeuristic_1() {
+		int n = 0;
+		for( Proposition proposition : WholeSystem.getConceptMap().getPropositions()) {
+			if(Concept.verifyIfCategory(proposition.getTargetConcept())) {
+				proposition.setLink("belongs to");
+				String newTargetConcept = Concept.extractCategory(proposition.getTargetConcept()) + " category";
+				proposition.setTargetConcept(newTargetConcept);
+				n++;
+			}
+		}
+		return n;
+	}
+		
 	public String toString() {
 		return  "\nQuantity connected component: " + this.connectedComponentsCount +
 		        "\n"+Config.doubleLine+"Table array: "+Config.singleLine + 

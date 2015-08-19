@@ -59,8 +59,6 @@ public class NodesTableArray {
 		return groupConcept;
 	}
 	
-	
-	
 	public NodesTableArray sortBetwennness() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
 		Arrays.sort(newTable, new SortBetweenness());

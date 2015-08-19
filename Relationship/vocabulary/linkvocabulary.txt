@@ -1,0 +1,10 @@
+influenced -> was influenced for
+influences -> was influenced for
+influencedBy -> influenced by
+field -> belongs to field
+subject	-> has subject
+core#broader -> is broader of
+leaderName	-> is leader
+author	-> is author
+genre -> has genre
+core#related -> is related to
