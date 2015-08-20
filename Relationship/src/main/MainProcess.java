@@ -1,4 +1,4 @@
-// v4.3 - finalised but need adjust. 
+// v4.4 - adjust in the concept map (do not create gexf file). 
 
 package main;
 
@@ -133,7 +133,7 @@ public class MainProcess {
 				// tentar retirar seguinda a ordem de betweenness, depois de closeness
 				// mas, se mesmo assim não conseguir processa para atingir o maximo de conceitos possível, mesmo que aumente os connected component 
 			
-            buildGexfGraphFile(Config.time.lastGraph);
+            buildGexfGraphFile(Config.time.afterSelectionMainConcepts);
 			
             // a partir daqui ele irá construir o mapa conceitual (na verdade, proposições em formato de texto)
             indicateAlgorithmFinalStage(); // building concept map
@@ -147,12 +147,14 @@ public class MainProcess {
 			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 			classifyConnectedComponent_buildSubGraphs(); 
 
-            buildGexfGraphFile(Config.time.lastGraph);
+            buildGexfGraphFile(Config.time.finalGraph);
 
             parseVocabulary(parser);
 			buildRawConceptMap();
 			upgradeConceptMap_withLinkVocabularyTable();
 			upgradeConceptMap_withHeuristic_1();
+
+			buildGexfGraphFileFromConceptMap();
 			
 			end();
 		}
@@ -196,34 +198,34 @@ public class MainProcess {
 		parser.parseUserTerms(WholeSystem.getListSetQuerySparql().getFirst());
 		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
 		WholeSystem.initGoalMaxConceptsQuantity();
-		Log.outFileCompleteReport("Quantity of terms parsed: " + 
-		        WholeSystem.getQuantityOriginalConcepts() +   
-                " (file: "+Config.nameUserTermsFile+")\n" +  
-		        WholeSystem.getConceptsRegister().getOriginalConcepts().toStringLong());
-		Log.outFileShortReport("Quantity of terms parsed: " + 
-                WholeSystem.getConceptsRegister().size() + 
-                " (file: "+Config.nameUserTermsFile+")\n" +  
-                WholeSystem.getConceptsRegister().getOriginalConcepts().toString());
+		String sameReport = "Quantity of terms parsed: " + WholeSystem.getQuantityOriginalConcepts() + 
+				            " (file: "+Config.nameUserTermsFile+")\n"; 
+		Log.outFileCompleteReport(sameReport + WholeSystem.getConceptsRegister().getOriginalConcepts().toStringLong());
+		Log.outFileShortReport(sameReport + WholeSystem.getConceptsRegister().getOriginalConcepts().toString());
 	}
 	public static void indicateIterationNumber() throws Exception {
 		Log.consoleln("*** Iteration "+iteration+" ***");
-		Log.outFileCompleteReport(Config.starsLine+"Iteration "+iteration+Config.starsLine);
-		Log.outFileShortReport(Config.starsLine+"Iteration "+iteration+Config.starsLine);
+		String sameReport = Config.starsLine+"Iteration "+iteration+Config.starsLine;
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void indicateAlgorithmIntermediateStage1() throws Exception {
 		Log.consoleln("*** Intermediate stage 1 (work only with selected and original concepts) ***");
-		Log.outFileCompleteReport(Config.starsLine+"Intermediate stage 1 (work only with selected and original concepts)"+Config.starsLine);
-		Log.outFileShortReport(Config.starsLine+"Intermediate stage 1 (work only with selected and original concepts)"+Config.starsLine);
+		String sameReport = Config.starsLine+"Intermediate stage 1 (work only with selected and original concepts)"+Config.starsLine;
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void indicateAlgorithmIntermediateStage2() throws Exception {
 		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***");
-		Log.outFileCompleteReport(Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine);
-		Log.outFileShortReport(Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine);
+		String sameReport = Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine;
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void indicateAlgorithmFinalStage() throws Exception {
 		Log.consoleln("*** Final stage (building concept map) ***");
-		Log.outFileCompleteReport(Config.starsLine+"Final stage (building concept map)"+Config.starsLine);
-		Log.outFileShortReport(Config.starsLine+"Final stage (building concept map)"+Config.starsLine);
+		String sameReport = Config.starsLine+"Final stage (building concept map)"+Config.starsLine;
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void updateCurrentSetQuerySparqlVar() throws Exception {
 		currentSetQuerySparql = WholeSystem.getListSetQuerySparql().get(iteration);
@@ -232,10 +234,9 @@ public class MainProcess {
 		Log.console("- Assembling queries");
 		int num = currentSetQuerySparql.assemblyQueries();
 		Log.consoleln(" - "+num+" new queries assembled.");
-		Log.outFileCompleteReport("Queries assembled: " + num + "\n\n" + 
-				currentSetQuerySparql.toString());
-		Log.outFileShortReport("Queries assembled: " + num + "\n\n" + 
-				currentSetQuerySparql.toStringShort());
+		String sameReport = "Queries assembled: " + num + "\n\n";
+        Log.outFileCompleteReport(sameReport + currentSetQuerySparql.toString());
+		Log.outFileShortReport(sameReport + currentSetQuerySparql.toStringShort());
 	}
 	public static void collectRDFs() throws Exception {
 		Log.console("- Collecting RDFs");
@@ -251,9 +252,9 @@ public class MainProcess {
 			conceptsOut.append(currentSetQuerySparql.getListQuerySparql().get(i).getConcept().getBlankName());
 			conceptsOut.append("\"");
 		}
-		Log.outFileCompleteReport("Total collected RDFs: " + num + "\n" + conceptsOut.toString() + "\n\n" +
-				currentSetQuerySparql.toString());
-		Log.outFileShortReport("Total collected RDFs: " + num + "\n" + conceptsOut.toString());
+		String sameReport = "Total collected RDFs: " + num + "\n" + conceptsOut.toString();
+        Log.outFileCompleteReport(sameReport + "\n\n" + currentSetQuerySparql.toString());
+		Log.outFileShortReport(sameReport);
 	}
 	public static void createCurrentSystemGraphData() throws Exception {
 		WholeSystem.insertListSystemGraphData(new SystemGraphData());
@@ -278,23 +279,15 @@ public class MainProcess {
 		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData_buildEdgeTable_fromRdfs(currentSetQuerySparql);
 		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" new nodes, "+quantityNodesEdges.getNumEdges()+" new edges in the visualization graph.");
 		Log.consoleln("- Creating edge hash table - "+WholeSystem.getEdgesTable().size()+" edges.");
-		Log.outFileCompleteReport("Stream Graph Data created (graph used in the preview): \n" + 
+		String sameReport = "Stream Graph Data created (graph used in the preview): \n" + 
 		        quantityNodesEdges.getNumNodes() + " new nodes, " + 
 				quantityNodesEdges.getNumEdges() + " new edges in the visualization graph.\n" +
 		        WholeSystem.getStreamGraphData().getRealTotalNodes() + " total nodes, " +
-		        WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges." + 
-		        WholeSystem.getStreamGraphData().toString());
-		Log.outFileCompleteReport("Edge hash table created:" + 
-				"\n("+WholeSystem.getEdgesTable().size()+" edges)." +
-				"\n"+WholeSystem.getEdgesTable().toString());
-		Log.outFileShortReport("Stream Graph Data created (graph used in the preview): \n" + 
-                quantityNodesEdges.getNumNodes() + " new nodes, " + 
-                quantityNodesEdges.getNumEdges() + " new edges in the visualization graph.\n" +
-                WholeSystem.getStreamGraphData().getRealTotalNodes() + " total nodes, " +
-                WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges." +
-        		WholeSystem.getStreamGraphData().toStringShort());				                  
-		Log.outFileShortReport("Edge hash table created:" + 
-				"\n("+WholeSystem.getEdgesTable().size()+" edges).");
+		        WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges.";
+		String sameReport2 = "Edge hash table created:" + 
+				"\n("+WholeSystem.getEdgesTable().size()+" edges).";
+        Log.outFileCompleteReport(sameReport + WholeSystem.getStreamGraphData().toString() + sameReport2 + "\n"+WholeSystem.getEdgesTable().toString());
+		Log.outFileShortReport(sameReport + WholeSystem.getStreamGraphData().toStringShort() + sameReport2);
 	}
 	public static void showQuantitiesStreamGraph() throws Exception {
 		Log.consoleln("- Quantities Stream Graph built: "+WholeSystem.getStreamGraphData().getRealTotalNodes()+
@@ -305,10 +298,9 @@ public class MainProcess {
 		Log.console("- Second iteration or more: copying old elements of the last iteration");
 		int n = currentSetQuerySparql.insertListQuerySparql(WholeSystem.getListSetQuerySparql().get(iteration-1).getListQuerySparql());
 		Log.consoleln(" - "+n+" elements copied.");
-		Log.outFileCompleteReport("Second iteration or more: "+n+" old elements copied from last iteration.\n" +
-				WholeSystem.getListSetQuerySparql().get(iteration-1).toString());
-		Log.outFileShortReport("Second iteration or more: "+n+" old elements copied from last iteration.\n" +
-				WholeSystem.getListSetQuerySparql().get(iteration-1).toStringShort());
+		String sameReport = "Second iteration or more: "+n+" old elements copied from last iteration.\n";
+        Log.outFileCompleteReport(sameReport + WholeSystem.getListSetQuerySparql().get(iteration-1).toString());
+		Log.outFileShortReport(sameReport + WholeSystem.getListSetQuerySparql().get(iteration-1).toStringShort());
 	}
 	public static void applyNDegreeFilterTrigger() throws Exception {
 		Log.console("- Starting "+Config.nDegreeFilter+"-degree filter algorithm "+
@@ -325,25 +317,17 @@ public class MainProcess {
 		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
 		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges.");
 		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
-		Log.outFileCompleteReport("Runned "+Config.nDegreeFilter+"-degree filter algorithm "+
+		String sameReport = "Runned "+Config.nDegreeFilter+"-degree filter algorithm "+
 				"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " + 
 				Config.quantityNodesToApplyNdegreeFilter + ")\n" +
 				(numOldNodes - numCurrentNodes) +" deleted nodes" +
 				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
 				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
 				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
-				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges." +
-				"\n\n" + WholeSystem.getStreamGraphData().toString() );
-		Log.outFileShortReport("Triggered "+Config.nDegreeFilter+"-degree filter algorithm "+
-				"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " +					
-				Config.quantityNodesToApplyNdegreeFilter + ")\n" +
-				(numOldNodes - numCurrentNodes) +" deleted nodes" +
-				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
-				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
-				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
-				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.";
+        Log.outFileCompleteReport(sameReport + "\n\n" + WholeSystem.getStreamGraphData().toString() );
+		Log.outFileShortReport(sameReport);
 	}			
-	
 	public static void applyKCoreFilterTrigger() throws Exception {
 		Log.console("- Starting "+Config.kCoreFilter+"-core filter algorithm ");
 		int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
@@ -356,19 +340,14 @@ public class MainProcess {
 		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
 		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges");
 		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
-		Log.outFileCompleteReport("Runned "+Config.kCoreFilter+"-core filter algorithm\n" +
+		String sameReport = "Runned "+Config.kCoreFilter+"-core filter algorithm\n" +
 				(numOldNodes - numCurrentNodes) +" deleted nodes" +
 				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
 				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
 				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
-				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges." +
-				"\n\n" + WholeSystem.getStreamGraphData().toString() );
-		Log.outFileShortReport("Triggered "+Config.kCoreFilter+"-core filter algorithm\n" +
-				(numOldNodes - numCurrentNodes) +" deleted nodes" +
-				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
-				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
-				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
-				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
+				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.";
+        Log.outFileCompleteReport(sameReport + "\n\n" + WholeSystem.getStreamGraphData().toString() );
+		Log.outFileShortReport(sameReport);
 	}
 			
 	public static void buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph() throws Exception {
@@ -390,55 +369,59 @@ public class MainProcess {
 		Log.console("- Calculating distance measures of the whole network");
 		currentSystemGraphData.getGephiGraphData().calculateGephiGraphDistanceMeasures();
 		Log.consoleln(" - "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString() + ".");
-		Log.outFileCompleteReport("Distance measures of the whole network calculated." + 
-				"\n(betweenness and closeness to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
-		Log.outFileShortReport("Distance measures of the whole network calculated." + 
-				"\n(betweenness and closeness to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
+		String sameReport = "Distance measures of the whole network calculated." + 
+				"\n(betweenness and closeness to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")";
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void calculateEigenvectorMeasureWholeNetwork() throws Exception {
 		Log.console("- Calculating eigenvector measure of the whole network");
 		currentSystemGraphData.getGephiGraphData().calculateGephiGraphEigenvectorMeasure();
 		Log.consoleln(" - "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString() + ".");
-		Log.outFileCompleteReport("Eigenvector measure of the whole network calculated." + 
-				"\n(eigenvector to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
-		Log.outFileShortReport("Eigenvector measure of the whole network calculated." + 
-				"\n(eigenvector to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")");
+		String sameReport = "Eigenvector measure of the whole network calculated." + 
+				"\n(eigenvector to "+currentSystemGraphData.getGephiGraphData().getRealQuantityNodesEdges().toString()+")";
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void storeDistanceMeasuresWholeNetworkToMainNodeTable() throws Exception {
 		Log.consoleln("- Storing distance measures of the whole network to main node table.");
 		currentSystemGraphData.storeDistanceMeasuresWholeNetwork();
-		Log.outFileCompleteReport("Stored distance measures of the whole network to main node table.");
-		Log.outFileShortReport("Stored distance measures of the whole network to main node table.");
+		String sameReport = "Stored distance measures of the whole network to main node table.";
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	} 
 	public static void storeEigenvectorMeasuresWholeNetworkToMainNodeTable() throws Exception {
 		Log.consoleln("- Storing eigenvector measures of the whole network to main node table.");
 		currentSystemGraphData.storeEigenvectorMeasuresWholeNetwork();
-		Log.outFileCompleteReport("Stored eigenvector measures of the whole network to main node table.");
-		Log.outFileShortReport("Stored eigenvector measures of the whole network to main node table.");
+		String sameReport = "Stored eigenvector measures of the whole network to main node table.";
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	} 
 	public static void sortMeasuresWholeNetwork() throws Exception {
 		Log.consoleln("- Sorting measures of the whole network.");
 		currentSystemGraphData.sortBetweennessWholeNetwork();
 		currentSystemGraphData.sortClosenessWholeNetwork();
 		currentSystemGraphData.sortEigenvectorWholeNetwork();
-		Log.outFileCompleteReport("Sorted measures of the whole network.");
-		Log.outFileShortReport("Sorted measures of the whole network.");
+		String sameReport = "Sorted measures of the whole network.";
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void classifyConnectedComponent_buildSubGraphs() throws Exception {
 		Log.console("- Classifying connected component and building sub graphs");
 		int num = currentSystemGraphData.getGephiGraphData().classifyConnectedComponent();
 		currentSystemGraphData.setConnectedComponentsCount(num);
 		Log.consoleln(" - quantity of connected components: " + num + ".");
-		Log.outFileCompleteReport("Connected component and sub graphs created\n" + 
-				num + " connected components.");
-		Log.outFileShortReport("Connected component and sub graphs created\n" + 
-				num + " connected components.");
+		String sameReport = "Connected component and sub graphs created\n" + 
+				num + " connected components.";
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void buildSubGraphsRanks() throws Exception {
 		Log.consoleln("- Building sub-graphs ranks.");
 		currentSystemGraphData.buildSubGraphRanks();
-		Log.outFileCompleteReport("Sub-graphs ranks built.");
-		Log.outFileShortReport("Sub-graphs ranks built.");
+		String sameReport = "Sub-graphs ranks built.";
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void buildGexfGraphFile(Config.time time) throws Exception {
 		String nameFileGexf = null;
@@ -446,40 +429,46 @@ public class MainProcess {
 			nameFileGexf = Config.nameGEXFGraph + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
 		else if(time == Config.time.afterIteration)
 	   		nameFileGexf = Config.nameGEXFGraph + "_after_iterations.gexf";
-		else if(time == Config.time.lastGraph)
+		else if(time == Config.time.afterSelectionMainConcepts)
+	   		nameFileGexf = Config.nameGEXFGraph + "_after_selection_main_concepts.gexf";
+		else if(time == Config.time.finalGraph)
 			nameFileGexf = Config.nameGEXFGraph + "_final.gexf";	
-		else if(time == Config.time.conceptMap)
-			nameFileGexf = Config.nameGEXFGraph + "_concept_map.gexf";	
-		Log.consoleln("- Building GEXF Graph File (generated file: " + nameFileGexf + ").");
-		currentSystemGraphData.getGephiGraphData().buildGephiGraphFile(nameFileGexf);
-		Log.outFileCompleteReport("GEXF graph file generated: " + nameFileGexf);
-		Log.outFileShortReport("GEXF graph file generated: " + nameFileGexf);
+		Log.console("- Building GEXF Graph File");
+		currentSystemGraphData.getGephiGraphData().buildGexfGraphFile(nameFileGexf);
+		Log.consoleln(" (generated file: " + nameFileGexf + ").");
+		String sameReport = "GEXF graph file generated: " + nameFileGexf;
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void buildSubGraphsTablesInConnectedComponents() throws Exception {
 		Log.consoleln("- Building sub-graphs tables belong to connected components.");
 		currentSystemGraphData.buildSubGraphsTablesInConnectedComponents();
-		Log.outFileCompleteReport("Sub-graphs tables belong to connected components built.");
-		Log.outFileShortReport("Sub-graphs tables belong to connected components built.");
+		String sameReport = "Sub-graphs tables belong to connected components built.";
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void sortConnectedComponentsRanks() throws Exception {
 		Log.consoleln("- Sorting connected components ranks.");
 		currentSystemGraphData.sortConnectecComponentRanks();
-		Log.outFileCompleteReport("Connected components ranks sorted.");
-		Log.outFileShortReport("Connected components ranks sorted.");
+		String sameReport = "Connected components ranks sorted.";
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void selectLargestNodesByBetweennessCloseness() throws Exception {
 		Log.console("- Selecting largest nodes by betweenness+closeness");
 		int num = currentSystemGraphData.selectLargestNodesBetweennessCloseness(iteration);
 		Log.consoleln(" - "+num+" new selected concepts.");
-		Log.outFileCompleteReport("Largest nodes by betweenness+closeness: " + num + " nodes.");
-		Log.outFileShortReport("Largest nodes by betweenness+closeness: " + num + " nodes.");
+		String sameReport = "Largest nodes by betweenness+closeness: " + num + " nodes.";
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void selectLargestNodesByEigenvector() throws Exception {
 		Log.console("- Selecting largest nodes by eigenvector");
 		int num = currentSystemGraphData.selectLargestNodesEigenvector(iteration);
 		Log.consoleln(" - "+num+" new selected concepts.");
-		Log.outFileCompleteReport("Largest nodes by eigenvector: " + num + " nodes.");
-		Log.outFileShortReport("Largest nodes by eigenvector: " + num + " nodes.");
+		String sameReport = "Largest nodes by eigenvector: " + num + " nodes."; 
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static void reportSelectedNodesToNewIteration() throws Exception {
 		Log.consoleln("- Reporting selected nodes to new iteration.");
@@ -487,9 +476,9 @@ public class MainProcess {
 		Log.outFileShortReport("Iteration "+iteration);
 		Log.outFileCompleteReport(currentSystemGraphData.toString());
 		Log.outFileShortReport(currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
-		String report = currentSystemGraphData.reportSelectedNodes(iteration);			
-		Log.outFileCompleteReport(report);
-		Log.outFileShortReport(report);
+		String sameReport = currentSystemGraphData.reportSelectedNodes(iteration);			
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 	}
 	public static boolean breakIteration() throws Exception {
 		boolean isBreak = false;
@@ -497,8 +486,9 @@ public class MainProcess {
 		if(iteration == Config.maxIteration-1) {
 			isBreak = true;
 			Log.consoleln("- Ending loop, maximum iteration quantity "+(Config.maxIteration)+" reached.");
-			Log.outFileCompleteReport("Loop ended, maximum iteration quantity "+(Config.maxIteration)+" reached.");
-			Log.outFileShortReport("Loop ended, maximum iteration quantity "+(Config.maxIteration)+" reached.");
+			String sameReport = "Loop ended, maximum iteration quantity "+(Config.maxIteration)+" reached.";
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);
 		}
 		// at least x iterations are necessary
 		else if(iteration < Config.minIteration-1) {
@@ -508,8 +498,9 @@ public class MainProcess {
 		else if(currentSystemGraphData.getConnectedComponentsCount() == 1) {
 			isBreak = true;
 			Log.consoleln("- Ending loop, 1 connected component reached and at least "+(Config.minIteration)+" iterations.");
-			Log.outFileCompleteReport("Loop ended, 1 connected component reached and at least "+(Config.minIteration)+" iterations.");
-			Log.outFileShortReport("Loop ended, 1 connected component reached and at least "+(Config.minIteration)+" iterations.");
+			String sameReport = "Loop ended, 1 connected component reached and at least "+(Config.minIteration)+" iterations.";
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);
 		}
 		return isBreak;
 	}
@@ -523,12 +514,10 @@ public class MainProcess {
 		newSetQuerySparql.insertListConcept(newGroupConcept);
 		WholeSystem.insertListSetQuerySparql(newSetQuerySparql);
 		Log.consoleln(" - "+newGroupConcept.size()+" concepts inserted in the set of query Sparql.");
-		Log.outFileCompleteReport("Data to new iteration prepared.\n" +
-					newGroupConcept.size()+" concepts inserted in the set of query Sparql.\n" +
-					newGroupConcept.toStringLong());
-		Log.outFileShortReport("Data to new iteration prepared.\n" +
-					newGroupConcept.size()+" concepts inserted in the set of query Sparql.\n" +
-					newGroupConcept.toString());
+		String sameReport = "Data to new iteration prepared.\n" +
+				newGroupConcept.size()+" concepts inserted in the set of query Sparql.\n";
+        Log.outFileCompleteReport(sameReport + newGroupConcept.toStringLong());
+		Log.outFileShortReport(sameReport + newGroupConcept.toString());
 	}
 	public static void deleteCommonNodes_remainOriginalAndSelectedConcepts() throws Exception {
 		Log.console("- Deleting common nodes, remain only original and selected concepts");
@@ -582,15 +571,16 @@ public class MainProcess {
 	}
 	public static void buildRawConceptMap()  throws Exception {
 		Log.console("- Building raw propositions of the concept map");
-		currentSystemGraphData.buildRawConceptMap();
-		Log.consoleln(" - "+WholeSystem.getConceptMap().size()+" proposition created.");
-		String sameReport = "Built "+WholeSystem.getConceptMap().size()+" raw propositions of the concept map:\n" + WholeSystem.getConceptMap().toString();
+		int n =currentSystemGraphData.buildRawConceptMap();
+		Log.consoleln(" - "+WholeSystem.getConceptMap().size()+" proposition created (" + n + " repeated propositions - eliminated).");
+		String sameReport = "Built "+WholeSystem.getConceptMap().size()+" raw propositions of the concept map (" + 
+		                     n + " repeated propositions - eliminated):\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
 	public static void upgradeConceptMap_withLinkVocabularyTable()  throws Exception {
 		Log.console("- Upgrading the concept map propositions with link vocabulary table");
-		int n = currentSystemGraphData.upgradeConceptMap_withLinkVocabularyTable();
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_withLinkVocabularyTable();
 		Log.consoleln(" - " + n + " links name changed.");
 		String sameReport = "Upgraded "+n+" concept map propositions with link vocabulary table:\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
@@ -598,18 +588,33 @@ public class MainProcess {
 	}
 	public static void upgradeConceptMap_withHeuristic_1()  throws Exception {
 		Log.console("- Upgrading the concept map with first heuristic");
-		int n = currentSystemGraphData.upgradeConceptMap_withHeuristic_1();
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_withHeuristic_1();
 		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Upgraded the concept map with firs heuristic (" + n + " elements changed):\n" + WholeSystem.getConceptMap().toString();
+		String sameReport = "Upgraded the concept map with first heuristic (" + n + " elements changed):\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
+	
+	
+	public static void buildGexfGraphFileFromConceptMap() throws Exception {
+		String nameFileGexf = Config.nameGEXFGraph + "_concept_map.gexf";
+		Log.console("- Building GEXF Graph File from final concept map");
+		WholeSystem.getConceptMap().buildGexfGraphFileFromConceptMap(nameFileGexf);
+		Log.consoleln(" (generated file: " + nameFileGexf + ").");
+		String sameReport = "GEXF graph file generated: " + nameFileGexf;
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
+	}
+
+	
+	
 	public static void end() throws Exception {
 		Log.consoleln("- Closing.");
 		if(Config.graphStreamVisualization) 
 			WholeSystem.getStreamGraphData().getStreamGraph().clear();
-		Log.outFileCompleteReport("Closed.\nOk!");
-		Log.outFileShortReport("Closed.\nOk!");
+		String sameReport = "Closed.\nOk!";
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
 		Log.consoleln("- Ok!");
 		Log.close();
 	}

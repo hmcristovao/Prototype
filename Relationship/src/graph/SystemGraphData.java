@@ -405,44 +405,20 @@ public class SystemGraphData {
 
 		
 	// create a raw map concept from Stream Graph
-	public void buildRawConceptMap() {
+	// return quantity of repeated propositions (not inserted)
+	public int buildRawConceptMap() {
+		int quantityRepeatedPropositions = 0;
 		for( org.graphstream.graph.Node node : WholeSystem.getStreamGraphData().getStreamGraph().getEachNode() ) {
 			for( org.graphstream.graph.Edge edge : node.getEachEdge()) {
-				NodeData sourceConcept = this.getNodeData(node.getId());
+				NodeData sourceConcept = this.getNodeData(edge.getSourceNode().getId());
 				NodeData targetConcept = this.getNodeData(edge.getTargetNode().getId());
-				WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept);
+				if(!WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept))
+					quantityRepeatedPropositions++;
 			}
 		}
-	}
-	// create the final map concept
-	// it only changes the links from vocabularyTable
-	public int upgradeConceptMap_withLinkVocabularyTable() {
-		int n = 0;
-		for( Proposition proposition : WholeSystem.getConceptMap().getPropositions()) {
-			String newLink = WholeSystem.getVocabularyTable().get(proposition.getLink());
-			if(newLink != null) {
-				proposition.setLink(newLink);
-				n++;
-			}
-		}
-		return n;
+		return quantityRepeatedPropositions;
 	}
 	
-	// the prefix "Category:" in target concept is changed to:
-	// link: "belongs to"
-	// target concept: "... category"
-	public int upgradeConceptMap_withHeuristic_1() {
-		int n = 0;
-		for( Proposition proposition : WholeSystem.getConceptMap().getPropositions()) {
-			if(Concept.verifyIfCategory(proposition.getTargetConcept())) {
-				proposition.setLink("belongs to");
-				String newTargetConcept = Concept.extractCategory(proposition.getTargetConcept()) + " category";
-				proposition.setTargetConcept(newTargetConcept);
-				n++;
-			}
-		}
-		return n;
-	}
 		
 	public String toString() {
 		return  "\nQuantity connected component: " + this.connectedComponentsCount +

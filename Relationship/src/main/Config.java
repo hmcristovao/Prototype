@@ -26,7 +26,7 @@ public interface Config {
 	// CONFIG - OUTPUT FILES (gexf) 
     //
 	String nameGEXFGraph = "graph\\graph"+Config.testNumber;
-	enum time {whileIteration, afterIteration, lastGraph, conceptMap  };
+	enum time {whileIteration, afterIteration, afterSelectionMainConcepts, finalGraph };
 
 	
 	// ============================================================================

@@ -123,10 +123,10 @@ public class GephiGraphData {
 	
 	// create a file to especific iteration marked into of the fileGexf string
 	// MUST be execute after calculation of Graph Table, to added the measure columns
-	public void buildGephiGraphFile(String fileGexf) throws Exception {
+	public void buildGexfGraphFile(String fileGexf) throws Exception {
 		//Export full graph
 		ExportController exportController = Lookup.getDefault().lookup(ExportController.class);
-	    exportController.exportFile(new File("io_gexf.gexf"));
+	    // exportController.exportFile(new File("io_gexf.gexf"));  ????
 		GraphExporter exporter = (GraphExporter) exportController.getExporter("gexf");     //Get GEXF exporter
 		exporter.setExportVisible(false);  // exports all graph
 		exporter.setWorkspace(this.workspace);
