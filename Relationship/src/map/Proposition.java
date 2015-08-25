@@ -41,7 +41,7 @@ public class Proposition {
 	public NodeData getTargetNodeData() {
 		return this.targetNodeData;
 	}
-	
+
 	
 	@Override
 	public boolean equals(Object obj) {

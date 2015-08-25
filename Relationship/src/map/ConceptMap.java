@@ -14,6 +14,8 @@ import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
 import org.gephi.io.exporter.api.ExportController;
 import org.gephi.io.exporter.spi.GraphExporter;
+import org.gephi.statistics.plugin.EigenvectorCentrality;
+import org.gephi.statistics.plugin.GraphDistance;
 import org.openide.util.Lookup;
 
 import user.Concept;
@@ -52,9 +54,27 @@ public class ConceptMap {
 		return false;
 	}
 	
+	// remove part of link with #DDD...D
+	public int upgradeConceptMap_heuristic_01_removeLinkNumber() {
+		int n = 0;
+		for( Proposition proposition : this.getPropositions()) {
+			// verify whether there is a substring "#DDDD" (D=digit)
+			int pos = proposition.getLink().lastIndexOf('#');
+			if(pos != -1) {
+				if(proposition.getLink().charAt(pos+1) >= '0' && proposition.getLink().charAt(pos+1) <= '9' &&
+				   proposition.getLink().charAt(pos+2) >= '0' && proposition.getLink().charAt(pos+2) <= '9' &&
+				   proposition.getLink().charAt(pos+3) >= '0' && proposition.getLink().charAt(pos+3) <= '9') {
+					 proposition.setLink(proposition.getLink().substring(0, pos));
+				     n++;
+				}
+			}
+		}
+		return n;
+	}
+
 	// create the final map concept
 	// it only changes the links from vocabularyTable
-	public int upgradeConceptMap_withLinkVocabularyTable() {
+	public int upgradeConceptMap_heuristic_02_vocabularyTable() {
 		int n = 0;
 		for( Proposition proposition : this.getPropositions()) {
 			String newLink = WholeSystem.getVocabularyTable().get(proposition.getLink());
@@ -69,7 +89,7 @@ public class ConceptMap {
 	// the prefix "Category:" in target concept is changed to:
 	// link: "belongs to"
 	// target concept: "... category"
-	public int upgradeConceptMap_withHeuristic_1() {
+	public int upgradeConceptMap_heuristic_03_categoryInTargetConcept() {
 		int n = 0;
 		for( Proposition proposition : this.getPropositions()) {
 			if(Concept.verifyIfCategory(proposition.getTargetConcept())) {
@@ -88,17 +108,31 @@ public class ConceptMap {
 		// at first, create a new gephi graph
 		GephiGraphData gephiGraphData = new GephiGraphData();
 		// second: fill this gephi graph with concept map data
- 		for(Proposition proposition : this.propositions) {
- 			// create the two new gephiNode
-			Node nodeSource = gephiGraphData.getGephiGraph().getGraphModel().factory().newNode(proposition.getSourceConcept());
-			Node nodeTarget = gephiGraphData.getGephiGraph().getGraphModel().factory().newNode(proposition.getTargetConcept());
- 			// create the edge
-			Edge edge = gephiGraphData.getGraphModel().factory().newEdge(proposition.getLink(), nodeSource, nodeTarget, 1, true);
-			Log.consoleln(nodeSource.toString());
-			Log.consoleln(nodeTarget.toString());
-			Log.consoleln(edge.getId());
-		}		
-		// third: create a file from gephi graph
+		AttributeColumn labelAttributeColumn = gephiGraphData.getAttributeModel().getNodeTable().getColumn("Label");
+		int edgeIdNumber = 0;
+		for(Proposition proposition : this.propositions) {
+ 			// create 1º node gephiNode
+			Node nodeSource = gephiGraphData.getGraphModel().factory().newNode(proposition.getSourceConcept());
+			nodeSource.getNodeData().getAttributes().setValue(labelAttributeColumn.getIndex(), proposition.getSourceConcept());	
+			gephiGraphData.getGephiGraph().addNode(nodeSource);
+			
+			// create 2º node gephiNode
+			Node nodeTarget = gephiGraphData.getGraphModel().factory().newNode(proposition.getTargetConcept());
+			nodeTarget.getNodeData().getAttributes().setValue(labelAttributeColumn.getIndex(), proposition.getTargetConcept());
+			gephiGraphData.getGephiGraph().addNode(nodeTarget);
+			
+			// create the edge (put different id to each edge because it is not possible same id in the record of getxf) 
+			Edge edge = gephiGraphData.getGephiGraph().getGraphModel().factory().newEdge("#"+edgeIdNumber, nodeSource, nodeTarget, 1, true);
+			edge.getEdgeData().getAttributes().setValue(labelAttributeColumn.getIndex(), proposition.getLink());				
+			gephiGraphData.getGephiGraph().addEdge(edge);
+			edgeIdNumber++;
+		}
+ 		// third: calculate measures
+ 		gephiGraphData.calculateGephiGraphDistanceMeasures();
+ 		gephiGraphData.calculateGephiGraphEigenvectorMeasure();
+ 		gephiGraphData.classifyConnectedComponent();
+ 		
+		// fourth: create a file from gephi graph
 		gephiGraphData.buildGexfGraphFile(fileGexf);
 	}
 		

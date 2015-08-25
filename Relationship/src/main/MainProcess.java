@@ -1,7 +1,8 @@
-// v4.4 - adjust in the concept map (do not create gexf file). 
+// v4.5 - fixed record problem of final map - gexf.  Working but need adjusts. 
 
 package main;
 
+import graph.GephiGraphData;
 import graph.NodeData;
 import graph.NodesTableArray;
 import graph.QuantityNodesEdges;
@@ -27,7 +28,7 @@ public class MainProcess {
 	public static int iteration = 0;
 	public static SetQuerySparql  currentSetQuerySparql;
 	public static SystemGraphData currentSystemGraphData;
-		
+	
 	public static void body(Wrapterms parser) throws Exception {
 		try {
 			start();
@@ -151,8 +152,9 @@ public class MainProcess {
 
             parseVocabulary(parser);
 			buildRawConceptMap();
-			upgradeConceptMap_withLinkVocabularyTable();
-			upgradeConceptMap_withHeuristic_1();
+			upgradeConceptMap_heuristic_01_removeLinkNumber();
+			upgradeConceptMap_heuristic_02_vocabularyTable();
+			upgradeConceptMap_heuristic_03_categoryInTargetConcept();
 
 			buildGexfGraphFileFromConceptMap();
 			
@@ -284,7 +286,7 @@ public class MainProcess {
 				quantityNodesEdges.getNumEdges() + " new edges in the visualization graph.\n" +
 		        WholeSystem.getStreamGraphData().getRealTotalNodes() + " total nodes, " +
 		        WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges.";
-		String sameReport2 = "Edge hash table created:" + 
+		String sameReport2 = "\n\nEdge hash table created:" + 
 				"\n("+WholeSystem.getEdgesTable().size()+" edges).";
         Log.outFileCompleteReport(sameReport + WholeSystem.getStreamGraphData().toString() + sameReport2 + "\n"+WholeSystem.getEdgesTable().toString());
 		Log.outFileShortReport(sameReport + WholeSystem.getStreamGraphData().toStringShort() + sameReport2);
@@ -578,19 +580,27 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
-	public static void upgradeConceptMap_withLinkVocabularyTable()  throws Exception {
-		Log.console("- Upgrading the concept map propositions with link vocabulary table");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_withLinkVocabularyTable();
-		Log.consoleln(" - " + n + " links name changed.");
-		String sameReport = "Upgraded "+n+" concept map propositions with link vocabulary table:\n" + WholeSystem.getConceptMap().toString();
+	public static void upgradeConceptMap_heuristic_01_removeLinkNumber()  throws Exception {
+		Log.console("- Upgrading the concept map with first heuristic (remove link number)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_01_removeLinkNumber();
+		Log.consoleln(" - " + n + " propositions changed.");
+		String sameReport = "Heuristic 01: upgraded "+n+" concept map propositions with remove of link number:\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
-	public static void upgradeConceptMap_withHeuristic_1()  throws Exception {
+	public static void upgradeConceptMap_heuristic_02_vocabularyTable()  throws Exception {
+		Log.console("- Upgrading the concept map with second heuristic (change links with vocabulary table)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_02_vocabularyTable();
+		Log.consoleln(" - " + n + " links name changed.");
+		String sameReport = "Heuristic 02: upgraded "+n+" concept map propositions with use of link vocabulary table:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	public static void upgradeConceptMap_heuristic_03_categoryInTargetConcept()  throws Exception {
 		Log.console("- Upgrading the concept map with first heuristic");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_withHeuristic_1();
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_03_categoryInTargetConcept();
 		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Upgraded the concept map with first heuristic (" + n + " elements changed):\n" + WholeSystem.getConceptMap().toString();
+		String sameReport = "Heuristic 03: upgraded "+n+" concept map propositions with change of category in target concept:\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}

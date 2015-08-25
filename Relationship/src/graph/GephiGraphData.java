@@ -126,7 +126,7 @@ public class GephiGraphData {
 	public void buildGexfGraphFile(String fileGexf) throws Exception {
 		//Export full graph
 		ExportController exportController = Lookup.getDefault().lookup(ExportController.class);
-	    // exportController.exportFile(new File("io_gexf.gexf"));  ????
+	    exportController.exportFile(new File("io_gexf.gexf")); 
 		GraphExporter exporter = (GraphExporter) exportController.getExporter("gexf");     //Get GEXF exporter
 		exporter.setExportVisible(false);  // exports all graph
 		exporter.setWorkspace(this.workspace);
@@ -148,7 +148,11 @@ public class GephiGraphData {
 	    	str.append("Edges:\n");
 	    	for(Edge edge : this.gephiGraph.getEdges(node)) {
 	    		str.append("      ");
+		    	str.append(edge.getSource().toString());
+	    		str.append("  ->  ");
 		    	str.append(edge.getEdgeData().getId());
+	    		str.append("  ->  ");
+		    	str.append(edge.getTarget().toString());
 		    	str.append("\n");
 		    }
 	    	str.append("\n");
