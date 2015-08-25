@@ -137,6 +137,19 @@ public class SystemGraphData {
 			if(Config.edgeLabelFileGephi)  // or add to all, if configured to this
 				gephiEdge.getEdgeData().getAttributes().setValue(labelAttributeColumn.getIndex(), streamEdge.toString());				
 
+			// if exist, also put the attribute "repeatedTimes" in the edge
+			if(streamEdge.getAttribute("repeatedTimes") != null)
+				gephiEdge.getEdgeData().getAttributes().setValue("repeatedTimes", streamEdge.getAttribute("repeatedTimes"));				
+
+			// if exist, also put the attributes "nextedge#" in the edge
+			for(int numberExtraEdge = 0; ; numberExtraEdge++) {
+				if(streamEdge.getAttribute("nextedge"+numberExtraEdge) == null) 
+					break;
+				else 
+					gephiEdge.getEdgeData().getAttributes().setValue("nextedge"+numberExtraEdge, streamEdge.getAttribute("nextedge"+numberExtraEdge));				
+			}	
+			
+			// insert the edge in the gephi graph
 			this.gephiGraphData.getGephiGraph().addEdge(gephiEdge);
 			quantityNodesEdges.getNumEdges();
 		}		
@@ -175,7 +188,7 @@ public class SystemGraphData {
 	}
 	
 	public void sortBetweennessWholeNetwork() {
-		this.betweennessSortTable = this.nodesTableArray.sortBetwennness();
+		this.betweennessSortTable = this.nodesTableArray.sortBetweenness();
 	}
 	public void sortClosenessWholeNetwork() {
 		this.closenessSortTable   = this.nodesTableArray.sortCloseness();
@@ -254,7 +267,7 @@ public class SystemGraphData {
 			// create each new sort table with measures from BasicTableArray
 			currentNodesTableArray = this.ranks.getMeasuresRankTable(i).getBasicTable();
 			
-			sortedNodesTableArray  = currentNodesTableArray.sortBetwennness();
+			sortedNodesTableArray  = currentNodesTableArray.sortBetweenness();
 			this.ranks.getMeasuresRankTable(i).setBetweenness(sortedNodesTableArray);
 			
 			sortedNodesTableArray  = currentNodesTableArray.sortCloseness();
@@ -387,10 +400,11 @@ public class SystemGraphData {
 	// copy selected concepts to a NodesTableArray
 	// sort this table e store it in WholeSystem.sortAverageSelectedConcepts
 	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
-	public void createSortAverageOnlySelectedConcepts() throws Exception {
+	// return quantity of concepts that already were category or concepts with zero rdfs
+	public int createSortAverageOnlySelectedConcepts() throws Exception {
 		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
 		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
-		int quantity = 0;
+		int quantity = 0, excluded = 0;
 		for(int i=0; i<selectedConcepts.size(); i++) {
 			Concept concept = selectedConcepts.getConcept(i);
 			if(concept.getCategory() != Config.Category.was && concept.getQuantityRdfs() != 0) {	
@@ -398,9 +412,19 @@ public class SystemGraphData {
 				nodesTableArray.insert(nodeData);
 				quantity++;
 			}
+			else
+				excluded++;
 		}
-		nodesTableArray.sortCrescentAverage(quantity);
+Log.consoleln("\n\nquantity="+quantity+"\n\n");
+Log.consoleln(nodesTableArray.toString());
+		//nodesTableArray.sortCrescentAverage(quantity);
+		nodesTableArray.sortBetweenness(quantity);
+Log.consoleln("\n\nsorted 1\n\n");
+Log.consoleln(nodesTableArray.toString());
 		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray);
+Log.consoleln("\n\nsorted 2\n\n");
+Log.consoleln(WholeSystem.getSortAverageSelectedConcepts().toString());
+		return excluded;
 	}
 
 		
@@ -412,8 +436,23 @@ public class SystemGraphData {
 			for( org.graphstream.graph.Edge edge : node.getEachEdge()) {
 				NodeData sourceConcept = this.getNodeData(edge.getSourceNode().getId());
 				NodeData targetConcept = this.getNodeData(edge.getTargetNode().getId());
-				if(!WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept))
+				// if it can not intert, plus 1
+				if(!WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept)) {
 					quantityRepeatedPropositions++;
+					continue;
+				}
+				
+				// if exist extra edges then get each one
+				for(int numberExtraEdge = 0; ; numberExtraEdge++) {
+					if(edge.getAttribute("nextedge"+numberExtraEdge) == null) 
+						break;
+					else {
+						// if it can not intert, plus 1
+						if(!WholeSystem.getConceptMap().insert(sourceConcept, (String)edge.getAttribute("nextedge"+numberExtraEdge), targetConcept)) {
+							quantityRepeatedPropositions++;
+						}
+					}
+				}
 			}
 		}
 		return quantityRepeatedPropositions;

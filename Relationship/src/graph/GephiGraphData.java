@@ -148,12 +148,8 @@ public class GephiGraphData {
 	    	str.append("Edges:\n");
 	    	for(Edge edge : this.gephiGraph.getEdges(node)) {
 	    		str.append("      ");
-		    	str.append(edge.getSource().toString());
-	    		str.append("  ->  ");
-		    	str.append(edge.getEdgeData().getId());
-	    		str.append("  ->  ");
-		    	str.append(edge.getTarget().toString());
-		    	str.append("\n");
+		    	str.append(edge.getEdgeData().getLabel());
+	    		str.append("\n");
 		    }
 	    	str.append("\n");
 		}

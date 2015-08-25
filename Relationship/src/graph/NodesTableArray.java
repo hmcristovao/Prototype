@@ -9,7 +9,7 @@ import main.*;
 
 public class NodesTableArray {
 	private NodeData table[]; 
-	private int count;
+	private int count; 
 	private int max;
 	
 	public NodesTableArray(NodeData table[]) {
@@ -23,7 +23,7 @@ public class NodesTableArray {
 	}
 	
 	public int getCount() {
-			return this.max;
+			return this.count;
 	}
 	
 	public void insert(NodeData nodeData) throws Exception {
@@ -59,12 +59,12 @@ public class NodesTableArray {
 		return groupConcept;
 	}
 	
-	public NodesTableArray sortBetwennness() {
+	public NodesTableArray sortBetweenness() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
 		Arrays.sort(newTable, new SortBetweenness());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortBetwennness(int first) {
+	public NodesTableArray sortBetweenness(int first) {
 		if(first > this.max)
 			first = this.max;
 		NodeData newTable[] = Arrays.copyOf(this.table, first);
@@ -111,6 +111,7 @@ public class NodesTableArray {
 
 	public String toStringShort(int quantityNodes) {
 		StringBuffer str = new StringBuffer();
+		str.append("Parcial quantity: "+quantityNodes+"\n\n");
 		for(int i=0; i<quantityNodes && i<this.count; i++) {
 			str.append(this.table[i].toString());
 			str.append("\n\n");
@@ -120,6 +121,7 @@ public class NodesTableArray {
 	
 	public String toString() {
 		StringBuffer str = new StringBuffer();
+		str.append("Total quantity: "+this.count+" (intern), "+this.table.length+" (max size).\n\n");
 		for(int i=0; i<this.count; i++) {
 			str.append(this.table[i].toString());
 			str.append("\n\n");

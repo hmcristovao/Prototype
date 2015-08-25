@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "00"; 
+	String  testNumber = "22"; 
 	
 	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
@@ -23,10 +23,12 @@ public interface Config {
 	
 	
 	// ============================================================================
-	// CONFIG - OUTPUT FILES (gexf) 
+	// CONFIG - OUTPUT FILES  (.GEXF and .TXT) 
     //
-	String nameGEXFGraph = "graph\\graph"+Config.testNumber;
-	enum time {whileIteration, afterIteration, afterSelectionMainConcepts, finalGraph };
+	String nameFileGexfGraph      = "graph\\graph"+Config.testNumber;
+	String nameFileTxtConceptMap  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
+	String nameFileCmapConceptMap = "conceptmap\\conceptmap"+Config.testNumber+".cmap";
+    enum time {whileIteration, afterIteration, afterSelectionMainConcepts, finalGraph };
 
 	
 	// ============================================================================
@@ -77,8 +79,8 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 3;   // better set: 8
-	int maxIteration = 3;  // better set: 12
+	int minIteration = 4;   // better set: 8
+	int maxIteration = 4;  // better set: 12
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;
@@ -127,10 +129,7 @@ public interface Config {
 	// CONFIG - CONCEPT MAP 
     //
 	// to calculate min and max concepts to map
-	int conceptsQuantityCalulationFactor = 18;
+	int conceptsQuantityCalulationFactor = 18;  // goal of concepts quantity: log2(1/original quantity)*2 + (factor)
 	int conceptsMinMaxRange = 5;
 	
-	String nameConceptMapTxt =  "conceptmap\\conceptmap"+Config.testNumber+".txt";
-	String nameConceptMap    =  "conceptmap\\conceptmap"+Config.testNumber+".cmap";
-
 }

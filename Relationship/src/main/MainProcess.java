@@ -1,4 +1,4 @@
-// v4.5 - fixed record problem of final map - gexf.  Working but need adjusts. 
+// v4.51 - concept map generated (txt). Problem with sort average. 
 
 package main;
 
@@ -121,15 +121,17 @@ public class MainProcess {
 				
 				createSortAverageOnlySelectedConcepts();
 				
-				// verifica se a qtde de selected concepts == goal
-				if(WholeSystem.getSortAverageSelectedConcepts().getCount() <= WholeSystem.getGoalConceptsQuantity())
+				// verify whether the quantity of selected concepts + original concepts == goal of total concepts
+				if(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
 					break;				
 			} while(nodeDataPos < WholeSystem.getSortAverageSelectedConcepts().getCount());
-			if(WholeSystem.getSortAverageSelectedConcepts().getCount() <= WholeSystem.getGoalConceptsQuantity())
+			
+			// verify whether the goal was achieved: quantity of selected concepts + original concepts == goal of total concepts
+			if(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
 				// ok, meta atingida;
-				Log.consoleln("- Meta atingida!");
+				Log.consoleln("- Goal achieved!!! Total concepts: " + WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts());
 			else
-				Log.consoleln("- Meta nao atingida!");
+				Log.consoleln("- Goal did not achieve. Total concepts: " + WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts());
 			    // meta não atingida
 				// tentar retirar seguinda a ordem de betweenness, depois de closeness
 				// mas, se mesmo assim não conseguir processa para atingir o maximo de conceitos possível, mesmo que aumente os connected component 
@@ -157,6 +159,7 @@ public class MainProcess {
 			upgradeConceptMap_heuristic_03_categoryInTargetConcept();
 
 			buildGexfGraphFileFromConceptMap();
+			buildTxtFileFromConceptMap();
 			
 			end();
 		}
@@ -218,8 +221,14 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);
 	}
 	public static void indicateAlgorithmIntermediateStage2() throws Exception {
-		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***");
-		String sameReport = Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine;
+		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***" + 
+				" - current concepts quantity: "+WholeSystem.getStreamGraphData().getTotalNodes()+" - "+
+                "goal of concepts quantity: "+WholeSystem.getGoalConceptsQuantity()+
+                " good, "+WholeSystem.getMaxConceptsQuantity()+" maximum.");
+		String sameReport = Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine+
+				"\nCurrent concepts quantity: "+WholeSystem.getStreamGraphData().getTotalNodes()+"."+
+                "\nGoal of concepts quantity: "+WholeSystem.getGoalConceptsQuantity()+
+                " good, "+WholeSystem.getMaxConceptsQuantity()+" maximum.";
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
@@ -428,13 +437,13 @@ public class MainProcess {
 	public static void buildGexfGraphFile(Config.time time) throws Exception {
 		String nameFileGexf = null;
 		if(time == Config.time.whileIteration) 
-			nameFileGexf = Config.nameGEXFGraph + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
+			nameFileGexf = Config.nameFileGexfGraph + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
 		else if(time == Config.time.afterIteration)
-	   		nameFileGexf = Config.nameGEXFGraph + "_after_iterations.gexf";
+	   		nameFileGexf = Config.nameFileGexfGraph + "_after_iterations.gexf";
 		else if(time == Config.time.afterSelectionMainConcepts)
-	   		nameFileGexf = Config.nameGEXFGraph + "_after_selection_main_concepts.gexf";
+	   		nameFileGexf = Config.nameFileGexfGraph + "_after_selection_main_concepts.gexf";
 		else if(time == Config.time.finalGraph)
-			nameFileGexf = Config.nameGEXFGraph + "_final.gexf";	
+			nameFileGexf = Config.nameFileGexfGraph + "_final.gexf";	
 		Log.console("- Building GEXF Graph File");
 		currentSystemGraphData.getGephiGraphData().buildGexfGraphFile(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
@@ -546,16 +555,19 @@ public class MainProcess {
 	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
 	public static void createSortAverageOnlySelectedConcepts() throws Exception {
 		Log.console("- Creating sort table (average) of selected concepts");
-		currentSystemGraphData.createSortAverageOnlySelectedConcepts();
-		Log.consoleln(" - "+WholeSystem.getSortAverageSelectedConcepts().getCount()+" nodes stored and sorted.");
-		String sameReport = "Table of selected nodes created and sorted (average):\n\n"+WholeSystem.getSortAverageSelectedConcepts().toString();
+		int n = currentSystemGraphData.createSortAverageOnlySelectedConcepts();
+		Log.consoleln(" - "+WholeSystem.getSortAverageSelectedConcepts().getCount()+" nodes stored and sorted ("+
+		              n + " concepts did not insert: that already were category or concepts with zero rdfs).");
+		String sameReport = "Table of selected nodes created and sorted (average)\n"+WholeSystem.getSortAverageSelectedConcepts().toString()+
+				      n + " concepts did not insert: that already were category or concepts with zero rdfs.";
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);	
 		// zero remain concepts: stop right now
 		if(WholeSystem.getSortAverageSelectedConcepts().getCount() == 0) {
 			Log.consoleln("- Stoping. It's not possible to continue with zero selected concepts.");
-			Log.outFileCompleteReport("Algorithm stoped. It's not possible to continue with zero selected concepts.");
-			Log.outFileShortReport("Algorithm stoped. It's not possible to continue with zero selected concepts.");	
+			sameReport = "Algorithm stoped. It's not possible to continue with zero selected concepts.";
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);	
 			end();
 			System.exit(0);
 		}
@@ -605,9 +617,8 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);		
 	}
 	
-	
 	public static void buildGexfGraphFileFromConceptMap() throws Exception {
-		String nameFileGexf = Config.nameGEXFGraph + "_concept_map.gexf";
+		String nameFileGexf = Config.nameFileGexfGraph + "_concept_map.gexf";
 		Log.console("- Building GEXF Graph File from final concept map");
 		WholeSystem.getConceptMap().buildGexfGraphFileFromConceptMap(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
@@ -615,7 +626,14 @@ public class MainProcess {
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
-
+	public static void buildTxtFileFromConceptMap() throws Exception {
+		Log.console("- Building TXT final Concept Map");
+		WholeSystem.getConceptMap().buildTxtFileFromConceptMap(Config.nameFileTxtConceptMap);
+		Log.consoleln(" (generated file: " + Config.nameFileTxtConceptMap + ").");
+		String sameReport = "TXT concept map generated: " + Config.nameFileTxtConceptMap;
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
+	}
 	
 	
 	public static void end() throws Exception {

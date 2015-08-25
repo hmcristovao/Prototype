@@ -5,7 +5,9 @@ import graph.NodeData;
 import graph.NodesTableArray;
 import graph.QuantityNodesEdges;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -136,6 +138,21 @@ public class ConceptMap {
 		gephiGraphData.buildGexfGraphFile(fileGexf);
 	}
 		
+	// create a TXT file from concept map
+	// use tab ('\t') to separate concepts and links
+	public void buildTxtFileFromConceptMap(String fileTxt) throws Exception {
+		BufferedWriter outFile = new BufferedWriter(new FileWriter(fileTxt)); 
+		for(Proposition proposition : this.propositions) {
+ 			outFile.write(proposition.getSourceConcept());
+ 			outFile.write('\t');
+ 			outFile.write(proposition.getLink());
+ 			outFile.write('\t');
+ 			outFile.write(proposition.getTargetConcept());	
+ 			outFile.write('\r');
+			outFile.write('\n');
+		}
+		outFile.close();
+	}
 		
 	public String toString() {
 		StringBuffer out = new StringBuffer();
