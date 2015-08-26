@@ -168,6 +168,7 @@ public class Concept {
 					 "[blankName: " + this.blankName +    "]" +
 					 "[underline: " + this.underlineName +"]" + 
 				     "[category: "  + this.strCategory() + "]" +
+				     "[rdf quantity: "+ this.quantityRdfs + "]" +
 					 "[status: "    + Concept.statusToString(this.status) + "]" +
 				     "[iteration: " + this.iteration + "]" +
 					 "[connected components: ";

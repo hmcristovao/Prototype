@@ -189,7 +189,9 @@ public class SetQuerySparql {
 			// update rdfs quantity in concept
 			querySparql.getConcept().setQuantityRdfs(subTotal);
 			// if exist concept into WholeSystem then update its quantity
+Log.consoleln("Conceito no setquerySparql: "+querySparql.getConcept().getBlankName() + "qtde: "+subTotal);
 			WholeSystem.getConceptsRegister().getConcept(querySparql.getConcept().getBlankName()).setQuantityRdfs(subTotal);
+Log.consoleln("Conceito no WholeSystem: "+WholeSystem.getConceptsRegister().getConcept(querySparql.getConcept().getBlankName()).toStringLong());
 		}
 		return total;
 	}

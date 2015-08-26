@@ -1,4 +1,4 @@
-// v4.51 - concept map generated (txt). Problem with sort average. 
+// v4.52 - fixed problem with sort average. Problem with "Category:" subword 
 
 package main;
 
@@ -52,7 +52,7 @@ public class MainProcess {
 				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
 				
-				classifyConnectedComponent_buildSubGraphs();
+				classifyConnectedComponent();
                 buildGexfGraphFile(Config.time.whileIteration);
 				// conditionals set to continue the iteration
 				if(breakIteration())
@@ -68,8 +68,16 @@ public class MainProcess {
 				selectLargestNodesByBetweennessCloseness();
 				selectLargestNodesByEigenvector();
 				reportSelectedNodesToNewIteration();
+				if(Config.additionNewConceptWithoutCategory)
+					duplicateConceptsWithoutCategory(iteration);				
 				prepareDataToNewIteration();
 				iteration++;
+				
+if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
+	Log.consoleln("1>>>>>> Memory = null");
+else
+	Log.consoleln("1>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
+
 			} while(true);
 			indicateAlgorithmIntermediateStage1(); // after iterations loop
 			deleteCommonNodes_remainOriginalAndSelectedConcepts();
@@ -80,55 +88,73 @@ public class MainProcess {
 			storeDistanceMeasuresWholeNetworkToMainNodeTable();
 			calculateEigenvectorMeasureWholeNetwork();
 			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
-			classifyConnectedComponent_buildSubGraphs();
+			classifyConnectedComponent();
  			buildGexfGraphFile(Config.time.afterIteration);
 			indicateAlgorithmIntermediateStage2(); // selection main concepts
+
+			
+			if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
+				Log.consoleln("2>>>>>> Memory = null");
+			else
+				Log.consoleln("2>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
+
+			
+			// create a average sort list of nodes to get the least 
 			createSortAverageOnlySelectedConcepts();
 			int baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
 			int nodeDataPos = 0;
-			do {
-				// pega o selected concept de menor average dentro do conjunto de nodes
+			// loop while:
+			// 1. quantity of selected concepts + original concepts > goal of total concepts, AND
+			// 2. there are not concepts to try the remotion (because the quantity of componentes connected is improving)
+			
+			if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
+				Log.consoleln("3>>>>>> Memory = null");
+			else
+				Log.consoleln("3>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
+
+			
+			
+			while(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
+				  &&
+				  nodeDataPos < WholeSystem.getSortAverageSelectedConcepts().getCount()) {
 				
+				// get the node that has the least average				
 				NodeData nodeDataWithLeastAverage = WholeSystem.getSortAverageSelectedConcepts().getNodeData(nodeDataPos);
+				Log.consoleln("Node data with least average: "+nodeDataWithLeastAverage+" (pos: "+nodeDataPos+")");
 				// store the current informations of node that will be deleted (because it can be recovered)
 				Node currentNode = nodeDataWithLeastAverage.getStreamNode();
 				List<Edge> currentEdgeSet = new ArrayList<Edge>();
 				for(Edge currentEdge : currentNode.getEdgeSet()) {
 					currentEdgeSet.add(currentEdge);
 				}
-				// deleta o node do stream graph
+				// delete the node in the stream graph
 				WholeSystem.getStreamGraphData().deleteNode(currentNode);
-				// cria novo systemGraphData
-				iteration++;
-				createCurrentSystemGraphData();
-				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
-				calculateDistanceMeasuresWholeNetwork();
-				storeDistanceMeasuresWholeNetworkToMainNodeTable();
-				calculateEigenvectorMeasureWholeNetwork();
-				storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
-				classifyConnectedComponent_buildSubGraphs(); 
-				// verifica se connected component aumentou
+				classifyConnectedComponent(); 
+				// if connected component quantity improved then recover the deleted node, edges (to stream graph)
+				Log.consoleln("currentSystemGraphData.getConnectedComponentsCount() > baseConnectedComponentCount "+
+				              currentSystemGraphData.getConnectedComponentsCount() +" > "+ baseConnectedComponentCount);
 				if(currentSystemGraphData.getConnectedComponentsCount() > baseConnectedComponentCount) {
-					// se sim, então recoloca o node e os edges no grafo novamente
 					WholeSystem.getStreamGraphData().insert(currentNode,currentEdgeSet);
-					// e recupera a iteração anterior
-					iteration--;
+					// try get the next node:
 					nodeDataPos++;
 				}
-				// se conseguiu excluir, volta a pegar o primeiro novamente
-				else
+				// if ok then start at the first node again (the least average node)
+				else {
+					// cria novo systemGraphData
+					iteration++;
+					createCurrentSystemGraphData();
+					buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
+					calculateDistanceMeasuresWholeNetwork();
+					storeDistanceMeasuresWholeNetworkToMainNodeTable();
+					calculateEigenvectorMeasureWholeNetwork();
+					storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 					nodeDataPos = 0;
-				
-				createSortAverageOnlySelectedConcepts();
-				
-				// verify whether the quantity of selected concepts + original concepts == goal of total concepts
-				if(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
-					break;				
-			} while(nodeDataPos < WholeSystem.getSortAverageSelectedConcepts().getCount());
-			
+					// create a average sort list of nodes to get the least 
+					createSortAverageOnlySelectedConcepts();
+				}
+			} 
 			// verify whether the goal was achieved: quantity of selected concepts + original concepts == goal of total concepts
 			if(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
-				// ok, meta atingida;
 				Log.consoleln("- Goal achieved!!! Total concepts: " + WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts());
 			else
 				Log.consoleln("- Goal did not achieve. Total concepts: " + WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts());
@@ -136,28 +162,20 @@ public class MainProcess {
 				// tentar retirar seguinda a ordem de betweenness, depois de closeness
 				// mas, se mesmo assim não conseguir processa para atingir o maximo de conceitos possível, mesmo que aumente os connected component 
 			
+			// create the last GEXF file that represent the graph
             buildGexfGraphFile(Config.time.afterSelectionMainConcepts);
-			
-            // a partir daqui ele irá construir o mapa conceitual (na verdade, proposições em formato de texto)
-            indicateAlgorithmFinalStage(); // building concept map
-			createCurrentSystemGraphData();
-			
-			
-			buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
-			calculateDistanceMeasuresWholeNetwork();
-			storeDistanceMeasuresWholeNetworkToMainNodeTable();
-			calculateEigenvectorMeasureWholeNetwork();
-			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
-			classifyConnectedComponent_buildSubGraphs(); 
-
+			indicateAlgorithmFinalStage(); // building concept map
+     		//
+			// falta aqui criar o particionamento, ou bem antes!!!
+			//
+			// create a GEXF file, like as concept map
             buildGexfGraphFile(Config.time.finalGraph);
-
             parseVocabulary(parser);
-			buildRawConceptMap();
+			buildRawConceptMapFromStreamGraph();
 			upgradeConceptMap_heuristic_01_removeLinkNumber();
 			upgradeConceptMap_heuristic_02_vocabularyTable();
 			upgradeConceptMap_heuristic_03_categoryInTargetConcept();
-
+			// create txt file of final concept map
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
 			
@@ -417,12 +435,12 @@ public class MainProcess {
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
-	public static void classifyConnectedComponent_buildSubGraphs() throws Exception {
-		Log.console("- Classifying connected component and building sub graphs");
+	public static void classifyConnectedComponent() throws Exception {
+		Log.console("- Classifying connected component");
 		int num = currentSystemGraphData.getGephiGraphData().classifyConnectedComponent();
 		currentSystemGraphData.setConnectedComponentsCount(num);
 		Log.consoleln(" - quantity of connected components: " + num + ".");
-		String sameReport = "Connected component and sub graphs created\n" + 
+		String sameReport = "Connected component classified\n" + 
 				num + " connected components.";
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
@@ -491,6 +509,15 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
+	public static void duplicateConceptsWithoutCategory(int iteration) throws Exception {
+		Log.console("- Duplicating concepts with \"Category:\" subword after to remove it");
+		GroupConcept newConcepts = WholeSystem.getConceptsRegister().duplicateConceptsWithoutCategory(iteration);
+		Log.consoleln(" - "+newConcepts.size()+" new concepts inserted.");
+		String sameReport = "Duplicated "+newConcepts.size()+" concepts with \"Category:\" subword after to remove it:\n"
+				            + newConcepts.toString(); 
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
+	}	
 	public static boolean breakIteration() throws Exception {
 		boolean isBreak = false;
 		// verify the iteration limit				
@@ -583,9 +610,9 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
-	public static void buildRawConceptMap()  throws Exception {
+	public static void buildRawConceptMapFromStreamGraph()  throws Exception {
 		Log.console("- Building raw propositions of the concept map");
-		int n =currentSystemGraphData.buildRawConceptMap();
+		int n =currentSystemGraphData.buildRawConceptMapFromStreamGraph();
 		Log.consoleln(" - "+WholeSystem.getConceptMap().size()+" proposition created (" + n + " repeated propositions - eliminated).");
 		String sameReport = "Built "+WholeSystem.getConceptMap().size()+" raw propositions of the concept map (" + 
 		                     n + " repeated propositions - eliminated):\n" + WholeSystem.getConceptMap().toString();

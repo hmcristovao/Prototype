@@ -22,23 +22,10 @@ public class GroupConcept {
 	}
 	
 	public boolean add(Concept concept) {
-		// if there is not repeted key (concept), add in ArrayList too 
+		// if there is not repeted key (concept), add in HashMap and ArrayList too 
 		if(!this.hash.containsKey(concept.getBlankName())) {
 			this.hash.put(concept.getBlankName(), concept);
 			this.list.add(concept);
-			// if is concept "Category", add pure concept too (if is also the configuration true)
-			if(Config.additionNewConceptWithoutCategory && concept.getCategory() == Config.Category.yes) {
-				// create new concept without "Category"
-				Concept newConceptWithoutCategory = new Concept(Concept.extractCategoryFullName(concept.getFullName()),
-						                                        Concept.extractCategory(concept.getBlankName()), 
-						                                        concept.getStatus(), 
-						                                        concept.getIteration(),
-						                                        Config.Category.was,
-						                                        0, // still is not possible to know the quantity RDFs
-						                                        concept.getConnectedComponent(concept.getIteration()));
-				this.hash.put(newConceptWithoutCategory.getBlankName(), newConceptWithoutCategory);
-				this.list.add(newConceptWithoutCategory);				
-			}
 			return true;
 		}
 		return false;
@@ -72,7 +59,9 @@ public class GroupConcept {
 			else if(iteration > 0) {
 				// get all concepts in each previous iterations
 				for(int i=0; i<iteration; i++) {
-					if( ( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept || concept.getStatus() == Config.Status.selectedEigenvectorConcept ) &&
+					if( ( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept || 
+						  concept.getStatus() == Config.Status.selectedEigenvectorConcept ||
+						  concept.getStatus() == Config.Status.selected ) && 				  
 						  concept.getIteration() == i ) {
 						result.add(concept);
 					}
@@ -156,8 +145,9 @@ public class GroupConcept {
 		GroupConcept result = new GroupConcept();
 		for(Concept concept : this.list) {
 			if( ( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
-				  concept.getStatus() == Config.Status.selectedEigenvectorConcept
-				) &&
+				  concept.getStatus() == Config.Status.selectedEigenvectorConcept ||
+				  concept.getStatus() == Config.Status.selected 				  
+					) &&
 			    concept.getIteration() == iteration &&
 			    concept.getConnectedComponent(iteration) == connectedComponent
 			  ) {
@@ -170,7 +160,8 @@ public class GroupConcept {
 		GroupConcept result = new GroupConcept();
 		for(Concept concept : this.list) {
 			if( ( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
-				  concept.getStatus() == Config.Status.selectedEigenvectorConcept
+				  concept.getStatus() == Config.Status.selectedEigenvectorConcept ||
+				  concept.getStatus() == Config.Status.selected 				  
 				) &&
 				concept.getIteration() == iteration
 				) {
@@ -183,7 +174,8 @@ public class GroupConcept {
 		GroupConcept result = new GroupConcept();
 		for(Concept concept : this.list) {
 			if( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
-				concept.getStatus() == Config.Status.selectedEigenvectorConcept
+				concept.getStatus() == Config.Status.selectedEigenvectorConcept  ||
+                concept.getStatus() == Config.Status.selected 				  
 			   ) {
 			   result.add(concept);
 			}
@@ -201,6 +193,31 @@ public class GroupConcept {
 	}
 	
 
+	// SPECIAL  ========================================================================
+
+	
+	// if is concept "Category", add pure concept too (only concepts of current iteration)
+	public GroupConcept duplicateConceptsWithoutCategory(int iteration) {
+		GroupConcept result = new GroupConcept();
+		for(Concept concept : this.list) {
+			if( concept.getCategory() == Config.Category.yes && concept.getIteration() == iteration) {
+   				// create new concept without "Category"
+   				Concept newConceptWithoutCategory = new Concept(
+   							Concept.extractCategoryFullName(concept.getFullName()),
+    						Concept.extractCategory(concept.getBlankName()), 
+    						Config.Status.selected, 
+    						iteration,
+    						Config.Category.was,
+    						0,    // still is not possible to know the quantity RDFs because it was not yet search rdfs
+    						-1);  // it is not possible to know the component connected  (??? need to be filled ???)
+    			this.add(newConceptWithoutCategory);
+    			result.add(newConceptWithoutCategory);
+       		}
+		}
+		return result;
+	}
+		
+		
 	// IS... ========================================================================
 
 	public boolean isOriginalConcept(String blankName) {
@@ -236,7 +253,10 @@ public class GroupConcept {
 	// GET ELEMENTS AND INFORMATION ========================================================================
 	
 	public Concept getConcept(String blankName) {
-		return this.hash.get(blankName);
+		if(this.hash.containsKey(blankName))
+			return this.hash.get(blankName);
+		else
+			return null;
 	}
 	public int getConnectedComponent(String blankName, int iteration) {
 		Concept concept = this.hash.get(blankName);
@@ -290,4 +310,6 @@ public class GroupConcept {
 		    }
 		return str.toString();
 	}
+
+
 }

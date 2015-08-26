@@ -59,52 +59,56 @@ public class NodesTableArray {
 		return groupConcept;
 	}
 	
-	public NodesTableArray sortBetweenness() {
-		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
+	public NodesTableArray createSortedNodesTableArrayBetweenness() {
+		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
 		Arrays.sort(newTable, new SortBetweenness());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortBetweenness(int first) {
-		if(first > this.max)
-			first = this.max;
-		NodeData newTable[] = Arrays.copyOf(this.table, first);
+	public NodesTableArray createSortedNodesTableArrayBetweenness(int theFirst) {
+		if(theFirst > this.max)
+			theFirst = this.max;
+		NodeData newTable[] = Arrays.copyOf(this.table, theFirst);
 		Arrays.sort(newTable, new SortBetweenness());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortCloseness() {
-		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
+	public NodesTableArray createSortedNodesTableArrayCloseness() {
+		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
 		Arrays.sort(newTable, new SortCloseness());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortCloseness(int first) {
-		if(first > this.max)
-			first = this.max;
-		NodeData newTable[] = Arrays.copyOf(this.table, first);
+	public NodesTableArray createSortedNodesTableArrayCloseness(int theFirst) {
+		if(theFirst > this.max)
+			theFirst = this.max;
+		NodeData newTable[] = Arrays.copyOf(this.table, theFirst);
 		Arrays.sort(newTable, new SortCloseness());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortEigenvector() {
-		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
+	public NodesTableArray createSortedNodesTableArrayEigenvector() {
+		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
 		Arrays.sort(newTable, new SortEigenvector());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortEigenvector(int first) {
-		if(first > this.max)
-			first = this.max;
-		NodeData newTable[] = Arrays.copyOf(this.table, first);
+	public NodesTableArray createSortedNodesTableArrayEigenvector(int theFirst) {
+		if(theFirst > this.max)
+			theFirst = this.max;
+		NodeData newTable[] = Arrays.copyOf(this.table, theFirst);
 		Arrays.sort(newTable, new SortEigenvector());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray sortBetweennessCloseness(int first) {
-		if(first > this.max)
-			first = this.max;
-		NodeData newTable[] = Arrays.copyOf(this.table, this.table.length);
+	// sort by betweenness, after sort only the first records by closeness
+	public NodesTableArray createSortedNodesTableArrayBetweennessCloseness(int theFirst) {
+		if(theFirst > this.max)
+			theFirst = this.max;
+		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
 		Arrays.sort(newTable, new SortBetweenness());
-		NodeData newNewTable[] = Arrays.copyOf(newTable, first);
+		NodeData newNewTable[] = Arrays.copyOf(newTable, theFirst);
+		Arrays.sort(newNewTable, new SortCloseness());
 		return new NodesTableArray(newNewTable);
 	}
-	public NodesTableArray sortCrescentAverage(int quantity) {
-		NodeData newTable[] = Arrays.copyOf(this.table, quantity);
+	public NodesTableArray createSortedNodesTableArrayCrescentAverage(int theFirst) {
+		if(theFirst > this.max)
+			theFirst = this.max;
+		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
 		Arrays.sort(newTable, new SortCrescentAverage());
 		return new NodesTableArray(newTable);
 	}
@@ -163,9 +167,9 @@ class SortEigenvector implements Comparator<NodeData> {
 class SortCrescentAverage implements Comparator<NodeData> {
 	public int compare(NodeData nodeData1, NodeData nodeData2) {
 		if(nodeData1.getAverage() < nodeData2.getAverage())
-			return 1;
-		else if(nodeData1.getAverage() > nodeData2.getAverage())
 			return -1;
+		else if(nodeData1.getAverage() > nodeData2.getAverage())
+			return 1;
 		else
 			return 0;
 	}

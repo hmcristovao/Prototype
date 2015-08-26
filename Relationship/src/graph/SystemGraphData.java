@@ -188,13 +188,13 @@ public class SystemGraphData {
 	}
 	
 	public void sortBetweennessWholeNetwork() {
-		this.betweennessSortTable = this.nodesTableArray.sortBetweenness();
+		this.betweennessSortTable = this.nodesTableArray.createSortedNodesTableArrayBetweenness();
 	}
 	public void sortClosenessWholeNetwork() {
-		this.closenessSortTable   = this.nodesTableArray.sortCloseness();
+		this.closenessSortTable   = this.nodesTableArray.createSortedNodesTableArrayCloseness();
 	}
 	public void sortEigenvectorWholeNetwork() {
-		this.eigenvectorSortTable = this.nodesTableArray.sortEigenvector(); 
+		this.eigenvectorSortTable = this.nodesTableArray.createSortedNodesTableArrayEigenvector(); 
 	}
 	
 	// create rank of MeasuresRanks objects
@@ -267,17 +267,17 @@ public class SystemGraphData {
 			// create each new sort table with measures from BasicTableArray
 			currentNodesTableArray = this.ranks.getMeasuresRankTable(i).getBasicTable();
 			
-			sortedNodesTableArray  = currentNodesTableArray.sortBetweenness();
+			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayBetweenness();
 			this.ranks.getMeasuresRankTable(i).setBetweenness(sortedNodesTableArray);
 			
-			sortedNodesTableArray  = currentNodesTableArray.sortCloseness();
+			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayCloseness();
 			this.ranks.getMeasuresRankTable(i).setCloseness(sortedNodesTableArray);
 			
-			sortedNodesTableArray  = currentNodesTableArray.sortEigenvector();
+			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayEigenvector();
 			this.ranks.getMeasuresRankTable(i).setEigenvector(sortedNodesTableArray);
 			
 			int filterQuantity = (int)(WholeSystem.getQuantityOriginalConcepts() * Config.proporcionBetweenness);
-			sortedNodesTableArray  = currentNodesTableArray.sortBetweennessCloseness(filterQuantity);
+			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayBetweennessCloseness(filterQuantity);
 			this.ranks.getMeasuresRankTable(i).setBetweennessCloseness(sortedNodesTableArray);	
 		}
 	}
@@ -308,7 +308,9 @@ public class SystemGraphData {
 					k++;
 					// add this node in the general register concepts
 					Concept concept = new Concept(currentNodeData.getFullName(),currentNodeData.getShortName(), 
-							                      Config.Status.selectedBetweennessClosenessConcept, iteration, Config.Category.no, 0, i);
+							                      Config.Status.selectedBetweennessClosenessConcept, iteration, Config.Category.no, 
+							                      0,  // still do not possible to know the quantity of rdfs
+							                      i);
 					WholeSystem.getConceptsRegister().add(concept);
 					count++;
 				}
@@ -343,7 +345,9 @@ public class SystemGraphData {
 					k++;
 					// add this node in the general register concepts
 					Concept concept = new Concept(currentNodeData.getFullName(),currentNodeData.getShortName(), 
-							                      Config.Status.selectedEigenvectorConcept, iteration, Config.Category.no, 0, i);
+							                      Config.Status.selectedEigenvectorConcept, iteration, Config.Category.no, 
+							                      0, // still do not possible to know the quantity of rdfs 
+							                      i);
 					WholeSystem.getConceptsRegister().add(concept);
 					count++;
 				}
@@ -403,34 +407,53 @@ public class SystemGraphData {
 	// return quantity of concepts that already were category or concepts with zero rdfs
 	public int createSortAverageOnlySelectedConcepts() throws Exception {
 		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
+		
+		if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
+			Log.consoleln("4>>>>>> Memory = null");
+		else
+			Log.consoleln("4>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
+
+		if(selectedConcepts.getConcept("Memory") == null)
+			Log.consoleln("5>>>>>> Memory = null");
+		else
+			Log.consoleln("5>>>>>> Memory = "+selectedConcepts.getConcept("Memory").toStringLong());
+
+		
 		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
 		int quantity = 0, excluded = 0;
 		for(int i=0; i<selectedConcepts.size(); i++) {
 			Concept concept = selectedConcepts.getConcept(i);
 			if(concept.getCategory() != Config.Category.was && concept.getQuantityRdfs() != 0) {	
-				NodeData nodeData = this.getNodeData(concept.getBlankName());
-				nodesTableArray.insert(nodeData);
+				NodeData foundNodeData = this.getNodeData(concept.getBlankName());
+				nodesTableArray.insert(foundNodeData);
 				quantity++;
 			}
-			else
+			else {
 				excluded++;
+Log.consoleln("Concept: "+concept.toStringLong());
+			}
 		}
-Log.consoleln("\n\nquantity="+quantity+"\n\n");
-Log.consoleln(nodesTableArray.toString());
-		//nodesTableArray.sortCrescentAverage(quantity);
-		nodesTableArray.sortBetweenness(quantity);
-Log.consoleln("\n\nsorted 1\n\n");
-Log.consoleln(nodesTableArray.toString());
-		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray);
-Log.consoleln("\n\nsorted 2\n\n");
-Log.consoleln(WholeSystem.getSortAverageSelectedConcepts().toString());
+		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray.createSortedNodesTableArrayCrescentAverage(quantity));
+		
+		if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
+			Log.consoleln("6>>>>>> Memory = null");
+		else
+			Log.consoleln("6>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
+
+		if(selectedConcepts.getConcept("Memory") == null)
+			Log.consoleln("7>>>>>> Memory = null");
+		else
+			Log.consoleln("7>>>>>> Memory = "+selectedConcepts.getConcept("Memory").toStringLong());
+
+		
+		
 		return excluded;
 	}
 
 		
 	// create a raw map concept from Stream Graph
 	// return quantity of repeated propositions (not inserted)
-	public int buildRawConceptMap() {
+	public int buildRawConceptMapFromStreamGraph() {
 		int quantityRepeatedPropositions = 0;
 		for( org.graphstream.graph.Node node : WholeSystem.getStreamGraphData().getStreamGraph().getEachNode() ) {
 			for( org.graphstream.graph.Edge edge : node.getEachEdge()) {
