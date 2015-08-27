@@ -10,7 +10,7 @@ import org.gephi.statistics.plugin.ConnectedComponents;
 import org.graphstream.graph.Graph;
 
 import user.Concept;
-import user.GroupConcept;
+import user.ConceptsGroup;
 
 public class SystemGraphData {
 	private GephiGraphData gephiGraphData;
@@ -229,7 +229,7 @@ public class SystemGraphData {
 		}
 	}
 
-	// build the basic table to each connected component
+	// build the parse table to each connected component
 	// and build the group of the original concepts
 	public void buildSubGraphsTablesInConnectedComponents() throws Exception {
 		org.gephi.graph.api.Graph currentGephiGraph;
@@ -403,77 +403,37 @@ public class SystemGraphData {
 	
 	// copy selected concepts to a NodesTableArray
 	// sort this table e store it in WholeSystem.sortAverageSelectedConcepts
-	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
-	// return quantity of concepts that already were category or concepts with zero rdfs
-	public int createSortAverageOnlySelectedConcepts() throws Exception {
-		GroupConcept selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
-		
-		if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
-			Log.consoleln("4>>>>>> Memory = null");
-		else
-			Log.consoleln("4>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
-
-		if(selectedConcepts.getConcept("Memory") == null)
-			Log.consoleln("5>>>>>> Memory = null");
-		else
-			Log.consoleln("5>>>>>> Memory = "+selectedConcepts.getConcept("Memory").toStringLong());
-
-		
+	public void createSortAverageOnlySelectedConcepts() throws Exception {
+		ConceptsGroup selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
 		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
-		int quantity = 0, excluded = 0;
 		for(int i=0; i<selectedConcepts.size(); i++) {
 			Concept concept = selectedConcepts.getConcept(i);
-			if(concept.getCategory() != Config.Category.was && concept.getQuantityRdfs() != 0) {	
-				NodeData foundNodeData = this.getNodeData(concept.getBlankName());
-				nodesTableArray.insert(foundNodeData);
-				quantity++;
-			}
-			else {
-				excluded++;
-Log.consoleln("Concept: "+concept.toStringLong());
-			}
+			NodeData foundNodeData = this.getNodeData(concept.getBlankName());
+			nodesTableArray.insert(foundNodeData);
 		}
-		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray.createSortedNodesTableArrayCrescentAverage(quantity));
-		
-		if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
-			Log.consoleln("6>>>>>> Memory = null");
-		else
-			Log.consoleln("6>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
-
-		if(selectedConcepts.getConcept("Memory") == null)
-			Log.consoleln("7>>>>>> Memory = null");
-		else
-			Log.consoleln("7>>>>>> Memory = "+selectedConcepts.getConcept("Memory").toStringLong());
-
-		
-		
-		return excluded;
+		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray.createSortedNodesTableArrayCrescentAverage());
 	}
-
 		
 	// create a raw map concept from Stream Graph
 	// return quantity of repeated propositions (not inserted)
 	public int buildRawConceptMapFromStreamGraph() {
 		int quantityRepeatedPropositions = 0;
-		for( org.graphstream.graph.Node node : WholeSystem.getStreamGraphData().getStreamGraph().getEachNode() ) {
-			for( org.graphstream.graph.Edge edge : node.getEachEdge()) {
-				NodeData sourceConcept = this.getNodeData(edge.getSourceNode().getId());
-				NodeData targetConcept = this.getNodeData(edge.getTargetNode().getId());
-				// if it can not intert, plus 1
-				if(!WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept)) {
-					quantityRepeatedPropositions++;
-					continue;
-				}
-				
-				// if exist extra edges then get each one
-				for(int numberExtraEdge = 0; ; numberExtraEdge++) {
-					if(edge.getAttribute("nextedge"+numberExtraEdge) == null) 
-						break;
-					else {
-						// if it can not intert, plus 1
-						if(!WholeSystem.getConceptMap().insert(sourceConcept, (String)edge.getAttribute("nextedge"+numberExtraEdge), targetConcept)) {
-							quantityRepeatedPropositions++;
-						}
+		for( org.graphstream.graph.Edge edge : WholeSystem.getStreamGraphData().getStreamGraph().getEachEdge()) {
+			NodeData sourceConcept = this.getNodeData(edge.getSourceNode().getId());
+			NodeData targetConcept = this.getNodeData(edge.getTargetNode().getId());
+            // if it can not intert, plus 1
+			if(!WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept)) {
+				quantityRepeatedPropositions++;
+				continue;
+			}
+			// if exist extra edges then get each one
+			for(int numberExtraEdge = 0; ; numberExtraEdge++) {
+				if(edge.getAttribute("nextedge"+numberExtraEdge) == null) 
+					break;
+				else {
+					// if it can not intert, plus 1
+					if(!WholeSystem.getConceptMap().insert(sourceConcept, (String)edge.getAttribute("nextedge"+numberExtraEdge), targetConcept)) {
+						quantityRepeatedPropositions++;
 					}
 				}
 			}

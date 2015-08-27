@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import user.Concept;
-import user.GroupConcept;
+import user.ConceptsGroup;
 import main.*;
 
 public class NodesTableArray {
@@ -46,17 +46,17 @@ public class NodesTableArray {
 		}
 		return originalQuantity;
 	}
-	public GroupConcept getGroupOriginalConcepts() {
-		GroupConcept groupConcept = new GroupConcept();
+	public ConceptsGroup getGroupOriginalConcepts() {
+		ConceptsGroup conceptsGroup = new ConceptsGroup();
 		Concept concept;
 		for(int i=0; i<this.count; i++) {
 			if(this.table[i].getStatus() == Config.Status.originalConcept) {
 				concept = WholeSystem.getConceptsRegister().getConcept(this.table[i].getShortName());
 				// concept = new Concept(this.table[i].getStrIdNode(), this.table[i].getShortName(), this.table[i].getStatus(), 0, Config.Category.no, 0, Config.withoutConnectedComponent);  
-				groupConcept.add(concept);
+				conceptsGroup.add(concept);
 			}
 		}
-		return groupConcept;
+		return conceptsGroup;
 	}
 	
 	public NodesTableArray createSortedNodesTableArrayBetweenness() {
@@ -105,9 +105,7 @@ public class NodesTableArray {
 		Arrays.sort(newNewTable, new SortCloseness());
 		return new NodesTableArray(newNewTable);
 	}
-	public NodesTableArray createSortedNodesTableArrayCrescentAverage(int theFirst) {
-		if(theFirst > this.max)
-			theFirst = this.max;
+	public NodesTableArray createSortedNodesTableArrayCrescentAverage() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
 		Arrays.sort(newTable, new SortCrescentAverage());
 		return new NodesTableArray(newTable);

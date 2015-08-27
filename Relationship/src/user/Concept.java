@@ -1,7 +1,7 @@
 package user;
 
+import parse.Token;
 import main.*;
-import basic.Token;
 
 public class Concept {
 	private String           fullName;  // with address and underline

@@ -2,7 +2,7 @@ package graph;
 
 import main.Config;
 import user.Concept;
-import user.GroupConcept;
+import user.ConceptsGroup;
 
 public class MeasuresRanks {
 	private int connectedComponentNumber;  
@@ -13,7 +13,7 @@ public class MeasuresRanks {
 	private NodesTableArray eigenvector;
 	private NodesTableArray betweennessCloseness;
 	
-	private GroupConcept originalGroupConcept;
+	private ConceptsGroup originalGroupConcept;
 
 	public MeasuresRanks(int number) {
 		this.connectedComponentNumber         = number;
@@ -23,7 +23,7 @@ public class MeasuresRanks {
 		this.closeness                        = null;
 		this.eigenvector                      = null;
 		this.betweennessCloseness         	  = null;
-		this.originalGroupConcept             = new GroupConcept();
+		this.originalGroupConcept             = new ConceptsGroup();
 	}
 	
 	public int getConnectedComponentNumber() {
@@ -68,7 +68,7 @@ public class MeasuresRanks {
 	public void setBetweennessCloseness(NodesTableArray betweennessCloseness) {
 		this.betweennessCloseness = betweennessCloseness;
 	}
-	public GroupConcept getOriginalGroupConcepts() {
+	public ConceptsGroup getOriginalGroupConcepts() {
 		return this.originalGroupConcept;
 	}
 

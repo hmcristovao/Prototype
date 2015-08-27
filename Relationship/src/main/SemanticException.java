@@ -1,5 +1,5 @@
 package main;
-import basic.*;
+import parse.*;
 
 // herda de ParseExpection para aproveitar o throws colocado automaticamente em todos os métodos gerados pelo Javacc
 @SuppressWarnings("serial")

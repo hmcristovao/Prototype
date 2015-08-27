@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gexf xmlns="http://www.gexf.net/1.2draft" version="1.2" xmlns:viz="http://www.gexf.net/1.2draft/viz" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.gexf.net/1.2draft http://www.gexf.net/1.2draft/gexf.xsd">
-  <meta lastmodifieddate="2015-08-26">
+  <meta lastmodifieddate="2015-08-27">
     <creator>Gephi 0.8.1</creator>
     <description></description>
   </meta>
   <graph defaultedgetype="directed" mode="static">
     <attributes class="node" mode="static">
+      <attribute id="eccentricity" title="Eccentricity" type="double">
+        <default>0.0</default>
+      </attribute>
+      <attribute id="closnesscentrality" title="Closeness Centrality" type="double">
+        <default>0.0</default>
+      </attribute>
+      <attribute id="betweenesscentrality" title="Betweenness Centrality" type="double">
+        <default>0.0</default>
+      </attribute>
+      <attribute id="eigencentrality" title="Eigenvector Centrality" type="double">
+        <default>0.0</default>
+      </attribute>
       <attribute id="componentnumber" title="Component ID" type="integer">
         <default>0</default>
       </attribute>
@@ -13,449 +25,935 @@
         <default>0</default>
       </attribute>
     </attributes>
-    <attributes class="edge" mode="static">
-      <attribute id="nextedge0" title="nextedge0" type="string"></attribute>
-    </attributes>
     <nodes>
-      <node id="Concept skeleton">
+      <node id="Educational technology" label="Educational technology">
         <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="8"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="-381.06613" y="173.19519" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept map" label="Concept map">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="7"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="286.86377" y="-143.56271" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept Maps">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="9"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="460.37006" y="-61.875397" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept mapping">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="10"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="97.28784" y="254.41785" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="CmapTools">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="11"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="380.00323" y="-451.7187" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Visual Understanding Environment">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="12"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="41.238586" y="-127.466644" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concepts map">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="13"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="-23.759735" y="-274.9526" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept Map">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="14"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="254.19049" y="83.70471" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Category:Knowledge representation">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="0"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="-312.29718" y="204.18549" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Category:Concepts">
-        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
           <attvalue for="componentnumber" value="0"></attvalue>
           <attvalue for="strongcompnum" value="1"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="-415.44748" y="41.71942" z="0.0"></viz:position>
+        <viz:position x="480.3291" y="-378.34927" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
-      <node id="Category:Graph drawing">
+      <node id="Educational psychology category" label="Educational psychology category">
         <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
           <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="2"></attvalue>
+          <attvalue for="strongcompnum" value="0"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="70.21533" y="346.1991" z="0.0"></viz:position>
+        <viz:position x="-441.85675" y="-353.15054" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
-      <node id="Category:Educational technology">
+      <node id="Distance education" label="Distance education">
         <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="1"></attvalue>
           <attvalue for="strongcompnum" value="3"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="141.35309" y="-300.59137" z="0.0"></viz:position>
+        <viz:position x="-388.97202" y="432.43555" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
-      <node id="Category:Diagrams">
+      <node id="Learning methods category" label="Learning methods category">
         <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="4"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="1"></attvalue>
+          <attvalue for="strongcompnum" value="2"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="175.22296" y="57.48114" z="0.0"></viz:position>
+        <viz:position x="138.19507" y="164.71228" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
-      <node id="Category:Note-taking">
+      <node id="Learning programs category" label="Learning programs category">
         <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="2"></attvalue>
           <attvalue for="strongcompnum" value="5"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="92.35724" y="228.14197" z="0.0"></viz:position>
+        <viz:position x="369.5398" y="39.93463" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
-      <node id="Category:Visual thinking">
+      <node id="Learning methods category" label="Learning methods category">
         <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="6"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="2"></attvalue>
+          <attvalue for="strongcompnum" value="4"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="442.14545" y="351.01624" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept fan">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="15"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="-126.34308" y="13.598816" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept (disambiguation)">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="16"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="365.8059" y="481.8485" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept maps">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="17"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="148.53375" y="462.34302" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Bubble Map">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="18"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="-45.043304" y="355.22095" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Bubble map">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="19"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="436.40076" y="-430.45187" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept diagram">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="20"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="-340.94415" y="-175.76163" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Concept-mapping">
-        <attvalues>
-          <attvalue for="componentnumber" value="0"></attvalue>
-          <attvalue for="strongcompnum" value="21"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="321.8885" y="-429.70663" z="0.0"></viz:position>
+        <viz:position x="-448.55157" y="-333.8393" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
       <node id="Meaningful learning" label="Meaningful learning">
         <attvalues>
-          <attvalue for="componentnumber" value="1"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="3"></attvalue>
+          <attvalue for="strongcompnum" value="7"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-34.65616" y="305.7113" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning category" label="Learning category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="3"></attvalue>
+          <attvalue for="strongcompnum" value="6"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="9.70755" y="-124.17755" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Microlearning" label="Microlearning">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="4"></attvalue>
+          <attvalue for="strongcompnum" value="9"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="211.23224" y="176.0152" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology category" label="Educational technology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="4"></attvalue>
+          <attvalue for="strongcompnum" value="8"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="279.6031" y="-19.644196" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational psychology category" label="Educational psychology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="5"></attvalue>
+          <attvalue for="strongcompnum" value="11"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="440.40588" y="429.93463" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Pedagogy category" label="Pedagogy category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="5"></attvalue>
+          <attvalue for="strongcompnum" value="10"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-305.33685" y="484.96222" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology" label="Educational technology">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="6"></attvalue>
+          <attvalue for="strongcompnum" value="13"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="299.9906" y="86.90393" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Distance education category" label="Distance education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="6"></attvalue>
+          <attvalue for="strongcompnum" value="12"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="351.43646" y="-430.2758" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning programs category" label="Learning programs category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="7"></attvalue>
+          <attvalue for="strongcompnum" value="15"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-420.54938" y="-183.14001" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Pedagogy category" label="Pedagogy category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="7"></attvalue>
+          <attvalue for="strongcompnum" value="14"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="363.47815" y="-351.07532" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Virtual learning environment" label="Virtual learning environment">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="8"></attvalue>
+          <attvalue for="strongcompnum" value="17"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-16.645447" y="48.878296" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning methods category" label="Learning methods category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="8"></attvalue>
+          <attvalue for="strongcompnum" value="16"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-436.3908" y="-420.33365" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Microlearning" label="Microlearning">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="9"></attvalue>
+          <attvalue for="strongcompnum" value="19"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="290.17444" y="-142.09143" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational psychology category" label="Educational psychology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="9"></attvalue>
+          <attvalue for="strongcompnum" value="18"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-157.28784" y="240.52557" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Edutech" label="Edutech">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="10"></attvalue>
+          <attvalue for="strongcompnum" value="21"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-347.72476" y="124.27045" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology category" label="Educational technology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="10"></attvalue>
+          <attvalue for="strongcompnum" value="20"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="392.42834" y="6.638214" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Distance education" label="Distance education">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="11"></attvalue>
           <attvalue for="strongcompnum" value="23"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="7.832672" y="-430.89923" z="0.0"></viz:position>
+        <viz:position x="-113.02124" y="-93.14319" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
-      <node id="Category:Learning">
+      <node id="Distance education category" label="Distance education category">
         <attvalues>
-          <attvalue for="componentnumber" value="1"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="11"></attvalue>
           <attvalue for="strongcompnum" value="22"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="-450.3528" y="25.166626" z="0.0"></viz:position>
+        <viz:position x="479.47205" y="-15.470947" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
-      <node id="David Paul Ausubel">
+      <node id="Learning programs category" label="Learning programs category">
         <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="12"></attvalue>
+          <attvalue for="strongcompnum" value="25"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="484.563" y="448.5321" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning category" label="Learning category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="12"></attvalue>
+          <attvalue for="strongcompnum" value="24"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="20.879211" y="-261.8393" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology" label="Educational technology">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="13"></attvalue>
+          <attvalue for="strongcompnum" value="27"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-283.71637" y="-258.99615" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology category" label="Educational technology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="13"></attvalue>
+          <attvalue for="strongcompnum" value="26"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="152.3609" y="-362.9077" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Edutech" label="Edutech">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="14"></attvalue>
+          <attvalue for="strongcompnum" value="29"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-336.01855" y="116.48071" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology" label="Educational technology">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="14"></attvalue>
+          <attvalue for="strongcompnum" value="28"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="186.03058" y="-111.69937" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning methods category" label="Learning methods category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="15"></attvalue>
+          <attvalue for="strongcompnum" value="31"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="212.56659" y="-95.27597" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning category" label="Learning category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="15"></attvalue>
+          <attvalue for="strongcompnum" value="30"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-160.87097" y="-224.866" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Concept map" label="Concept map">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="16"></attvalue>
+          <attvalue for="strongcompnum" value="33"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="47.64508" y="-203.36511" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology category" label="Educational technology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="16"></attvalue>
+          <attvalue for="strongcompnum" value="32"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="381.97003" y="-379.97162" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="United States" label="United States">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="17"></attvalue>
+          <attvalue for="strongcompnum" value="35"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="482.78296" y="189.31097" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="United States" label="United States">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="17"></attvalue>
           <attvalue for="strongcompnum" value="34"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="-318.18817" y="481.3999" z="0.0"></viz:position>
+        <viz:position x="401.18237" y="-487.96625" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
       <node id="David Ausubel" label="David Ausubel">
         <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="33"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="18"></attvalue>
+          <attvalue for="strongcompnum" value="37"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="112.19574" y="375.48474" z="0.0"></viz:position>
+        <viz:position x="504.3761" y="452.54388" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
-      <node id="Ausubel">
+      <node id="United States" label="United States">
         <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="35"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="111.84918" y="-135.33322" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="United States">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="24"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="-353.84424" y="344.26013" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Jean Piaget">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="25"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="-8.134888" y="306.3028" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Educational psychology">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="26"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="66.46637" y="-443.8878" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Psychology">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="27"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="281.34412" y="-223.77667" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Brooklyn">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="28"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="388.68353" y="402.6447" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Category:2008 deaths">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="29"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="372.8017" y="363.98682" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Category:1918 births">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="30"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="116.225525" y="489.37823" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Category:American psychologists">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="31"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="104.303406" y="78.87921" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="Category:Educational psychologists">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
-          <attvalue for="strongcompnum" value="32"></attvalue>
-        </attvalues>
-        <viz:size value="1.0"></viz:size>
-        <viz:position x="402.4344" y="-33.851837" z="0.0"></viz:position>
-        <viz:color r="153" g="153" b="153"></viz:color>
-      </node>
-      <node id="David P. Ausubel">
-        <attvalues>
-          <attvalue for="componentnumber" value="2"></attvalue>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="18"></attvalue>
           <attvalue for="strongcompnum" value="36"></attvalue>
         </attvalues>
         <viz:size value="1.0"></viz:size>
-        <viz:position x="208.25214" y="306.36743" z="0.0"></viz:position>
+        <viz:position x="203.4253" y="-104.1398" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Microlearning" label="Microlearning">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="19"></attvalue>
+          <attvalue for="strongcompnum" value="39"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-233.17639" y="-246.9807" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning category" label="Learning category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="19"></attvalue>
+          <attvalue for="strongcompnum" value="38"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="495.1057" y="-293.93213" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Distance education category" label="Distance education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="20"></attvalue>
+          <attvalue for="strongcompnum" value="41"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="396.67725" y="-199.98166" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology category" label="Educational technology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="20"></attvalue>
+          <attvalue for="strongcompnum" value="40"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-134.77231" y="-151.81033" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Edutech" label="Edutech">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="21"></attvalue>
+          <attvalue for="strongcompnum" value="43"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="371.66663" y="-364.78912" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="United States" label="United States">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="21"></attvalue>
+          <attvalue for="strongcompnum" value="42"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-228.64438" y="477.98846" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Microlearning" label="Microlearning">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="22"></attvalue>
+          <attvalue for="strongcompnum" value="45"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-71.02353" y="379.16785" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Distance education category" label="Distance education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="22"></attvalue>
+          <attvalue for="strongcompnum" value="44"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="182.77423" y="-289.2842" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Distance education category" label="Distance education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="23"></attvalue>
+          <attvalue for="strongcompnum" value="47"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-73.12106" y="-331.4896" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning programs category" label="Learning programs category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="23"></attvalue>
+          <attvalue for="strongcompnum" value="46"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-229.71933" y="104.15204" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Distance education" label="Distance education">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="24"></attvalue>
+          <attvalue for="strongcompnum" value="49"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="334.79968" y="370.15198" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology category" label="Educational technology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="24"></attvalue>
+          <attvalue for="strongcompnum" value="48"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-451.35553" y="502.3733" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Virtual learning environment" label="Virtual learning environment">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="25"></attvalue>
+          <attvalue for="strongcompnum" value="51"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="59.124573" y="42.87848" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology category" label="Educational technology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="25"></attvalue>
+          <attvalue for="strongcompnum" value="50"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="175.62402" y="-398.39688" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Virtual learning environment" label="Virtual learning environment">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="26"></attvalue>
+          <attvalue for="strongcompnum" value="53"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="125.52826" y="-468.4487" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Education category" label="Education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="26"></attvalue>
+          <attvalue for="strongcompnum" value="52"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-309.47162" y="-94.828186" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Learning category" label="Learning category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="27"></attvalue>
+          <attvalue for="strongcompnum" value="55"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-166.66476" y="25.506653" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Education category" label="Education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="27"></attvalue>
+          <attvalue for="strongcompnum" value="54"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="335.6657" y="-428.47955" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational psychology category" label="Educational psychology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="28"></attvalue>
+          <attvalue for="strongcompnum" value="57"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-126.602905" y="-109.73651" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Education category" label="Education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="28"></attvalue>
+          <attvalue for="strongcompnum" value="56"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="245.62158" y="27.349915" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Educational technology category" label="Educational technology category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="29"></attvalue>
+          <attvalue for="strongcompnum" value="59"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-441.80002" y="-409.55807" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Education category" label="Education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="29"></attvalue>
+          <attvalue for="strongcompnum" value="58"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="212.15985" y="117.43042" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Education category" label="Education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="30"></attvalue>
+          <attvalue for="strongcompnum" value="61"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="251.38959" y="61.83246" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Catalysts and potential catalysts of change category" label="Catalysts and potential catalysts of change category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="30"></attvalue>
+          <attvalue for="strongcompnum" value="60"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="436.64398" y="-6.749817" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Education category" label="Education category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="0.0"></attvalue>
+          <attvalue for="componentnumber" value="31"></attvalue>
+          <attvalue for="strongcompnum" value="63"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="-196.37033" y="-38.153656" z="0.0"></viz:position>
+        <viz:color r="153" g="153" b="153"></viz:color>
+      </node>
+      <node id="Knowledge sharing category" label="Knowledge sharing category">
+        <attvalues>
+          <attvalue for="eccentricity" value="1.0"></attvalue>
+          <attvalue for="closnesscentrality" value="1.0"></attvalue>
+          <attvalue for="betweenesscentrality" value="0.0"></attvalue>
+          <attvalue for="eigencentrality" value="1.0"></attvalue>
+          <attvalue for="componentnumber" value="31"></attvalue>
+          <attvalue for="strongcompnum" value="62"></attvalue>
+        </attvalues>
+        <viz:size value="1.0"></viz:size>
+        <viz:position x="167.22375" y="-95.40436" z="0.0"></viz:position>
         <viz:color r="153" g="153" b="153"></viz:color>
       </node>
     </nodes>
     <edges>
-      <edge id="wikiPageRedirects[Concept skeleton-&gt;Concept map]" source="Concept skeleton" target="Concept map" label="wikiPageRedirects[Concept skeleton-&gt;Concept map]">
+      <edge id="#0" source="Educational technology" target="Educational psychology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject[Concept map-&gt;Category:Knowledge representation]" source="Concept map" target="Category:Knowledge representation" label="subject[Concept map-&gt;Category:Knowledge representation]">
+      <edge id="#1" source="Distance education" target="Learning methods category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#000[Concept map-&gt;Category:Concepts]" source="Concept map" target="Category:Concepts" label="subject#000[Concept map-&gt;Category:Concepts]">
+      <edge id="#2" source="Learning programs category" target="Learning methods category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#001[Concept map-&gt;Category:Graph drawing]" source="Concept map" target="Category:Graph drawing" label="subject#001[Concept map-&gt;Category:Graph drawing]">
+      <edge id="#3" source="Meaningful learning" target="Learning category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#002[Concept map-&gt;Category:Educational technology]" source="Concept map" target="Category:Educational technology" label="subject#002[Concept map-&gt;Category:Educational technology]">
+      <edge id="#4" source="Microlearning" target="Educational technology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#003[Concept map-&gt;Category:Diagrams]" source="Concept map" target="Category:Diagrams" label="subject#003[Concept map-&gt;Category:Diagrams]">
+      <edge id="#5" source="Educational psychology category" target="Pedagogy category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#004[Concept map-&gt;Category:Note-taking]" source="Concept map" target="Category:Note-taking" label="subject#004[Concept map-&gt;Category:Note-taking]">
+      <edge id="#6" source="Educational technology" target="Distance education category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#005[Concept map-&gt;Category:Visual thinking]" source="Concept map" target="Category:Visual thinking" label="subject#005[Concept map-&gt;Category:Visual thinking]">
+      <edge id="#7" source="Learning programs category" target="Pedagogy category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#000[Concept Maps-&gt;Concept map]" source="Concept Maps" target="Concept map" label="wikiPageRedirects#000[Concept Maps-&gt;Concept map]">
+      <edge id="#8" source="Virtual learning environment" target="Learning methods category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#001[Concept mapping-&gt;Concept map]" source="Concept mapping" target="Concept map" label="wikiPageRedirects#001[Concept mapping-&gt;Concept map]">
+      <edge id="#9" source="Microlearning" target="Educational psychology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#002[CmapTools-&gt;Concept map]" source="CmapTools" target="Concept map" label="wikiPageRedirects#002[CmapTools-&gt;Concept map]">
+      <edge id="#10" source="Edutech" target="Educational technology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="genre[Visual Understanding Environment-&gt;Concept map]" source="Visual Understanding Environment" target="Concept map" label="genre[Visual Understanding Environment-&gt;Concept map]">
+      <edge id="#11" source="Distance education" target="Distance education category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#003[Concepts map-&gt;Concept map]" source="Concepts map" target="Concept map" label="wikiPageRedirects#003[Concepts map-&gt;Concept map]">
+      <edge id="#12" source="Learning programs category" target="Learning category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#004[Concept Map-&gt;Concept map]" source="Concept Map" target="Concept map" label="wikiPageRedirects#004[Concept Map-&gt;Concept map]">
+      <edge id="#13" source="Educational technology" target="Educational technology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#005[Concept fan-&gt;Concept map]" source="Concept fan" target="Concept map" label="wikiPageRedirects#005[Concept fan-&gt;Concept map]">
+      <edge id="#14" source="Edutech" target="Educational technology" label="industry">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageDisambiguates[Concept (disambiguation)-&gt;Concept map]" source="Concept (disambiguation)" target="Concept map" label="wikiPageDisambiguates[Concept (disambiguation)-&gt;Concept map]">
+      <edge id="#15" source="Learning methods category" target="Learning category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#006[Concept maps-&gt;Concept map]" source="Concept maps" target="Concept map" label="wikiPageRedirects#006[Concept maps-&gt;Concept map]">
+      <edge id="#16" source="Concept map" target="Educational technology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#007[Bubble Map-&gt;Concept map]" source="Bubble Map" target="Concept map" label="wikiPageRedirects#007[Bubble Map-&gt;Concept map]">
+      <edge id="#17" source="United States" target="United States" label="see also">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#008[Bubble map-&gt;Concept map]" source="Bubble map" target="Concept map" label="wikiPageRedirects#008[Bubble map-&gt;Concept map]">
+      <edge id="#18" source="David Ausubel" target="United States" label="nationality">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#009[Concept diagram-&gt;Concept map]" source="Concept diagram" target="Concept map" label="wikiPageRedirects#009[Concept diagram-&gt;Concept map]">
+      <edge id="#19" source="Microlearning" target="Learning category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#010[Concept-mapping-&gt;Concept map]" source="Concept-mapping" target="Concept map" label="wikiPageRedirects#010[Concept-mapping-&gt;Concept map]">
+      <edge id="#20" source="Distance education category" target="Educational technology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#006[Meaningful learning-&gt;Category:Learning]" source="Meaningful learning" target="Category:Learning" label="subject#006[Meaningful learning-&gt;Category:Learning]">
+      <edge id="#21" source="Edutech" target="United States" label="areaServed">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#011[David Paul Ausubel-&gt;David Ausubel]" source="David Paul Ausubel" target="David Ausubel" label="wikiPageRedirects#011[David Paul Ausubel-&gt;David Ausubel]">
+      <edge id="#22" source="Microlearning" target="Distance education category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="nationality[David Ausubel-&gt;United States]" source="David Ausubel" target="United States" label="nationality[David Ausubel-&gt;United States]">
+      <edge id="#23" source="Distance education category" target="Learning programs category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="influences[David Ausubel-&gt;Jean Piaget]" source="David Ausubel" target="Jean Piaget" label="influences[David Ausubel-&gt;Jean Piaget]">
-        <attvalues>
-          <attvalue for="nextedge0" value="influencedBy"></attvalue>
-        </attvalues>
-      </edge>
-      <edge id="field[David Ausubel-&gt;Educational psychology]" source="David Ausubel" target="Educational psychology" label="field[David Ausubel-&gt;Educational psychology]">
+      <edge id="#24" source="Distance education" target="Educational technology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="field#000[David Ausubel-&gt;Psychology]" source="David Ausubel" target="Psychology" label="field#000[David Ausubel-&gt;Psychology]">
+      <edge id="#25" source="Virtual learning environment" target="Educational technology category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="birthPlace[David Ausubel-&gt;Brooklyn]" source="David Ausubel" target="Brooklyn" label="birthPlace[David Ausubel-&gt;Brooklyn]">
-        <attvalues>
-          <attvalue for="nextedge0" value="placeOfBirth"></attvalue>
-        </attvalues>
-      </edge>
-      <edge id="subject#007[David Ausubel-&gt;Category:2008 deaths]" source="David Ausubel" target="Category:2008 deaths" label="subject#007[David Ausubel-&gt;Category:2008 deaths]">
+      <edge id="#26" source="Virtual learning environment" target="Education category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#008[David Ausubel-&gt;Category:1918 births]" source="David Ausubel" target="Category:1918 births" label="subject#008[David Ausubel-&gt;Category:1918 births]">
+      <edge id="#27" source="Learning category" target="Education category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#009[David Ausubel-&gt;Category:American psychologists]" source="David Ausubel" target="Category:American psychologists" label="subject#009[David Ausubel-&gt;Category:American psychologists]">
+      <edge id="#28" source="Educational psychology category" target="Education category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="subject#010[David Ausubel-&gt;Category:Educational psychologists]" source="David Ausubel" target="Category:Educational psychologists" label="subject#010[David Ausubel-&gt;Category:Educational psychologists]">
+      <edge id="#29" source="Educational technology category" target="Education category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageDisambiguates#000[Ausubel-&gt;David Ausubel]" source="Ausubel" target="David Ausubel" label="wikiPageDisambiguates#000[Ausubel-&gt;David Ausubel]">
+      <edge id="#30" source="Education category" target="Catalysts and potential catalysts of change category" label="belongs to">
         <attvalues></attvalues>
       </edge>
-      <edge id="wikiPageRedirects#012[David P. Ausubel-&gt;David Ausubel]" source="David P. Ausubel" target="David Ausubel" label="wikiPageRedirects#012[David P. Ausubel-&gt;David Ausubel]">
+      <edge id="#31" source="Education category" target="Knowledge sharing category" label="belongs to">
         <attvalues></attvalues>
       </edge>
     </edges>

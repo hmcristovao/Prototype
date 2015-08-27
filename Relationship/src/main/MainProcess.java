@@ -1,4 +1,4 @@
-// v4.52 - fixed problem with sort average. Problem with "Category:" subword 
+// v4.6 - fixed problem with "Category:" subword. Problem with recalculate connected component. Need to use Eccentricity.  
 
 package main;
 
@@ -19,8 +19,8 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.stream.gephi.JSONSender;
 
+import parse.*;
 import rdf.SetQuerySparql;
-import basic.*;
 import user.*;
 
 // this class manages the main process and it does system logs
@@ -38,6 +38,7 @@ public class MainProcess {
 				updateCurrentSetQuerySparqlVar();
 				assemblyQueries();
 				collectRDFs();
+				removeConceptsWithZeroRdfs();  // exit whether original concept has zero RDFs
 				createCurrentSystemGraphData();
 				connectStreamVisualization();
 				buildStreamGraphData_buildEdgeTable_fromRdfs();
@@ -72,12 +73,6 @@ public class MainProcess {
 					duplicateConceptsWithoutCategory(iteration);				
 				prepareDataToNewIteration();
 				iteration++;
-				
-if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
-	Log.consoleln("1>>>>>> Memory = null");
-else
-	Log.consoleln("1>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
-
 			} while(true);
 			indicateAlgorithmIntermediateStage1(); // after iterations loop
 			deleteCommonNodes_remainOriginalAndSelectedConcepts();
@@ -91,55 +86,55 @@ else
 			classifyConnectedComponent();
  			buildGexfGraphFile(Config.time.afterIteration);
 			indicateAlgorithmIntermediateStage2(); // selection main concepts
-
-			
-			if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
-				Log.consoleln("2>>>>>> Memory = null");
-			else
-				Log.consoleln("2>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
-
-			
 			// create a average sort list of nodes to get the least 
-			createSortAverageOnlySelectedConcepts();
+			createSortAverageOnlySelectedConcepts(); // exit whether zero selected concepts
 			int baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
 			int nodeDataPos = 0;
 			// loop while:
 			// 1. quantity of selected concepts + original concepts > goal of total concepts, AND
 			// 2. there are not concepts to try the remotion (because the quantity of componentes connected is improving)
-			
-			if(WholeSystem.getConceptsRegister().getConcept("Memory") == null)
-				Log.consoleln("3>>>>>> Memory = null");
-			else
-				Log.consoleln("3>>>>>> Memory = "+WholeSystem.getConceptsRegister().getConcept("Memory").toStringLong());
-
-			
-			
 			while(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
-				  &&
-				  nodeDataPos < WholeSystem.getSortAverageSelectedConcepts().getCount()) {
+				  && nodeDataPos < WholeSystem.getSortAverageSelectedConcepts().getCount()) {
 				
 				// get the node that has the least average				
 				NodeData nodeDataWithLeastAverage = WholeSystem.getSortAverageSelectedConcepts().getNodeData(nodeDataPos);
-				Log.consoleln("Node data with least average: "+nodeDataWithLeastAverage+" (pos: "+nodeDataPos+")");
-				// store the current informations of node that will be deleted (because it can be recovered)
+				Log.consoleln("- Node data with least average: "+nodeDataWithLeastAverage.getShortName()+" (pos: "+nodeDataPos+")");
+				
+				// store the current informations of the node that will be deleted (because it can be recovered)
 				Node currentNode = nodeDataWithLeastAverage.getStreamNode();
 				List<Edge> currentEdgeSet = new ArrayList<Edge>();
 				for(Edge currentEdge : currentNode.getEdgeSet()) {
 					currentEdgeSet.add(currentEdge);
 				}
+				
 				// delete the node in the stream graph
 				WholeSystem.getStreamGraphData().deleteNode(currentNode);
+				
+				// calculate the new connected component
 				classifyConnectedComponent(); 
+				
+				
+				Log.consoleln("- After exclusion, component connected: "+currentSystemGraphData.getConnectedComponentsCount());
+				
 				// if connected component quantity improved then recover the deleted node, edges (to stream graph)
-				Log.consoleln("currentSystemGraphData.getConnectedComponentsCount() > baseConnectedComponentCount "+
-				              currentSystemGraphData.getConnectedComponentsCount() +" > "+ baseConnectedComponentCount);
 				if(currentSystemGraphData.getConnectedComponentsCount() > baseConnectedComponentCount) {
+					Log.consoleln("- Node did not exclude: "+nodeDataWithLeastAverage.getShortName()
+							      +" (connected component improves to "+currentSystemGraphData.getConnectedComponentsCount()+")");
 					WholeSystem.getStreamGraphData().insert(currentNode,currentEdgeSet);
 					// try get the next node:
 					nodeDataPos++;
+					Log.consoleln(" (Stream graph: "+WholeSystem.getStreamGraphData().getTotalNodes() + " nodes)");
+					
+					
+					classifyConnectedComponent(); 
+					Log.consoleln("- Node recovered. Component connected: "+currentSystemGraphData.getConnectedComponentsCount());
+				
+					
 				}
 				// if ok then start at the first node again (the least average node)
 				else {
+					Log.consoleln("- Node data excluded: "+nodeDataWithLeastAverage.getShortName()+".");
+					Log.consoleln(" (Stream graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes() + " nodes)");
 					// cria novo systemGraphData
 					iteration++;
 					createCurrentSystemGraphData();
@@ -150,18 +145,27 @@ else
 					storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 					nodeDataPos = 0;
 					// create a average sort list of nodes to get the least 
-					createSortAverageOnlySelectedConcepts();
+					createSortAverageOnlySelectedConcepts(); // exit whether zero selected concepts
 				}
 			} 
+			
+			String sameReport = "- Total concepts:\n"  
+	                  + "  "+WholeSystem.getSortAverageSelectedConcepts().getCount() + " selected concepts + " 
+					  + WholeSystem.getQuantityOriginalConcepts() + " original concepts = " 
+	                  + (WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts()) + " total concepts\n"
+	                  + "  Connected component count: " + currentSystemGraphData.getConnectedComponentsCount()
+	                  + " (base: " + baseConnectedComponentCount + ")\n" 
+	                  + "  Stream Graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes() + " nodes, " 
+	                  + WholeSystem.getStreamGraphData().getRealTotalEdges() + " edges";
 			// verify whether the goal was achieved: quantity of selected concepts + original concepts == goal of total concepts
 			if(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
-				Log.consoleln("- Goal achieved!!! Total concepts: " + WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts());
-			else
-				Log.consoleln("- Goal did not achieve. Total concepts: " + WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts());
+				Log.consoleln("- Goal achieved!!! \n" + sameReport); 
+			else {
+				Log.consoleln("- Goal did not achieve. \n" + sameReport);
 			    // meta não atingida
 				// tentar retirar seguinda a ordem de betweenness, depois de closeness
 				// mas, se mesmo assim não conseguir processa para atingir o maximo de conceitos possível, mesmo que aumente os connected component 
-			
+			}
 			// create the last GEXF file that represent the graph
             buildGexfGraphFile(Config.time.afterSelectionMainConcepts);
 			indicateAlgorithmFinalStage(); // building concept map
@@ -175,6 +179,7 @@ else
 			upgradeConceptMap_heuristic_01_removeLinkNumber();
 			upgradeConceptMap_heuristic_02_vocabularyTable();
 			upgradeConceptMap_heuristic_03_categoryInTargetConcept();
+			upgradeConceptMap_heuristic_04_categoryInSourceConcept();
 			// create txt file of final concept map
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
@@ -239,16 +244,17 @@ else
 		Log.outFileShortReport(sameReport);
 	}
 	public static void indicateAlgorithmIntermediateStage2() throws Exception {
-		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***" + 
-				" - current concepts quantity: "+WholeSystem.getStreamGraphData().getTotalNodes()+" - "+
-                "goal of concepts quantity: "+WholeSystem.getGoalConceptsQuantity()+
-                " good, "+WholeSystem.getMaxConceptsQuantity()+" maximum.");
-		String sameReport = Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine+
-				"\nCurrent concepts quantity: "+WholeSystem.getStreamGraphData().getTotalNodes()+"."+
-                "\nGoal of concepts quantity: "+WholeSystem.getGoalConceptsQuantity()+
-                " good, "+WholeSystem.getMaxConceptsQuantity()+" maximum.";
-        Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);
+		String sameReport = "Current concepts quantity: "+
+		        WholeSystem.getStreamGraphData().getTotalNodes()+" stream graph  ("+
+		        WholeSystem.getConceptsRegister().getSelectedConcepts().size() + " selected concepts, "+
+		        WholeSystem.getQuantityOriginalConcepts() + " original concepts).  "+
+                "Goal of concepts quantity: "+
+		        WholeSystem.getGoalConceptsQuantity()+ " good, "+
+                WholeSystem.getMaxConceptsQuantity()+" maximum.";
+		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***\n- " + sameReport);
+		String sameReport2 = Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine;
+		Log.outFileCompleteReport(sameReport2+sameReport);
+		Log.outFileShortReport(sameReport2+sameReport);
 	}
 	public static void indicateAlgorithmFinalStage() throws Exception {
 		Log.consoleln("*** Final stage (building concept map) ***");
@@ -285,6 +291,31 @@ else
         Log.outFileCompleteReport(sameReport + "\n\n" + currentSetQuerySparql.toString());
 		Log.outFileShortReport(sameReport);
 	}
+	public static void removeConceptsWithZeroRdfs() throws Exception {
+		Log.console("- Looking for concepts with zero RDFs");
+		ConceptsGroup excludedConcepts = currentSetQuerySparql.removeConceptsWithZeroRdfs();
+		if(excludedConcepts.size() == 0)
+			Log.consoleln(" - neither concept found.");
+		else
+			Log.consoleln(" - " + excludedConcepts.size() + " concepts found and excluded.");
+		String sameReport = "Concepts with zero RDFs: ";
+		if(excludedConcepts.size() == 0) 
+			sameReport += "neither";
+		else
+			sameReport += "\n" + excludedConcepts.toString();
+	    Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
+		// verify whether there is any original concept with zero RDFs
+		if(excludedConcepts.getQuantityOriginalConcept() > 0) {
+			String sameReport2 = "*** Algorithm stoped - there is original concept with zero RDFs\n";
+			sameReport2 += excludedConcepts.getOriginalConcepts().toString();
+			Log.consoleln(sameReport2);
+			Log.outFileCompleteReport(sameReport2);
+			Log.outFileShortReport(sameReport2);
+			end();
+			System.exit(1);
+		}
+	}	
 	public static void createCurrentSystemGraphData() throws Exception {
 		WholeSystem.insertListSystemGraphData(new SystemGraphData());
 		currentSystemGraphData = WholeSystem.getListSystemGraphData().get(iteration);
@@ -510,10 +541,10 @@ else
 		Log.outFileShortReport(sameReport);
 	}
 	public static void duplicateConceptsWithoutCategory(int iteration) throws Exception {
-		Log.console("- Duplicating concepts with \"Category:\" subword after to remove it");
-		GroupConcept newConcepts = WholeSystem.getConceptsRegister().duplicateConceptsWithoutCategory(iteration);
+		Log.console("- Duplicating concepts with \"Category:\" subword");
+		ConceptsGroup newConcepts = WholeSystem.getConceptsRegister().duplicateConceptsWithoutCategory(iteration);
 		Log.consoleln(" - "+newConcepts.size()+" new concepts inserted.");
-		String sameReport = "Duplicated "+newConcepts.size()+" concepts with \"Category:\" subword after to remove it:\n"
+		String sameReport = "Duplicated "+newConcepts.size()+" concepts with \"Category:\" subword:\n"
 				            + newConcepts.toString(); 
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
@@ -546,7 +577,7 @@ else
 		// preparation to a new iteration
 		Log.console("- Preparing data to new iteration");
 		// extract new selected concepts
-		GroupConcept newGroupConcept = WholeSystem.getConceptsRegister().getSelectedConcepts(iteration);
+		ConceptsGroup newGroupConcept = WholeSystem.getConceptsRegister().getSelectedConcepts(iteration);
 		// put the new concepts into the new instance of SetQuerySparql and add it in WholeSystem 
 		SetQuerySparql newSetQuerySparql = new SetQuerySparql();
 		newSetQuerySparql.insertListConcept(newGroupConcept);
@@ -582,11 +613,9 @@ else
 	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
 	public static void createSortAverageOnlySelectedConcepts() throws Exception {
 		Log.console("- Creating sort table (average) of selected concepts");
-		int n = currentSystemGraphData.createSortAverageOnlySelectedConcepts();
-		Log.consoleln(" - "+WholeSystem.getSortAverageSelectedConcepts().getCount()+" nodes stored and sorted ("+
-		              n + " concepts did not insert: that already were category or concepts with zero rdfs).");
-		String sameReport = "Table of selected nodes created and sorted (average)\n"+WholeSystem.getSortAverageSelectedConcepts().toString()+
-				      n + " concepts did not insert: that already were category or concepts with zero rdfs.";
+		currentSystemGraphData.createSortAverageOnlySelectedConcepts();
+		Log.consoleln(" - "+WholeSystem.getSortAverageSelectedConcepts().getCount()+" nodes stored and sorted.");
+		String sameReport = "Table of selected nodes created and sorted (average)\n"+WholeSystem.getSortAverageSelectedConcepts().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);	
 		// zero remain concepts: stop right now
@@ -636,14 +665,21 @@ else
 		Log.outFileShortReport(sameReport);		
 	}
 	public static void upgradeConceptMap_heuristic_03_categoryInTargetConcept()  throws Exception {
-		Log.console("- Upgrading the concept map with first heuristic");
+		Log.console("- Upgrading the concept map with third heuristic");
 		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_03_categoryInTargetConcept();
 		Log.consoleln(" - " + n + " propositions changed.");
 		String sameReport = "Heuristic 03: upgraded "+n+" concept map propositions with change of category in target concept:\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
-	
+	public static void upgradeConceptMap_heuristic_04_categoryInSourceConcept()  throws Exception {
+		Log.console("- Upgrading the concept map with fourth heuristic");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_04_categoryInSourceConcept();
+		Log.consoleln(" - " + n + " propositions changed.");
+		String sameReport = "Heuristic 04: upgraded "+n+" concept map propositions with change of category in source concept:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
 	public static void buildGexfGraphFileFromConceptMap() throws Exception {
 		String nameFileGexf = Config.nameFileGexfGraph + "_concept_map.gexf";
 		Log.console("- Building GEXF Graph File from final concept map");
@@ -670,7 +706,7 @@ else
 		String sameReport = "Closed.\nOk!";
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
-		Log.consoleln("- Ok!");
+		Log.consoleln("- The end.");
 		Log.close();
 	}
 }

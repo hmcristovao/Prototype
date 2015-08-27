@@ -25,7 +25,7 @@ import rdf.OneRDF;
 import rdf.QuerySparql;
 import rdf.SetQuerySparql;
 import user.Concept;
-import user.GroupConcept;
+import user.ConceptsGroup;
 
 enum Deleted { yes, no, yesConcept}; 
 
@@ -305,7 +305,7 @@ public class StreamGraphData {
 
 	/*
 	// do not working...
-	public void addNewConceptsLabel(GroupConcept newConcepts) {
+	public void addNewConceptsLabel(ConceptsGroup newConcepts) {
 		Node node;
 		for(Concept concept : newConcepts.getList()) {
 			node = this.streamGraph.getNode(concept.getBlankName());

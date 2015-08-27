@@ -3,6 +3,7 @@ package rdf;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.apache.jena.riot.WebContent;
@@ -11,7 +12,7 @@ import main.Config;
 import main.Log;
 import main.WholeSystem;
 import user.Concept;
-import user.GroupConcept;
+import user.ConceptsGroup;
 
 import com.hp.hpl.jena.query.Query;
 import com.hp.hpl.jena.query.QueryExecutionFactory;
@@ -71,9 +72,9 @@ public class SetQuerySparql {
 	}
 
 	// fill listQuerySparql with a concept list
-	public void insertListConcept(GroupConcept groupConcept) {
+	public void insertListConcept(ConceptsGroup conceptsGroup) {
 		QuerySparql querySparql;
-		for(Concept concept : groupConcept.getList()) { 
+		for(Concept concept : conceptsGroup.getList()) { 
 			querySparql = new QuerySparql(concept, new QueryString(), new ListRDF());
 			this.listQuerySparql.add(querySparql); 
 		}
@@ -102,8 +103,8 @@ public class SetQuerySparql {
 	}
 	// exceptional function, direct access to original concepts listQuerySparql
 	// return one object LinkedList containing all current concepts short name 
-	public GroupConcept getListCurrentConcepts() {
-		GroupConcept list = new GroupConcept();
+	public ConceptsGroup getListCurrentConcepts() {
+		ConceptsGroup list = new ConceptsGroup();
 		for(QuerySparql x: this.listQuerySparql) 		
 			list.add(x.getConcept());
 		return list;
@@ -189,9 +190,7 @@ public class SetQuerySparql {
 			// update rdfs quantity in concept
 			querySparql.getConcept().setQuantityRdfs(subTotal);
 			// if exist concept into WholeSystem then update its quantity
-Log.consoleln("Conceito no setquerySparql: "+querySparql.getConcept().getBlankName() + "qtde: "+subTotal);
 			WholeSystem.getConceptsRegister().getConcept(querySparql.getConcept().getBlankName()).setQuantityRdfs(subTotal);
-Log.consoleln("Conceito no WholeSystem: "+WholeSystem.getConceptsRegister().getConcept(querySparql.getConcept().getBlankName()).toStringLong());
 		}
 		return total;
 	}
@@ -203,6 +202,27 @@ Log.consoleln("Conceito no WholeSystem: "+WholeSystem.getConceptsRegister().getC
 				return true;
 		}
 		return false;
+	}
+	
+	public ConceptsGroup removeConceptsWithZeroRdfs() {
+		ConceptsGroup zeroRdfsConcepts = new ConceptsGroup();
+		ArrayList<QuerySparql> auxList = new ArrayList<QuerySparql>();
+		// find concepts with zero RDFs
+		for(QuerySparql querySparql : this.listQuerySparql) {
+			if(querySparql.getListRDF().size() == 0) {
+				zeroRdfsConcepts.add(querySparql.getConcept());
+				auxList.add(querySparql);
+			}
+		}
+		// remove concepts with zero RDFs from current SetQuerySparql
+		for(QuerySparql querySparql : auxList) {
+			this.listQuerySparql.remove(querySparql);
+		}
+		// remove concepts with zero RDFs from static ConceptsGroup (in WholeSystem)
+		for(Concept concept : zeroRdfsConcepts.getList()) {
+			WholeSystem.getConceptsRegister().removeConcept(concept.getBlankName());
+		}
+		return zeroRdfsConcepts;
 	}
 	
 	public String toStringShort() {

@@ -3,14 +3,14 @@ package main;
 import graph.*;
 import rdf.*;
 import user.Concept;
-import user.GroupConcept;
+import user.ConceptsGroup;
 import map.*;
 
 import java.util.LinkedList;
 
 public class WholeSystem {
 	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
-	private static GroupConcept conceptsRegister = new GroupConcept();
+	private static ConceptsGroup conceptsRegister = new ConceptsGroup();
 	private static int quantityOriginalConcepts;  // it will be filled from method MainProcess.parseTerms()
 	private static EdgesTableHash edgesTable = new EdgesTableHash(); 
 	private static LinkedList<SetQuerySparql> listSetQuerySparql = new LinkedList<SetQuerySparql>();
@@ -38,7 +38,7 @@ public class WholeSystem {
 	public static StreamGraphData getStreamGraphData() {
 		return WholeSystem.streamGraphData;
 	}
-	public static GroupConcept getConceptsRegister() {
+	public static ConceptsGroup getConceptsRegister() {
 		return WholeSystem.conceptsRegister;
 	}
 	public static EdgesTableHash getEdgesTable() {

@@ -5,7 +5,7 @@ options {
   STATIC = false;
 }
 PARSER_BEGIN(Wrapterms)
-package basic;
+package parse;
 
 import java.io.*;
 import main.*;

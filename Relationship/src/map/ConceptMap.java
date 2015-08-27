@@ -104,6 +104,19 @@ public class ConceptMap {
 		return n;
 	}
 	
+	// the prefix "Category:" in source concept is changed to:
+	// source concept: "... category"
+	public int upgradeConceptMap_heuristic_04_categoryInSourceConcept() {
+		int n = 0;
+		for( Proposition proposition : this.getPropositions()) {
+			if(Concept.verifyIfCategory(proposition.getSourceConcept())) {
+				String newSourceConcept = Concept.extractCategory(proposition.getSourceConcept()) + " category";
+				proposition.setSourceConcept(newSourceConcept);
+				n++;
+			}
+		}
+		return n;
+	}
 	
 	// create a gephiGraph from concept map and generate a gexf file
 	public void buildGexfGraphFileFromConceptMap(String fileGexf) throws Exception {

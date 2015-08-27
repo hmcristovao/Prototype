@@ -5,7 +5,7 @@ import user.Concept;
 import main.Config;
 
 public class NodeData {
-	// basic data
+	// parse data
 	private String strIdNode; // is the same as blankName 
 	private String shortName; // is the same as blankName in the Concept class = strIdNode
 	private String fullName;  // is the same as fullName in the Concept class
