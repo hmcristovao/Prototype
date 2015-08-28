@@ -10,6 +10,7 @@ public class MeasuresRanks {
 	private NodesTableArray basicTable; // without order, to be used in the building of the other tables
 	private NodesTableArray betweenness; 
 	private NodesTableArray closeness;
+	private NodesTableArray eccentricity;
 	private NodesTableArray eigenvector;
 	private NodesTableArray betweennessCloseness;
 	
@@ -21,6 +22,7 @@ public class MeasuresRanks {
 		this.basicTable                       = null; // will be fill before to sort the ranks
 		this.betweenness                      = null; // will be fill when happen the sorts to the ranks
 		this.closeness                        = null;
+		this.eccentricity                     = null;
 		this.eigenvector                      = null;
 		this.betweennessCloseness         	  = null;
 		this.originalGroupConcept             = new ConceptsGroup();
@@ -49,6 +51,12 @@ public class MeasuresRanks {
 	}
 	public void setBetweenness(NodesTableArray betweenness) {
 		this.betweenness = betweenness;
+	}
+	public NodesTableArray getEccentricity() {
+		return this.eccentricity;
+	}
+	public void setEccentricity(NodesTableArray eccentricity) {
+		this.eccentricity = eccentricity;
 	}
 	public NodesTableArray getCloseness() {
 		return this.closeness;
@@ -79,6 +87,9 @@ public class MeasuresRanks {
 		        + "\n"+Config.doubleLine+"Table array (closeness sorted) - Connected component number: "
 		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
 		        + this.getCloseness().toStringShort(quantityNodes) 
+		        + "\n"+Config.doubleLine+"Table array (eccentricity sorted) - Connected component number: "
+		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
+		        + this.getEccentricity().toStringShort(quantityNodes) 
 		        + "\n"+Config.doubleLine+"Table array (eingenvector sorted) - Connected component number: "
 		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
 		        + this.getEigenvector().toStringShort(quantityNodes)		
@@ -94,6 +105,9 @@ public class MeasuresRanks {
 		        + "\n"+Config.doubleLine+"Table array (closeness sorted) - Connected component number: "
 		        + connectedComponentNumber + Config.singleLine  
 		        + this.getCloseness().toString() 
+		        + "\n"+Config.doubleLine+"Table array (eccentricity sorted) - Connected component number: "
+		        + connectedComponentNumber + Config.singleLine  
+		        + this.getEccentricity().toString() 
 		        + "\n"+Config.doubleLine+"Table array (eingenvector sorted) - Connected component number: "
 		        + connectedComponentNumber + Config.singleLine  
 		        + this.getEigenvector().toString()		

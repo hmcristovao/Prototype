@@ -347,35 +347,47 @@ public class StreamGraphData {
 		// second: delete the selected nodes and their respectives edges
 		int quantityDeletedSelectedConcepts = 0;
 		for( Node node : auxList ) {
-			if(this.deleteNode(node) == Deleted.yesConcept)
+			Concept excludedConcept = this.deleteNode(node);
+			// figure out quantity of deleted nodes
+			if(excludedConcept == null)
+				quantityDeletedSelectedConcepts++;
+			else if(!excludedConcept.isOriginal())
 				quantityDeletedSelectedConcepts++;
 		} 
 		return quantityDeletedSelectedConcepts;
 	}
 	
-	// delete a node and all edges linked it
-	// return true if node is a concept
+	// remove node of the concepts register, if it is the case
 	// NEVER it delete an original concept
-	public Deleted deleteNode(Node node) {
-		// if original concept, do not delete
-		if(WholeSystem.getConceptsRegister().isOriginalConcept((String)node.getAttribute("shortblankname"))) 
-		   return Deleted.no;
+	// delete a node and all edges linked it
+	// return equivalente concept (or null whether it is not a concept selected)
+	public Concept deleteNode(Node node) {
+		Concept equivalentConcept = null;
+		// verify whether exist equivalent concept
+		if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
+			equivalentConcept = WholeSystem.getConceptsRegister().getConcept((String)node.getAttribute("shortblankname"));
+			// if original concept, do not delete
+		    if(equivalentConcept.isOriginal()) { 
+		        return equivalentConcept;
+		    }
+		    else {
+		    	// if not original, remove it of the general concepts register
+				WholeSystem.getConceptsRegister().removeConcept(equivalentConcept.getBlankName());
+		    }
+		}
+		
 		this.incTotalNodesDeleted();
 		this.incTotalEdgesDeleted(node.getEdgeSet().size());
 		this.incTotalNodes(-1);
 		this.incTotalEdges(-1*node.getEdgeSet().size());
+		
 		// remove all edges linked with this node
 		for( Edge edge : node.getEachEdge()) {
 			this.streamGraph.removeEdge(edge);
 		}
-		// finally, remove the node of the Stream Graph
-		this.streamGraph.removeNode(node);
-		// remove node of the concepts register, if it is the case
-		if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
-			WholeSystem.getConceptsRegister().removeConcept((String)node.getAttribute("shortblankname"));
-			return Deleted.yesConcept;
-		}
-		return Deleted.yes;
+		// remove the node of the Stream Graph
+		Node x = this.streamGraph.removeNode(node);
+		return equivalentConcept;
 	}
 	
 	// delete a node and all edges linked it

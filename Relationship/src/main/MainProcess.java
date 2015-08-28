@@ -1,4 +1,4 @@
-// v4.6 - fixed problem with "Category:" subword. Problem with recalculate connected component. Need to use Eccentricity.  
+// v4.7 - insert eccentricity.  Working!  
 
 package main;
 
@@ -25,12 +25,17 @@ import user.*;
 
 // this class manages the main process and it does system logs
 public class MainProcess {	
-	public static int iteration = 0;
+	public static int iteration, baseConnectedComponentCount, nodeDataPos;
 	public static SetQuerySparql  currentSetQuerySparql;
-	public static SystemGraphData currentSystemGraphData;
+	public static SystemGraphData currentSystemGraphData, oldSystemGraphData;
+	public static NodeData nodeDataWithLeastEccentricityAndAverage;
+	public static Node currentNode;
+	public static List<Edge> currentEdgeSet;
+	public static Concept excludedConcept;
 	
 	public static void body(Wrapterms parser) throws Exception {
 		try {
+			iteration = 0;
 			start();
 			parseTerms(parser);
 			do {
@@ -52,7 +57,6 @@ public class MainProcess {
 					applyKCoreFilterTrigger();
 				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
-				
 				classifyConnectedComponent();
                 buildGexfGraphFile(Config.time.whileIteration);
 				// conditionals set to continue the iteration
@@ -86,86 +90,50 @@ public class MainProcess {
 			classifyConnectedComponent();
  			buildGexfGraphFile(Config.time.afterIteration);
 			indicateAlgorithmIntermediateStage2(); // selection main concepts
-			// create a average sort list of nodes to get the least 
-			createSortAverageOnlySelectedConcepts(); // exit whether zero selected concepts
-			int baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
-			int nodeDataPos = 0;
+			createSortEccentricityAndAverageOnlySelectedConcepts(); // exit whether zero selected concepts
+			baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
+			nodeDataPos = 0;
 			// loop while:
 			// 1. quantity of selected concepts + original concepts > goal of total concepts, AND
 			// 2. there are not concepts to try the remotion (because the quantity of componentes connected is improving)
-			while(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
-				  && nodeDataPos < WholeSystem.getSortAverageSelectedConcepts().getCount()) {
-				
-				// get the node that has the least average				
-				NodeData nodeDataWithLeastAverage = WholeSystem.getSortAverageSelectedConcepts().getNodeData(nodeDataPos);
-				Log.consoleln("- Node data with least average: "+nodeDataWithLeastAverage.getShortName()+" (pos: "+nodeDataPos+")");
-				
-				// store the current informations of the node that will be deleted (because it can be recovered)
-				Node currentNode = nodeDataWithLeastAverage.getStreamNode();
-				List<Edge> currentEdgeSet = new ArrayList<Edge>();
-				for(Edge currentEdge : currentNode.getEdgeSet()) {
-					currentEdgeSet.add(currentEdge);
-				}
-				
+			while(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
+				  && nodeDataPos < WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount()) {
+			
+				getNodeDataWithLeastEccentricityAndAverage();
+				storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted();
 				// delete the node in the stream graph
-				WholeSystem.getStreamGraphData().deleteNode(currentNode);
-				
+				excludedConcept = WholeSystem.getStreamGraphData().deleteNode(currentNode);
+				// create new environment (with a new gephi graph) and 
 				// calculate the new connected component
+				iteration++;
+				createCurrentSystemGraphData();
+				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();				
 				classifyConnectedComponent(); 
-				
-				
-				Log.consoleln("- After exclusion, component connected: "+currentSystemGraphData.getConnectedComponentsCount());
-				
 				// if connected component quantity improved then recover the deleted node, edges (to stream graph)
 				if(currentSystemGraphData.getConnectedComponentsCount() > baseConnectedComponentCount) {
-					Log.consoleln("- Node did not exclude: "+nodeDataWithLeastAverage.getShortName()
-							      +" (connected component improves to "+currentSystemGraphData.getConnectedComponentsCount()+")");
-					WholeSystem.getStreamGraphData().insert(currentNode,currentEdgeSet);
-					// try get the next node:
+					recoverEnvironmentAndNodeAndEdges();
 					nodeDataPos++;
-					Log.consoleln(" (Stream graph: "+WholeSystem.getStreamGraphData().getTotalNodes() + " nodes)");
-					
-					
-					classifyConnectedComponent(); 
-					Log.consoleln("- Node recovered. Component connected: "+currentSystemGraphData.getConnectedComponentsCount());
-				
-					
+					iteration--;
 				}
 				// if ok then start at the first node again (the least average node)
 				else {
-					Log.consoleln("- Node data excluded: "+nodeDataWithLeastAverage.getShortName()+".");
-					Log.consoleln(" (Stream graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes() + " nodes)");
-					// cria novo systemGraphData
-					iteration++;
-					createCurrentSystemGraphData();
-					buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 					calculateDistanceMeasuresWholeNetwork();
 					storeDistanceMeasuresWholeNetworkToMainNodeTable();
 					calculateEigenvectorMeasureWholeNetwork();
 					storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 					nodeDataPos = 0;
-					// create a average sort list of nodes to get the least 
-					createSortAverageOnlySelectedConcepts(); // exit whether zero selected concepts
+					createSortEccentricityAndAverageOnlySelectedConcepts(); // exit whether zero selected concepts
 				}
 			} 
-			
-			String sameReport = "- Total concepts:\n"  
-	                  + "  "+WholeSystem.getSortAverageSelectedConcepts().getCount() + " selected concepts + " 
-					  + WholeSystem.getQuantityOriginalConcepts() + " original concepts = " 
-	                  + (WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts()) + " total concepts\n"
-	                  + "  Connected component count: " + currentSystemGraphData.getConnectedComponentsCount()
-	                  + " (base: " + baseConnectedComponentCount + ")\n" 
-	                  + "  Stream Graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes() + " nodes, " 
-	                  + WholeSystem.getStreamGraphData().getRealTotalEdges() + " edges";
 			// verify whether the goal was achieved: quantity of selected concepts + original concepts == goal of total concepts
-			if(WholeSystem.getSortAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
-				Log.consoleln("- Goal achieved!!! \n" + sameReport); 
+			if(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
+				Log.consoleln("- Goal achieved!!!"); 
 			else {
-				Log.consoleln("- Goal did not achieve. \n" + sameReport);
-			    // meta não atingida
-				// tentar retirar seguinda a ordem de betweenness, depois de closeness
-				// mas, se mesmo assim não conseguir processa para atingir o maximo de conceitos possível, mesmo que aumente os connected component 
+				Log.consoleln("- Goal did not achieve.");
+				if(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getMaxConceptsQuantity())
+					Log.consoleln("   (However, it is less than the maximum "+WholeSystem.getMaxConceptsQuantity()+" nodes)");
 			}
+			reportAfterSelectionMainConcepts();
 			// create the last GEXF file that represent the graph
             buildGexfGraphFile(Config.time.afterSelectionMainConcepts);
 			indicateAlgorithmFinalStage(); // building concept map
@@ -180,6 +148,8 @@ public class MainProcess {
 			upgradeConceptMap_heuristic_02_vocabularyTable();
 			upgradeConceptMap_heuristic_03_categoryInTargetConcept();
 			upgradeConceptMap_heuristic_04_categoryInSourceConcept();
+// ===========================================upgradeConceptMap_heuristic_05_removeSelfReference();
+			
 			// create txt file of final concept map
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
@@ -232,13 +202,13 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport + WholeSystem.getConceptsRegister().getOriginalConcepts().toString());
 	}
 	public static void indicateIterationNumber() throws Exception {
-		Log.consoleln("*** Iteration "+iteration+" ***");
+		Log.consoleln("\n*** Iteration "+iteration+" ***");
 		String sameReport = Config.starsLine+"Iteration "+iteration+Config.starsLine;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
 	public static void indicateAlgorithmIntermediateStage1() throws Exception {
-		Log.consoleln("*** Intermediate stage 1 (work only with selected and original concepts) ***");
+		Log.consoleln("\n*** Intermediate stage 1 (work only with selected and original concepts) ***");
 		String sameReport = Config.starsLine+"Intermediate stage 1 (work only with selected and original concepts)"+Config.starsLine;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
@@ -251,13 +221,13 @@ public class MainProcess {
                 "Goal of concepts quantity: "+
 		        WholeSystem.getGoalConceptsQuantity()+ " good, "+
                 WholeSystem.getMaxConceptsQuantity()+" maximum.";
-		Log.consoleln("*** Intermediate stage 2 (selection main concepts) ***\n- " + sameReport);
+		Log.consoleln("\n*** Intermediate stage 2 (selection main concepts) ***\n- " + sameReport);
 		String sameReport2 = Config.starsLine+"Intermediate stage 2 (selection main concepts)"+Config.starsLine;
 		Log.outFileCompleteReport(sameReport2+sameReport);
 		Log.outFileShortReport(sameReport2+sameReport);
 	}
 	public static void indicateAlgorithmFinalStage() throws Exception {
-		Log.consoleln("*** Final stage (building concept map) ***");
+		Log.consoleln("\n*** Final stage (building concept map) ***");
 		String sameReport = Config.starsLine+"Final stage (building concept map)"+Config.starsLine;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
@@ -461,11 +431,13 @@ public class MainProcess {
 		Log.consoleln("- Sorting measures of the whole network.");
 		currentSystemGraphData.sortBetweennessWholeNetwork();
 		currentSystemGraphData.sortClosenessWholeNetwork();
+		currentSystemGraphData.sortEccentricityWholeNetwork();
 		currentSystemGraphData.sortEigenvectorWholeNetwork();
 		String sameReport = "Sorted measures of the whole network.";
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
+	// work with current gephi graph (wherefore is better before to use: buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph())
 	public static void classifyConnectedComponent() throws Exception {
 		Log.console("- Classifying connected component");
 		int num = currentSystemGraphData.getGephiGraphData().classifyConnectedComponent();
@@ -609,17 +581,17 @@ public class MainProcess {
 	}
 	
 	// get group of selected concepts and copy them to a new NodesTableArray
-	// sort this table e store it in WholeSystem.sortAverageSelectedConcepts
+	// sort this table e store it in WholeSystem.sortEccentricityAndAverageSelectedConcepts
 	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
-	public static void createSortAverageOnlySelectedConcepts() throws Exception {
-		Log.console("- Creating sort table (average) of selected concepts");
-		currentSystemGraphData.createSortAverageOnlySelectedConcepts();
-		Log.consoleln(" - "+WholeSystem.getSortAverageSelectedConcepts().getCount()+" nodes stored and sorted.");
-		String sameReport = "Table of selected nodes created and sorted (average)\n"+WholeSystem.getSortAverageSelectedConcepts().toString();
+	public static void createSortEccentricityAndAverageOnlySelectedConcepts() throws Exception {
+		Log.console("- Creating eccentricity and average sort table of selected concepts");
+		currentSystemGraphData.createSortEccentricityAndAverageOnlySelectedConcepts();
+		Log.consoleln(" - "+WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount()+" nodes stored and sorted.");
+		String sameReport = "Table of selected nodes created and eccentricity and average (betweenness, closeness, eigenvector) sorted.\n"+WholeSystem.getSortEccentricityAndAverageSelectedConcepts().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);	
 		// zero remain concepts: stop right now
-		if(WholeSystem.getSortAverageSelectedConcepts().getCount() == 0) {
+		if(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() == 0) {
 			Log.consoleln("- Stoping. It's not possible to continue with zero selected concepts.");
 			sameReport = "Algorithm stoped. It's not possible to continue with zero selected concepts.";
 			Log.outFileCompleteReport(sameReport);
@@ -699,6 +671,47 @@ public class MainProcess {
 	}
 	
 	
+	public static void getNodeDataWithLeastEccentricityAndAverage() throws Exception {
+		// get the node that has the least average				
+		nodeDataWithLeastEccentricityAndAverage = WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getNodeData(nodeDataPos);
+		Log.consoleln("- Node data with least eccentricity and average: "+
+		               nodeDataWithLeastEccentricityAndAverage.getShortName()+" (pos: "+nodeDataPos+")");
+	}
+	
+	public static void storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted() {
+		// store the current informations of the environment and node that will be deleted (because it can be recovered)
+		oldSystemGraphData = currentSystemGraphData;
+		currentNode = nodeDataWithLeastEccentricityAndAverage.getStreamNode();
+		currentEdgeSet = new ArrayList<Edge>();
+		for(Edge currentEdge : currentNode.getEdgeSet()) {
+			currentEdgeSet.add(currentEdge);
+		}
+	}
+	
+	public static void recoverEnvironmentAndNodeAndEdges() {
+		Log.consoleln("- Node did not exclude: "+nodeDataWithLeastEccentricityAndAverage.getShortName()
+				      +" (connected component improves to "+currentSystemGraphData.getConnectedComponentsCount()+")");
+		WholeSystem.getStreamGraphData().insert(currentNode,currentEdgeSet);
+		// recover the last environment
+		WholeSystem.getListSystemGraphData().remove(iteration);
+		WholeSystem.getConceptsRegister().add(excludedConcept);	
+		Log.consoleln("- Node recovered. Component connected: "+currentSystemGraphData.getConnectedComponentsCount());
+		Log.consoleln(" (Stream graph: "+WholeSystem.getStreamGraphData().getTotalNodes() + " nodes)");
+		currentSystemGraphData = oldSystemGraphData;
+	}
+		
+	public static void reportAfterSelectionMainConcepts() {
+		String sameReport = "- Total concepts:\n"  
+				+ "  "+WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + " selected concepts + " 
+				+ WholeSystem.getQuantityOriginalConcepts() + " original concepts = " 
+				+ (WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts()) + " total concepts\n"
+				+ "  Connected component count: " + currentSystemGraphData.getConnectedComponentsCount()
+				+ " (base: " + baseConnectedComponentCount + ")\n" 
+				+ "  Stream Graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes() + " nodes, " 
+				+ WholeSystem.getStreamGraphData().getRealTotalEdges() + " edges";
+		Log.consoleln(sameReport);;
+	}
+
 	public static void end() throws Exception {
 		Log.consoleln("- Closing.");
 		if(Config.graphStreamVisualization) 

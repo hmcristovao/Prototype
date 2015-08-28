@@ -28,6 +28,9 @@ public class NodesTableHash {
 	private void putCloseness(String nodeId, double valueCloseness) {
 		this.table.get(nodeId).setCloseness(valueCloseness);
 	}
+	private void putBetweennessCloseness(String nodeId, double valueBetweenness, double valueCloseness) {
+		this.table.get(nodeId).setBetweennessCloseness(valueBetweenness, valueCloseness);
+	}
 	
 	public void buildNodesTableHash(GephiGraphData gephiGraphData) {
 		Double valueBetweenness, valueCloseness;
@@ -38,9 +41,8 @@ public class NodesTableHash {
 		for(Node gephiNode: gephiGraphData.getGephiGraph().getNodes()) {
 			nodeId = gephiNode.getNodeData().getId();
 			valueBetweenness = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnBetweenness.getIndex());
-			this.putBetweenness(nodeId, valueBetweenness.doubleValue());
 			valueCloseness   = (Double)gephiNode.getNodeData().getAttributes().getValue(attributeColumnCloseness.getIndex());
-			this.putCloseness(nodeId, valueCloseness.doubleValue());
+			this.putBetweennessCloseness(nodeId, valueBetweenness.doubleValue(),valueCloseness.doubleValue());
 		}	
 	}
 	

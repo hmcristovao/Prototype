@@ -4,12 +4,12 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "20"; 
+	String  testNumber = "00"; 
 	
-	String nameFileCompletReport = "log\\complete_report_"+Config.testNumber+".txt";
-	String nameFileShortReport   = "log\\short_report_"+Config.testNumber+".txt";
-	String nameFileConsoleReport = "log\\console_report_"+Config.testNumber+".txt";
-	String nameFileConsoleError  = "log\\consoleErr.txt";
+	String nameFileCompletReport = "C:\\Users\\Henrique\\Documents\\log\\complete_report_"+Config.testNumber+".txt";
+	String nameFileShortReport   = "C:\\Users\\Henrique\\Documents\\log\\short_report_"+Config.testNumber+".txt";
+	String nameFileConsoleReport = "C:\\Users\\Henrique\\Documents\\log\\console_report_"+Config.testNumber+".txt";
+	String nameFileConsoleError  = "C:\\Users\\Henrique\\Documents\\log\\consoleErr.txt";
 	String doubleLine = "\n=============================================================================================\n";
 	String singleLine = "\n---------------------------------------------------------------------------------------------\n";
 	String starsLine  = "\n*********************************************************************************************\n";
@@ -23,7 +23,7 @@ public interface Config {
 	
 	
 	// ============================================================================
-	// CONFIG - OUTPUT FILES  (.GEXF and .TXT) 
+	// CONFIG - OUTPUT FILES  (.GEXF and .TXT concept map) 
     //
 	String nameFileGexfGraph      = "graph\\graph"+Config.testNumber;
 	String nameFileTxtConceptMap  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
@@ -79,8 +79,8 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 4;   // better set: 8
-	int maxIteration = 4;  // better set: 12
+	int minIteration = 8;   // better set: 8
+	int maxIteration = 12;  // better set: 12
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;
@@ -108,7 +108,7 @@ public interface Config {
 	// K-core used in all system
 	int kCoreFilter = 2;
 	// since iteration number x to apply K-core filter trigger
-	int iterationTriggerApplyKCoreFilterAlgorithm = 3;  // better set: 5
+	int iterationTriggerApplyKCoreFilterAlgorithm = 5;  // better set: 5
 	// quantity of nodes to shoot K-core n algorithm
 	// int quantityNodesToApplyKcoreFilter = 100;
 	
@@ -117,7 +117,7 @@ public interface Config {
 	// since iteration number x to apply n-degree filter trigger
 	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 1000;  // better set: 5000
+	int quantityNodesToApplyNdegreeFilter = 5000;  // better set: 5000
 	
 	// ============================================================================
 	// CONFIG - REPORT 

@@ -26,6 +26,7 @@ public class NodeData {
 	private double eigenvector;
 	private int partitioning; 
 	private double average;  // arithmetic average of betweenness, closeness and eigenvector
+	private double eccentricity;
 	
 	// constructor to permanent data
 	public NodeData(String strIdNode, 
@@ -116,6 +117,11 @@ public class NodeData {
 		this.betweenness = betweenness;
 		this.average     = (this.betweenness + this.closeness + this.eigenvector)/3.0;
 	}
+	public void setBetweennessCloseness(double betweenness, double closeness) {
+		this.betweenness = betweenness;
+		this.closeness   = closeness;
+		this.average     = (this.betweenness + this.closeness + this.eigenvector)/3.0;
+	}
 	public double getCloseness() {
 		return this.closeness;
 	}
@@ -140,6 +146,12 @@ public class NodeData {
 	public double getAverage() {
 		return this.average;
 	}
+	public double getEccentricity() {
+		return this.eccentricity;
+	}
+	public void setEccentricity(double eccentricity) {
+		this.eccentricity = eccentricity;
+	}
 	
 	public int compareTo(NodeData nodeData) {
 		return this.strIdNode.compareTo(nodeData.strIdNode);
@@ -153,6 +165,7 @@ public class NodeData {
 				"\nConnected component: " + this.getConnectedComponent() +
 				"\nBetweenness:         " + this.getBetweenness() +
 				"\nCloseness:           " + this.getCloseness() +
+				"\nEccentricity:        " + this.getEccentricity() +
 				"\nEigenvector:         " + this.getEigenvector() +
 				"\nAverage:             " + this.getAverage() +
 				"\nPartitioning:        " + this.getPartitioning();

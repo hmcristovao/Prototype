@@ -31,6 +31,7 @@ public class GephiGraphData {
 	private AttributeColumn betweennessColumn;
 	private AttributeColumn closenessColumn;
 	private AttributeColumn eigenvectorColumn;
+	private AttributeColumn eccentricityColumn;
 	private AttributeColumn connectedComponentColumn;
 	private Graph gephiGraph;
 	
@@ -54,6 +55,7 @@ public class GephiGraphData {
 		this.betweennessColumn        = null;
 		this.closenessColumn          = null;
 		this.eigenvectorColumn        = null;
+		this.eccentricityColumn       = null;
 		this.connectedComponentColumn = null;
 	}
 	
@@ -83,6 +85,9 @@ public class GephiGraphData {
 	public AttributeColumn getEigenvectorColumn() {
 		return this.eigenvectorColumn;
 	}
+	public AttributeColumn getEccentricityColumn() {
+		return this.eccentricityColumn;
+	}
 	public AttributeColumn getConnectedComponentColumn() {
 		return this.connectedComponentColumn;
 	}
@@ -92,8 +97,7 @@ public class GephiGraphData {
 		return quantityNodesEdges;
 	}
 	
-	
-	// calculate measures of the table. In our case, we use only betweenness and closeness
+	// calculate measures of the table: betweenness, closeness and eccentricity
 	public void calculateGephiGraphDistanceMeasures() {
 		GraphDistance graphDistance = new GraphDistance();
 		graphDistance.setDirected(false);
@@ -102,6 +106,7 @@ public class GephiGraphData {
 		this.attributeTable 	= this.attributeModel.getNodeTable();
 		this.betweennessColumn  = this.attributeTable.getColumn(GraphDistance.BETWEENNESS);
 		this.closenessColumn    = this.attributeTable.getColumn(GraphDistance.CLOSENESS);
+		this.eccentricityColumn = this.attributeTable.getColumn(GraphDistance.ECCENTRICITY);
 	}
 	
 	// calculate eigenvector measure of the table
@@ -113,6 +118,7 @@ public class GephiGraphData {
 	}
 	
 	// classify connected components
+	// work with current gephi graph (wherefore is better before to use: buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph())
 	public int classifyConnectedComponent() {
 		ConnectedComponents connectedComponents = new ConnectedComponents();
 		connectedComponents.execute(this.graphModel, this.attributeModel);

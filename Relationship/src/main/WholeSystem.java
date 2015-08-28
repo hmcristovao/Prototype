@@ -17,7 +17,7 @@ public class WholeSystem {
 	private static LinkedList<SystemGraphData> listSystemGraphData = new LinkedList<SystemGraphData>();;
 	private static int goalConceptsQuantity; // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
 	private static int maxConceptsQuantity;  // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
-	private static NodesTableArray sortAverageSelectedConcepts; // it will be filled at algorithm final fase 
+	private static NodesTableArray sortEccentricityAndAverageSelectedConcepts; // it will be filled at algorithm final fase 
 	private static VocabularyTable vocabularyTable = new VocabularyTable();;
 	private static ConceptMap conceptMap = new ConceptMap();;
 	
@@ -63,11 +63,11 @@ public class WholeSystem {
 	public static int getMaxConceptsQuantity() {
 		return WholeSystem.maxConceptsQuantity; 
 	}
-	public static NodesTableArray getSortAverageSelectedConcepts() {
-		return WholeSystem.sortAverageSelectedConcepts;
+	public static NodesTableArray getSortEccentricityAndAverageSelectedConcepts() {
+		return WholeSystem.sortEccentricityAndAverageSelectedConcepts;
 	}
-	public static void setSortAverageSelectedConcepts(NodesTableArray nodesTableArray) {
-		WholeSystem.sortAverageSelectedConcepts = nodesTableArray;
+	public static void setSortEccentricityAndAverageSelectedConcepts(NodesTableArray nodesTableArray) {
+		WholeSystem.sortEccentricityAndAverageSelectedConcepts = nodesTableArray;
 	}
 	public static void insertListSetQuerySparql(SetQuerySparql setQuerySparql) {
 		WholeSystem.listSetQuerySparql.add(setQuerySparql);

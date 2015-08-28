@@ -83,6 +83,18 @@ public class NodesTableArray {
 		Arrays.sort(newTable, new SortCloseness());
 		return new NodesTableArray(newTable);
 	}
+	public NodesTableArray createSortedNodesTableArrayEccentricity() {
+		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
+		Arrays.sort(newTable, new SortEccentricity());
+		return new NodesTableArray(newTable);
+	}
+	public NodesTableArray createSortedNodesTableArrayEccentricity(int theFirst) {
+		if(theFirst > this.max)
+			theFirst = this.max;
+		NodeData newTable[] = Arrays.copyOf(this.table, theFirst);
+		Arrays.sort(newTable, new SortEccentricity());
+		return new NodesTableArray(newTable);
+	}
 	public NodesTableArray createSortedNodesTableArrayEigenvector() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
 		Arrays.sort(newTable, new SortEigenvector());
@@ -110,7 +122,11 @@ public class NodesTableArray {
 		Arrays.sort(newTable, new SortCrescentAverage());
 		return new NodesTableArray(newTable);
 	}
-
+	public NodesTableArray createSortedNodesTableArrayCrescentEccentricityAndAverage() {
+		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
+		Arrays.sort(newTable, new SortCrescentEccentricityAndAverage());
+		return new NodesTableArray(newTable);
+	}
 	public String toStringShort(int quantityNodes) {
 		StringBuffer str = new StringBuffer();
 		str.append("Parcial quantity: "+quantityNodes+"\n\n");
@@ -152,6 +168,16 @@ class SortCloseness implements Comparator<NodeData> {
 			return 0;
 	}
 }
+class SortEccentricity implements Comparator<NodeData> {
+	public int compare(NodeData nodeData1, NodeData nodeData2) {
+		if(nodeData1.getEccentricity() < nodeData2.getEccentricity())
+			return 1;
+		else if(nodeData1.getEccentricity() > nodeData2.getEccentricity())
+			return -1;
+		else
+			return 0;
+	}
+}
 class SortEigenvector implements Comparator<NodeData> {
 	public int compare(NodeData nodeData1, NodeData nodeData2) {
 		if(nodeData1.getEigenvector() < nodeData2.getEigenvector())
@@ -172,3 +198,20 @@ class SortCrescentAverage implements Comparator<NodeData> {
 			return 0;
 	}
 }
+class SortCrescentEccentricityAndAverage implements Comparator<NodeData> {
+	public int compare(NodeData nodeData1, NodeData nodeData2) {
+		if(nodeData1.getEccentricity() < nodeData2.getEccentricity())
+			return -1;
+		else if(nodeData1.getEccentricity() > nodeData2.getEccentricity())
+			return 1;
+		else // if eccentricity is equals then it uses average (betweenness, closeness, eigenvector)
+			if(nodeData1.getAverage() < nodeData2.getAverage())
+				return -1;
+			else if(nodeData1.getAverage() > nodeData2.getAverage())
+				return 1;
+			else
+				return 0;
+	}
+}
+
+

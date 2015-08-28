@@ -5,6 +5,8 @@ import map.Proposition;
 
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Edge;
+import org.gephi.graph.api.GraphFactory;
+import org.gephi.graph.api.GraphModel;
 import org.gephi.graph.api.Node;
 import org.gephi.statistics.plugin.ConnectedComponents;
 import org.graphstream.graph.Graph;
@@ -20,6 +22,7 @@ public class SystemGraphData {
 	private Ranks ranks;
 	private NodesTableArray betweennessSortTable;
 	private NodesTableArray closenessSortTable;
+	private NodesTableArray eccentricitySortTable;
 	private NodesTableArray eigenvectorSortTable;
 	
 	public SystemGraphData() {
@@ -34,6 +37,7 @@ public class SystemGraphData {
 		this.ranks                    		= null;
 		this.betweennessSortTable     		= null;
 		this.closenessSortTable       		= null;
+		this.eccentricitySortTable    		= null;
 		this.eigenvectorSortTable     		= null;
 	}
 
@@ -74,6 +78,12 @@ public class SystemGraphData {
 	public void setClosenessSortTable(NodesTableArray closenessSortTable) {
 		this.closenessSortTable = closenessSortTable;
 	}
+	public NodesTableArray getEccentricitySortTable() {
+		return this.eccentricitySortTable;
+	}
+	public void setEccentricitySortTable(NodesTableArray closenessSortTable) {
+		this.eccentricitySortTable = closenessSortTable;
+	}
 	public NodesTableArray getEigenvectorSortTable() {
 		return this.eigenvectorSortTable;
 	}
@@ -96,8 +106,10 @@ public class SystemGraphData {
 			String idNode         = streamNode.toString();
 			String shortBlankName = streamNode.getAttribute("shortblankname");
 			String fullName       = streamNode.getAttribute("fullname");
+
 			// create a new gephiNode
 			Node gephiNode = this.gephiGraphData.getGraphModel().factory().newNode(idNode);
+
 			// add attribute "label" if the concept is selected or original
 			if(WholeSystem.getConceptsRegister().isConcept(shortBlankName)) 
 				gephiNode.getNodeData().getAttributes().setValue(labelAttributeColumn.getIndex(), shortBlankName);
@@ -108,6 +120,7 @@ public class SystemGraphData {
 			this.gephiGraphData.getGephiGraph().addNode(gephiNode);
 			
 			status = WholeSystem.getConceptsRegister().getStatus(shortBlankName);
+
 			// create a new NodeData object
 			newNodeData = new NodeData(idNode, shortBlankName, fullName, streamNode, gephiNode, status);
 			// add attributes to new nodeData
@@ -122,6 +135,7 @@ public class SystemGraphData {
 			
 			// add node in nodesTableArray
 			this.nodesTableArray.insert(newNodeData);
+
 			// add node (the same) in nodesTableHash
 			this.nodesTableHash.put(shortBlankName,  newNodeData);
 			quantityNodesEdges.incNumNodes();
@@ -132,44 +146,55 @@ public class SystemGraphData {
 			String idNodeTarget  = streamEdge.getTargetNode().toString();
 			Node gephiNodeSource = this.gephiGraphData.getGephiGraph().getNode(idNodeSource);
 			Node gephiNodeTarget = this.gephiGraphData.getGephiGraph().getNode(idNodeTarget);
-			Edge gephiEdge  = this.gephiGraphData.getGraphModel().factory().newEdge(streamEdge.toString(), gephiNodeSource, gephiNodeTarget, 1, true);
-			// put "label" if configured to this
-			if(Config.edgeLabelFileGephi)  // or add to all, if configured to this
-				gephiEdge.getEdgeData().getAttributes().setValue(labelAttributeColumn.getIndex(), streamEdge.toString());				
-
-			// if exist, also put the attribute "repeatedTimes" in the edge
-			if(streamEdge.getAttribute("repeatedTimes") != null)
-				gephiEdge.getEdgeData().getAttributes().setValue("repeatedTimes", streamEdge.getAttribute("repeatedTimes"));				
-
-			// if exist, also put the attributes "nextedge#" in the edge
-			for(int numberExtraEdge = 0; ; numberExtraEdge++) {
-				if(streamEdge.getAttribute("nextedge"+numberExtraEdge) == null) 
-					break;
-				else 
-					gephiEdge.getEdgeData().getAttributes().setValue("nextedge"+numberExtraEdge, streamEdge.getAttribute("nextedge"+numberExtraEdge));				
-			}	
+			GraphModel graphModel = this.gephiGraphData.getGraphModel();
+			GraphFactory graphFactory = graphModel.factory();
+			Edge gephiEdge = null;
 			
-			// insert the edge in the gephi graph
-			this.gephiGraphData.getGephiGraph().addEdge(gephiEdge);
-			quantityNodesEdges.getNumEdges();
+			// it is possible that a edge has excluded and still remain there in the graph... (!? it seems a bug in package !?) 
+			if(gephiNodeSource == null)
+				System.err.println("After remotion, source node was lost in edge: "+streamEdge.toString());
+			else if(gephiNodeTarget == null)
+				System.err.println("After remotion, target node was lost in edge: "+streamEdge.toString());
+			else {
+				// only insert the edge if it is ok
+				gephiEdge  = graphFactory.newEdge(streamEdge.toString(), gephiNodeSource, gephiNodeTarget, 1, true);
+				
+				// put "label" if configured to this
+				if(Config.edgeLabelFileGephi)  // or add to all, if configured to this
+					gephiEdge.getEdgeData().getAttributes().setValue(labelAttributeColumn.getIndex(), streamEdge.toString());				
+				
+				// if exist, also put the attribute "repeatedTimes" in the edge
+				if(streamEdge.getAttribute("repeatedTimes") != null)
+					gephiEdge.getEdgeData().getAttributes().setValue("repeatedTimes", streamEdge.getAttribute("repeatedTimes"));				
+				
+				// if exist, also put the attributes "nextedge#" in the edge
+				for(int numberExtraEdge = 0; ; numberExtraEdge++) {
+					if(streamEdge.getAttribute("nextedge"+numberExtraEdge) == null) 
+						break;
+					else 
+						gephiEdge.getEdgeData().getAttributes().setValue("nextedge"+numberExtraEdge, streamEdge.getAttribute("nextedge"+numberExtraEdge));				
+				}	
+				// insert the edge in the gephi graph
+				this.gephiGraphData.getGephiGraph().addEdge(gephiEdge);
+				quantityNodesEdges.getNumEdges();
+			}
 		}		
 		return quantityNodesEdges;
 	}
 	
 	// store results in NodesData set
 	// BEFORE: must calculate calculateGephiGraphDistanceMeasures() from GephiGraphData class
-	public void storeDistanceMeasuresWholeNetwork() {
-		Double betweennessValue, closenessValue;
-		NodeData nodeData;		
+	public void storeDistanceMeasuresWholeNetwork() {		
 		// copy Betweenness and Closeness values to NodesTableArray 
 		for(Node gephiNode: this.gephiGraphData.getGephiGraph().getNodes()) {
 			String nodeId = gephiNode.getNodeData().getId();
-			betweennessValue  = (Double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getBetweennessColumn().getIndex());
-			closenessValue    = (Double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getClosenessColumn().getIndex());
+			double betweennessValue  = (double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getBetweennessColumn().getIndex());
+			double closenessValue    = (double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getClosenessColumn().getIndex());
+			double eccentricityValue = (double)gephiNode.getNodeData().getAttributes().getValue(this.gephiGraphData.getEccentricityColumn().getIndex());
 			// put the values in NodeData by NodeTableHash
-			nodeData = this.nodesTableHash.get(nodeId);
-			nodeData.setBetweenness(betweennessValue);
-			nodeData.setCloseness(closenessValue);
+			NodeData nodeData = this.nodesTableHash.get(nodeId);
+			nodeData.setBetweennessCloseness(betweennessValue, closenessValue);
+			nodeData.setEccentricity(eccentricityValue);
 		}	
 	}
 	// store results in NodesData set
@@ -188,13 +213,16 @@ public class SystemGraphData {
 	}
 	
 	public void sortBetweennessWholeNetwork() {
-		this.betweennessSortTable = this.nodesTableArray.createSortedNodesTableArrayBetweenness();
+		this.betweennessSortTable  = this.nodesTableArray.createSortedNodesTableArrayBetweenness();
 	}
 	public void sortClosenessWholeNetwork() {
-		this.closenessSortTable   = this.nodesTableArray.createSortedNodesTableArrayCloseness();
+		this.closenessSortTable    = this.nodesTableArray.createSortedNodesTableArrayCloseness();
+	}
+	public void sortEccentricityWholeNetwork() {
+		this.eccentricitySortTable = this.nodesTableArray.createSortedNodesTableArrayEccentricity();
 	}
 	public void sortEigenvectorWholeNetwork() {
-		this.eigenvectorSortTable = this.nodesTableArray.createSortedNodesTableArrayEigenvector(); 
+		this.eigenvectorSortTable  = this.nodesTableArray.createSortedNodesTableArrayEigenvector(); 
 	}
 	
 	// create rank of MeasuresRanks objects
@@ -273,6 +301,9 @@ public class SystemGraphData {
 			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayCloseness();
 			this.ranks.getMeasuresRankTable(i).setCloseness(sortedNodesTableArray);
 			
+			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayEccentricity();
+			this.ranks.getMeasuresRankTable(i).setEccentricity(sortedNodesTableArray);
+
 			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayEigenvector();
 			this.ranks.getMeasuresRankTable(i).setEigenvector(sortedNodesTableArray);
 			
@@ -402,8 +433,8 @@ public class SystemGraphData {
 	}
 	
 	// copy selected concepts to a NodesTableArray
-	// sort this table e store it in WholeSystem.sortAverageSelectedConcepts
-	public void createSortAverageOnlySelectedConcepts() throws Exception {
+	// sort this table and store it in WholeSystem.sortEccentricityAndAverageSelectedConcepts
+	public void createSortEccentricityAndAverageOnlySelectedConcepts() throws Exception {
 		ConceptsGroup selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
 		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
 		for(int i=0; i<selectedConcepts.size(); i++) {
@@ -411,7 +442,8 @@ public class SystemGraphData {
 			NodeData foundNodeData = this.getNodeData(concept.getBlankName());
 			nodesTableArray.insert(foundNodeData);
 		}
-		WholeSystem.setSortAverageSelectedConcepts(nodesTableArray.createSortedNodesTableArrayCrescentAverage());
+		// sort and store
+		WholeSystem.setSortEccentricityAndAverageSelectedConcepts(nodesTableArray.createSortedNodesTableArrayCrescentEccentricityAndAverage());
 	}
 		
 	// create a raw map concept from Stream Graph
@@ -421,19 +453,21 @@ public class SystemGraphData {
 		for( org.graphstream.graph.Edge edge : WholeSystem.getStreamGraphData().getStreamGraph().getEachEdge()) {
 			NodeData sourceConcept = this.getNodeData(edge.getSourceNode().getId());
 			NodeData targetConcept = this.getNodeData(edge.getTargetNode().getId());
-            // if it can not intert, plus 1
-			if(!WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept)) {
-				quantityRepeatedPropositions++;
-				continue;
-			}
-			// if exist extra edges then get each one
-			for(int numberExtraEdge = 0; ; numberExtraEdge++) {
-				if(edge.getAttribute("nextedge"+numberExtraEdge) == null) 
-					break;
-				else {
-					// if it can not intert, plus 1
-					if(!WholeSystem.getConceptMap().insert(sourceConcept, (String)edge.getAttribute("nextedge"+numberExtraEdge), targetConcept)) {
-						quantityRepeatedPropositions++;
+			if(sourceConcept != null && targetConcept != null) {
+				// if it can not insert, plus 1
+				if(!WholeSystem.getConceptMap().insert(sourceConcept, edge.getId(), targetConcept)) {
+					quantityRepeatedPropositions++;
+					continue;
+				}
+				// if exist extra edges then get each one
+				for(int numberExtraEdge = 0; ; numberExtraEdge++) {
+					if(edge.getAttribute("nextedge"+numberExtraEdge) == null) 
+						break;
+					else {
+						// if it can not intert, plus 1
+						if(!WholeSystem.getConceptMap().insert(sourceConcept, (String)edge.getAttribute("nextedge"+numberExtraEdge), targetConcept)) {
+							quantityRepeatedPropositions++;
+						}
 					}
 				}
 			}
@@ -448,8 +482,10 @@ public class SystemGraphData {
 				this.nodesTableArray.toString() +
 		        "\n"+Config.doubleLine+"Table array - Betweenness sorted:"+Config.singleLine + 
 				this.betweennessSortTable.toString() +
-		        "\n"+Config.doubleLine+"Table array - Closeness sorted (closeness sorted): "+Config.singleLine + 
+		        "\n"+Config.doubleLine+"Table array - Closeness sorted: "+Config.singleLine + 
 				this.closenessSortTable.toString() +
+		        "\n"+Config.doubleLine+"Table array - Eccentricity sorted: "+Config.singleLine + 
+				this.eccentricitySortTable.toString() +
 		        "\n"+Config.doubleLine+"Table array - Eingenvector sorted: "+Config.singleLine + 
 				this.eigenvectorSortTable.toString() +		
 				this.getRanks().toString();
@@ -463,6 +499,9 @@ public class SystemGraphData {
 		        "\n"+Config.doubleLine+"Table array - Closeness sorted - (only the first "+quantityNodes+" nodes)"+
 				Config.singleLine + 
 				this.closenessSortTable.toStringShort(quantityNodes) +
+		        "\n"+Config.doubleLine+"Table array - Eccentricity sorted - (only the first "+quantityNodes+" nodes)"+
+				Config.singleLine + 
+				this.eccentricitySortTable.toStringShort(quantityNodes) +
 		        "\n"+Config.doubleLine+"Table array - Eingenvector sorted - (only the first "+quantityNodes+" nodes)"+
 				Config.singleLine + 
 				this.eigenvectorSortTable.toStringShort(quantityNodes) +		
