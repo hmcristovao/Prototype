@@ -122,9 +122,9 @@ public class NodesTableArray {
 		Arrays.sort(newTable, new SortCrescentAverage());
 		return new NodesTableArray(newTable);
 	}
-	public NodesTableArray createSortedNodesTableArrayCrescentEccentricityAndAverage() {
+	public NodesTableArray createSortedNodesTableArrayEccentricityAndAverage() {
 		NodeData newTable[] = Arrays.copyOf(this.table, this.count);
-		Arrays.sort(newTable, new SortCrescentEccentricityAndAverage());
+		Arrays.sort(newTable, new SortEccentricityAndAverage());
 		return new NodesTableArray(newTable);
 	}
 	public String toStringShort(int quantityNodes) {
@@ -198,12 +198,13 @@ class SortCrescentAverage implements Comparator<NodeData> {
 			return 0;
 	}
 }
-class SortCrescentEccentricityAndAverage implements Comparator<NodeData> {
+// decrescent in eccentricity and crescent in average (betweenness,closeness,eigenvector)
+class SortEccentricityAndAverage implements Comparator<NodeData> {
 	public int compare(NodeData nodeData1, NodeData nodeData2) {
 		if(nodeData1.getEccentricity() < nodeData2.getEccentricity())
-			return -1;
-		else if(nodeData1.getEccentricity() > nodeData2.getEccentricity())
 			return 1;
+		else if(nodeData1.getEccentricity() > nodeData2.getEccentricity())
+			return -1;
 		else // if eccentricity is equals then it uses average (betweenness, closeness, eigenvector)
 			if(nodeData1.getAverage() < nodeData2.getAverage())
 				return -1;

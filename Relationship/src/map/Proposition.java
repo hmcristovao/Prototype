@@ -1,5 +1,6 @@
 package map;
 
+import user.Concept;
 import graph.NodeData;
 
 public class Proposition {
@@ -17,6 +18,15 @@ public class Proposition {
 		this.link           = link;
 	}
 	
+	// special case: alone concept (original concept with zero degree in Stream Graph)
+	public Proposition(Concept concept) {
+		this.sourceConcept  = concept.getBlankName();
+		this.targetConcept  = null;
+		this.sourceNodeData = null;
+		this.targetNodeData = null;
+		this.link           = null;
+	}
+
 	public String getLink() {
 		return this.link;
 	}
@@ -81,6 +91,9 @@ public class Proposition {
 	}
 
 	public String toString() {
-		return this.sourceConcept + " -> " + this.link + " -> " + this.targetConcept;
+		if(this.link == null)
+			return this.sourceConcept;
+		else
+			return this.sourceConcept + " -> " + this.link + " -> " + this.targetConcept;
 	}
 }

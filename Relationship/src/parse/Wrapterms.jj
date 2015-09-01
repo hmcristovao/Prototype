@@ -11,7 +11,8 @@ import java.io.*;
 import main.*;
 import user.*;
 import rdf.*;
-import map.*; 
+import map.*;
+import graph.*;
 
 public class Wrapterms {
    public static void main(String args[])  throws Exception {
@@ -33,20 +34,25 @@ TOKEN : {
  }
 /*
 Grammar (read of user terms):
-parseUserTerms        ->  ( element() )*  < EOF > 
+parseUserTerms        ->  ( elementUserTerm() )*  < EOF > 
 element               ->  < TERM > ( < SEPARATORS > )*
 
 Grammar (read of link vocabulary):
 parseSystemVocabulary ->  ( line() )*  < EOF >
 line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
 
+Grammar (read of useless concepts):
+parseUserTerms        ->  ( elementUselessConcept() )*  < EOF > 
+elementUselessConcept ->  < TERM > ( < SEPARATORS > )*
+
 */
 
+// list of user terms, separate for comma or new line 
 void parseUserTerms(SetQuerySparql originalSetQuerySparql) : {} 
 {
-   ( element(originalSetQuerySparql) )* < EOF >
+   ( elementUserTerm(originalSetQuerySparql) )* < EOF >
 }
-void element(SetQuerySparql originalSetQuerySparql) : {Token token; Concept concept;}  
+void elementUserTerm(SetQuerySparql originalSetQuerySparql) : {Token token; Concept concept;}  
 {
 	token = < TERM >
     {		concept = new Concept(token);
@@ -57,6 +63,7 @@ void element(SetQuerySparql originalSetQuerySparql) : {Token token; Concept conc
     ( < SEPARATORS > )*
 }
 
+// list of sentences, each one per line 
 void parseSystemVocabulary(VocabularyTable vocabularyTable) : {} 
 {
    ( line(vocabularyTable) )* < EOF >
@@ -69,4 +76,20 @@ void line(VocabularyTable vocabularyTable) : {Token tokenLeft; Token tokenRight;
     }
     ( < SEPARATORS > )*
 }
+
+// list of concepts, separate for comma or new line
+void parseUselessConcepts(UselessConceptsTable uselessConceptsTable) : {} 
+{
+   ( elementUselessConcept(uselessConceptsTable) )* < EOF >
+}
+void elementUselessConcept(UselessConceptsTable uselessConceptsTable) : {Token token;}  
+{
+	token = < TERM >
+    {
+		// copy the useless concept to static attribute in root class:
+		WholeSystem.getUselessConceptsTable().insert(token.image.trim());			
+    }
+    ( < SEPARATORS > )*
+}
+
 

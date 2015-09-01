@@ -9,6 +9,7 @@ import map.*;
 import java.util.LinkedList;
 
 public class WholeSystem {
+	private static UselessConceptsTable uselessConceptsTable = new UselessConceptsTable();
 	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
 	private static ConceptsGroup conceptsRegister = new ConceptsGroup();
 	private static int quantityOriginalConcepts;  // it will be filled from method MainProcess.parseTerms()
@@ -17,8 +18,9 @@ public class WholeSystem {
 	private static LinkedList<SystemGraphData> listSystemGraphData = new LinkedList<SystemGraphData>();;
 	private static int goalConceptsQuantity; // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
 	private static int maxConceptsQuantity;  // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
-	private static NodesTableArray sortEccentricityAndAverageSelectedConcepts; // it will be filled at algorithm final fase 
-	private static VocabularyTable vocabularyTable = new VocabularyTable();;
+	private static NodesTableArray sortEccentricityAndAverageSelectedConcepts;  // it will be filled at algorithm final fase 
+	private static NodesTableArray sortEccentricityAndAverageRemainingConcepts; // it will be filled at algorithm final fase 
+	private static VocabularyTable vocabularyTable = new VocabularyTable();
 	private static ConceptMap conceptMap = new ConceptMap();;
 	
 	public static void initQuantityOriginalConcepts(int quantity) {
@@ -57,6 +59,9 @@ public class WholeSystem {
 	public static VocabularyTable getVocabularyTable() {
 		return WholeSystem.vocabularyTable;
 	}
+	public static UselessConceptsTable getUselessConceptsTable() {
+		return WholeSystem.uselessConceptsTable;
+	}
 	public static int getGoalConceptsQuantity() {
 		return WholeSystem.goalConceptsQuantity; 
 	}
@@ -68,6 +73,12 @@ public class WholeSystem {
 	}
 	public static void setSortEccentricityAndAverageSelectedConcepts(NodesTableArray nodesTableArray) {
 		WholeSystem.sortEccentricityAndAverageSelectedConcepts = nodesTableArray;
+	}
+	public static NodesTableArray getSortEccentricityAndAverageRemainingConcepts() {
+		return WholeSystem.sortEccentricityAndAverageRemainingConcepts;
+	}
+	public static void setSortEccentricityAndAverageRemainingConcepts(NodesTableArray nodesTableArray) {
+		WholeSystem.sortEccentricityAndAverageRemainingConcepts = nodesTableArray;
 	}
 	public static void insertListSetQuerySparql(SetQuerySparql setQuerySparql) {
 		WholeSystem.listSetQuerySparql.add(setQuerySparql);

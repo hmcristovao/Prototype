@@ -432,20 +432,36 @@ public class SystemGraphData {
 		return str.toString();
 	}
 	
-	// copy selected concepts to a NodesTableArray
-	// sort this table and store it in WholeSystem.sortEccentricityAndAverageSelectedConcepts
+	// get group of selected concepts and copy them to a new NodesTableArray
+	// sort this table e store it in WholeSystem.sortEccentricityAndAverageSelectedConcepts
+	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
 	public void createSortEccentricityAndAverageOnlySelectedConcepts() throws Exception {
 		ConceptsGroup selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
-		NodesTableArray nodesTableArray = new NodesTableArray(selectedConcepts.size());
+		NodesTableArray newNodesTableArray = new NodesTableArray(selectedConcepts.size());
 		for(int i=0; i<selectedConcepts.size(); i++) {
 			Concept concept = selectedConcepts.getConcept(i);
 			NodeData foundNodeData = this.getNodeData(concept.getBlankName());
-			nodesTableArray.insert(foundNodeData);
+			newNodesTableArray.insert(foundNodeData);
 		}
 		// sort and store
-		WholeSystem.setSortEccentricityAndAverageSelectedConcepts(nodesTableArray.createSortedNodesTableArrayCrescentEccentricityAndAverage());
+		WholeSystem.setSortEccentricityAndAverageSelectedConcepts(newNodesTableArray.createSortedNodesTableArrayEccentricityAndAverage());
 	}
 		
+	// get remaining concepts in Stream Graph (after iterations) and copy them to a new NodesTableArray
+	// sort this table e store it in WholeSystem.sortEccentricityAndAverageRemainingConcepts
+	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
+	public void createSortEccentricityAndAverageOnlyRemainingConcepts() throws Exception {
+		NodesTableArray newNodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getStreamGraph().getNodeCount());
+		for(org.graphstream.graph.Node streamNode : WholeSystem.getStreamGraphData().getStreamGraph().getEachNode() ) {
+			String shortBlankName = streamNode.getAttribute("shortblankname");
+			NodeData foundNodeData = this.getNodeData(shortBlankName);
+			if(!WholeSystem.getConceptsRegister().isOriginalConcept(shortBlankName))
+				newNodesTableArray.insert(foundNodeData);
+		}
+		// sort and store
+		WholeSystem.setSortEccentricityAndAverageRemainingConcepts(newNodesTableArray.createSortedNodesTableArrayEccentricityAndAverage());
+	}
+
 	// create a raw map concept from Stream Graph
 	// return quantity of repeated propositions (not inserted)
 	public int buildRawConceptMapFromStreamGraph() {

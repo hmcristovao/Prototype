@@ -130,6 +130,7 @@ public class StreamGraphData {
 	//    in the firt iteration build StreamGraphData and EdgeTable from RDFs
 	//    in the second iteration so foth, just add new data (RDFs) into StreamGraphData and EdgeTable
     // (build stream graph from rdfs in set query Sparql)
+	// discard useless concepts (use WholeSystem.uselessConceptsTable to do this operation)
 	public QuantityNodesEdges buildStreamGraphData_buildEdgeTable_fromRdfs(SetQuerySparql setQuerySparql) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
@@ -145,8 +146,8 @@ public class StreamGraphData {
 				// insert into of graph
 				quantityNodesEdges.reset();
 				
-				// map RDF to Graph:
-				this.insertRDF(oneRDF, quantityNodesEdges);
+				// it maps RDF data to Graph data:
+				this.insertRDF_withinTheStreamGraph(oneRDF, quantityNodesEdges);
 				
 				this.incTotalNodes(quantityNodesEdges.getNumNodes());
 				this.incTotalEdges(quantityNodesEdges.getNumEdges());
@@ -160,11 +161,22 @@ public class StreamGraphData {
 	}
 	// only used by buildStreamGraphData_buildEdgeTable
 	// work with only one triple RDF each time
-	private void insertRDF(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
+	// discard useless concepts (use WholeSystem.uselessConceptsTable to do this operation)
+	// return whether it can or it can not insert RDF as graph element
+	private void insertRDF_withinTheStreamGraph(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
 		ItemRDF predicateRDF = oneRDF.getPredicate();
 		ItemRDF objectRDF    = oneRDF.getObject();
+		
+		// verify whether one of nodes belong to RDF is useless
+		// in this case, discard RDF
+		if(WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(subjectRDF.getShortBlankName()) ||
+		   WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(predicateRDF.getShortBlankName())) {
+			quantityNodesEdges.incUselessRDF();
+			return;
+		}
+		
 		Node node = null;
 		Edge edge = null;
 		// work with the subject RDF
@@ -278,6 +290,7 @@ public class StreamGraphData {
 				existentEdge.addAttribute("nextedge"+numberNextFreeAttribute, predicateRDF.getShortBlankName());
 			}
 		}
+		return;
 	}
 	
 	// don't used (instead of, it was used Gephi Tool Kit)

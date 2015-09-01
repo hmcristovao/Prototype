@@ -1,7 +1,8 @@
 influenced -> was influenced for
-influences -> was influenced for
+influences -> received influences of
 influencedBy -> influenced by
 field -> belongs to field
+fields -> belongs to fields
 subject	-> has subject
 core#broader -> is broader of
 leaderName	-> is leader
@@ -12,3 +13,14 @@ wikiPageDisambiguates -> can be confused with
 rdf-schema#seeAlso -> see also
 wikiPageRedirects -> see also
 core#broader -> is part of
+mainInterests -> has as main interest
+owl#differentFrom -> is different of
+mainInterest -> has as main interest
+industry -> is a industry of
+locationCountry -> is located in
+nationality -> has the nationality
+birthPlace -> birth place
+almaMater -> has alma matter
+deathPlace -> death place
+occupation -> has occupacion
+skills -> has skills

@@ -93,7 +93,7 @@ public class GephiGraphData {
 	}
 
 	public QuantityNodesEdges getRealQuantityNodesEdges() {
-		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges(this.gephiGraph.getNodeCount(),this.gephiGraph.getEdgeCount());
+		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges(this.gephiGraph.getNodeCount(),this.gephiGraph.getEdgeCount(),0);
 		return quantityNodesEdges;
 	}
 	
@@ -132,7 +132,7 @@ public class GephiGraphData {
 	public void buildGexfGraphFile(String fileGexf) throws Exception {
 		//Export full graph
 		ExportController exportController = Lookup.getDefault().lookup(ExportController.class);
-	    exportController.exportFile(new File("io_gexf.gexf")); 
+	    // ??? exportController.exportFile(new File("io_gexf.gexf")); 
 		GraphExporter exporter = (GraphExporter) exportController.getExporter("gexf");     //Get GEXF exporter
 		exporter.setExportVisible(false);  // exports all graph
 		exporter.setWorkspace(this.workspace);

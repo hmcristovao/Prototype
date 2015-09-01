@@ -6,6 +6,7 @@ import main.*;
 import user.*;
 import rdf.*;
 import map.*;
+import graph.*;
 
 public class Wrapterms implements WraptermsConstants {
    public static void main(String args[])  throws Exception {
@@ -15,14 +16,20 @@ public class Wrapterms implements WraptermsConstants {
 
 /*
 Grammar (read of user terms):
-parseUserTerms        ->  ( element() )*  < EOF > 
+parseUserTerms        ->  ( elementUserTerm() )*  < EOF > 
 element               ->  < TERM > ( < SEPARATORS > )*
 
 Grammar (read of link vocabulary):
 parseSystemVocabulary ->  ( line() )*  < EOF >
 line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
 
+Grammar (read of useless concepts):
+parseUserTerms        ->  ( elementUselessConcept() )*  < EOF > 
+elementUselessConcept ->  < TERM > ( < SEPARATORS > )*
+
 */
+
+// list of user terms, separate for comma or new line 
   final public void parseUserTerms(SetQuerySparql originalSetQuerySparql) throws ParseException {
     label_1:
     while (true) {
@@ -34,13 +41,13 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
         jj_la1[0] = jj_gen;
         break label_1;
       }
-      element(originalSetQuerySparql);
+      elementUserTerm(originalSetQuerySparql);
     }
     jj_consume_token(0);
   }
 
-  final public void element(SetQuerySparql originalSetQuerySparql) throws ParseException {
-                                                       Token token; Concept concept;
+  final public void elementUserTerm(SetQuerySparql originalSetQuerySparql) throws ParseException {
+                                                               Token token; Concept concept;
     token = jj_consume_token(TERM);
                 concept = new Concept(token);
                 originalSetQuerySparql.insertQuerySparql(concept);
@@ -60,6 +67,7 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
     }
   }
 
+// list of sentences, each one per line 
   final public void parseSystemVocabulary(VocabularyTable vocabularyTable) throws ParseException {
     label_3:
     while (true) {
@@ -120,6 +128,42 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
     }
   }
 
+// list of concepts, separate for comma or new line
+  final public void parseUselessConcepts(UselessConceptsTable uselessConceptsTable) throws ParseException {
+    label_7:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case TERM:
+        ;
+        break;
+      default:
+        jj_la1[6] = jj_gen;
+        break label_7;
+      }
+      elementUselessConcept(uselessConceptsTable);
+    }
+    jj_consume_token(0);
+  }
+
+  final public void elementUselessConcept(UselessConceptsTable uselessConceptsTable) throws ParseException {
+                                                                         Token token;
+    token = jj_consume_token(TERM);
+                // copy the useless concept to static attribute in root class:
+                WholeSystem.getUselessConceptsTable().insert(token.image.trim());
+    label_8:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        break label_8;
+      }
+      jj_consume_token(SEPARATORS);
+    }
+  }
+
   /** Generated Token Manager. */
   public WraptermsTokenManager token_source;
   SimpleCharStream jj_input_stream;
@@ -129,13 +173,13 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[6];
+  final private int[] jj_la1 = new int[8];
   static private int[] jj_la1_0;
   static {
       jj_la1_init_0();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x8,0x10,0x8,0x10,0x10,0x10,};
+      jj_la1_0 = new int[] {0x8,0x10,0x8,0x10,0x10,0x10,0x8,0x10,};
    }
 
   /** Constructor with InputStream. */
@@ -149,7 +193,7 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -163,7 +207,7 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -173,7 +217,7 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -183,7 +227,7 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -192,7 +236,7 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -201,7 +245,7 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 6; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 8; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -257,7 +301,7 @@ line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 8; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

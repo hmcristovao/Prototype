@@ -5,6 +5,7 @@ import main.*;
 import user.*;
 import rdf.*;
 import map.*;
+import graph.*;
 
 /** Token Manager. */
 public class WraptermsTokenManager implements WraptermsConstants

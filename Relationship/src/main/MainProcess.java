@@ -1,4 +1,4 @@
-// v4.7 - insert eccentricity.  Working!  
+// v4.8 - change selected concepts for remainig concepts  
 
 package main;
 
@@ -38,6 +38,8 @@ public class MainProcess {
 			iteration = 0;
 			start();
 			parseTerms(parser);
+			parseUselessConcepts(parser);
+			parseVocabulary(parser);
 			do {
 				indicateIterationNumber();
 				updateCurrentSetQuerySparqlVar();
@@ -79,7 +81,13 @@ public class MainProcess {
 				iteration++;
 			} while(true);
 			indicateAlgorithmIntermediateStage1(); // after iterations loop
-			deleteCommonNodes_remainOriginalAndSelectedConcepts();
+			
+			// very aggressive in removing nodes
+			//deleteCommonNodes_remainOriginalAndSelectedConcepts();
+			
+			// new:
+			applyKCoreFilterTrigger();  // cut alone (almost) selected nodes
+			
 			iteration++;
 			createCurrentSystemGraphData();
 			buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
@@ -90,14 +98,15 @@ public class MainProcess {
 			classifyConnectedComponent();
  			buildGexfGraphFile(Config.time.afterIteration);
 			indicateAlgorithmIntermediateStage2(); // selection main concepts
-			createSortEccentricityAndAverageOnlySelectedConcepts(); // exit whether zero selected concepts
+			// createSortEccentricityAndAverageOnlySelectedConcepts(); // exit whether zero selected concepts
+			createSortEccentricityAndAverageOnlyRemainingConcepts();
 			baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
 			nodeDataPos = 0;
 			// loop while:
 			// 1. quantity of selected concepts + original concepts > goal of total concepts, AND
 			// 2. there are not concepts to try the remotion (because the quantity of componentes connected is improving)
-			while(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
-				  && nodeDataPos < WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount()) {
+			while(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
+				  && nodeDataPos < WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount()) {
 			
 				getNodeDataWithLeastEccentricityAndAverage();
 				storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted();
@@ -122,7 +131,7 @@ public class MainProcess {
 					calculateEigenvectorMeasureWholeNetwork();
 					storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 					nodeDataPos = 0;
-					createSortEccentricityAndAverageOnlySelectedConcepts(); // exit whether zero selected concepts
+					createSortEccentricityAndAverageOnlyRemainingConcepts(); 
 				}
 			} 
 			// verify whether the goal was achieved: quantity of selected concepts + original concepts == goal of total concepts
@@ -133,7 +142,9 @@ public class MainProcess {
 				if(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getMaxConceptsQuantity())
 					Log.consoleln("   (However, it is less than the maximum "+WholeSystem.getMaxConceptsQuantity()+" nodes)");
 			}
-			reportAfterSelectionMainConcepts();
+			// reportAfterSelectionMainConcepts_selectedConcepts();
+			reportAfterSelectionMainConcepts_remainingConcepts();
+
 			// create the last GEXF file that represent the graph
             buildGexfGraphFile(Config.time.afterSelectionMainConcepts);
 			indicateAlgorithmFinalStage(); // building concept map
@@ -142,14 +153,14 @@ public class MainProcess {
 			//
 			// create a GEXF file, like as concept map
             buildGexfGraphFile(Config.time.finalGraph);
-            parseVocabulary(parser);
-			buildRawConceptMapFromStreamGraph();
+            buildRawConceptMapFromStreamGraph();
 			upgradeConceptMap_heuristic_01_removeLinkNumber();
 			upgradeConceptMap_heuristic_02_vocabularyTable();
 			upgradeConceptMap_heuristic_03_categoryInTargetConcept();
 			upgradeConceptMap_heuristic_04_categoryInSourceConcept();
-// ===========================================upgradeConceptMap_heuristic_05_removeSelfReference();
-			
+            upgradeConceptMap_heuristic_05_removeSelfReference();
+            upgradeConceptMap_heuristic_06_createOriginalConceptsWithZeroDegree();
+            
 			// create txt file of final concept map
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
@@ -201,6 +212,17 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport + WholeSystem.getConceptsRegister().getOriginalConcepts().toStringLong());
 		Log.outFileShortReport(sameReport + WholeSystem.getConceptsRegister().getOriginalConcepts().toString());
 	}
+	public static void parseUselessConcepts(Wrapterms parser) throws Exception {
+		Log.console("- Parsing useless concepts");
+		parser = new Wrapterms(new FileInputStream(Config.nameUselessConceptsFile));
+		parser.parseUselessConcepts(WholeSystem.getUselessConceptsTable());
+		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " concepts parsed.");
+		String sameReport = "Quantity of useless concepts parsed: " + WholeSystem.getUselessConceptsTable().size() +   
+                " (file: "+Config.nameUselessConceptsFile+")\n" +
+				"\nUseless concepts parsed:\n" + WholeSystem.getUselessConceptsTable().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
+	}
 	public static void indicateIterationNumber() throws Exception {
 		Log.consoleln("\n*** Iteration "+iteration+" ***");
 		String sameReport = Config.starsLine+"Iteration "+iteration+Config.starsLine;
@@ -216,7 +238,6 @@ public class MainProcess {
 	public static void indicateAlgorithmIntermediateStage2() throws Exception {
 		String sameReport = "Current concepts quantity: "+
 		        WholeSystem.getStreamGraphData().getTotalNodes()+" stream graph  ("+
-		        WholeSystem.getConceptsRegister().getSelectedConcepts().size() + " selected concepts, "+
 		        WholeSystem.getQuantityOriginalConcepts() + " original concepts).  "+
                 "Goal of concepts quantity: "+
 		        WholeSystem.getGoalConceptsQuantity()+ " good, "+
@@ -239,7 +260,7 @@ public class MainProcess {
 		Log.console("- Assembling queries");
 		int num = currentSetQuerySparql.assemblyQueries();
 		Log.consoleln(" - "+num+" new queries assembled.");
-		String sameReport = "Queries assembled: " + num + "\n\n";
+		String sameReport = "Queries assembled: " + num + "\n";
         Log.outFileCompleteReport(sameReport + currentSetQuerySparql.toString());
 		Log.outFileShortReport(sameReport + currentSetQuerySparql.toStringShort());
 	}
@@ -304,16 +325,19 @@ public class MainProcess {
 	// get RDFs and convert them to StreamGraph, but this fucntion is call: 
 	//    in the firt iteration build StreamGraphData and EdgeTable
 	//    in the second iteration so foth, just add new data into StreamGraphData and EdgeTable
+	// discard useless concepts (use WholeSystem.uselessConceptsTable to do this operation)
 	public static void buildStreamGraphData_buildEdgeTable_fromRdfs() throws Exception {
 		Log.console("- Building Stream Graph Data");
 		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData_buildEdgeTable_fromRdfs(currentSetQuerySparql);
-		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" new nodes, "+quantityNodesEdges.getNumEdges()+" new edges in the visualization graph.");
+		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" new nodes, "+quantityNodesEdges.getNumEdges()+" new edges in Stream Graph - " +
+		              quantityNodesEdges.getUselessRDF() + " useless RDFs.");
 		Log.consoleln("- Creating edge hash table - "+WholeSystem.getEdgesTable().size()+" edges.");
 		String sameReport = "Stream Graph Data created (graph used in the preview): \n" + 
 		        quantityNodesEdges.getNumNodes() + " new nodes, " + 
 				quantityNodesEdges.getNumEdges() + " new edges in the visualization graph.\n" +
 		        WholeSystem.getStreamGraphData().getRealTotalNodes() + " total nodes, " +
-		        WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges.";
+		        WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges\n" +
+	            quantityNodesEdges.getUselessRDF() + " useless RDFs.";
 		String sameReport2 = "\n\nEdge hash table created:" + 
 				"\n("+WholeSystem.getEdgesTable().size()+" edges).";
         Log.outFileCompleteReport(sameReport + WholeSystem.getStreamGraphData().toString() + sameReport2 + "\n"+WholeSystem.getEdgesTable().toString());
@@ -507,7 +531,7 @@ public class MainProcess {
 		Log.outFileCompleteReport("Iteration "+iteration);
 		Log.outFileShortReport("Iteration "+iteration);
 		Log.outFileCompleteReport(currentSystemGraphData.toString());
-		Log.outFileShortReport(currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
+		// Log.outFileShortReport(currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
 		String sameReport = currentSystemGraphData.reportSelectedNodes(iteration);			
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
@@ -587,8 +611,8 @@ public class MainProcess {
 		Log.console("- Creating eccentricity and average sort table of selected concepts");
 		currentSystemGraphData.createSortEccentricityAndAverageOnlySelectedConcepts();
 		Log.consoleln(" - "+WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount()+" nodes stored and sorted.");
-		String sameReport = "Table of selected nodes created and eccentricity and average (betweenness, closeness, eigenvector) sorted.\n"+WholeSystem.getSortEccentricityAndAverageSelectedConcepts().toString();
-		Log.outFileCompleteReport(sameReport);
+		String sameReport = "Table of selected nodes created and eccentricity and average (betweenness, closeness, eigenvector) sorted.\n";
+		Log.outFileCompleteReport(sameReport+WholeSystem.getSortEccentricityAndAverageSelectedConcepts().toString());
 		Log.outFileShortReport(sameReport);	
 		// zero remain concepts: stop right now
 		if(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() == 0) {
@@ -600,6 +624,84 @@ public class MainProcess {
 			System.exit(0);
 		}
 	}
+
+	// get group of remaining concepts in Stream Graph (after iterations) and copy them to a new NodesTableArray
+	// sort this table e store it in WholeSystem.sortEccentricityAndAverageRemainingConcepts
+	// (do not enter: original concepts, concepts that already were category or concepts with zero rdfs)
+	public static void createSortEccentricityAndAverageOnlyRemainingConcepts() throws Exception {
+		Log.console("- Creating eccentricity and average sort table of remaining concepts");
+		currentSystemGraphData.createSortEccentricityAndAverageOnlyRemainingConcepts();
+		Log.consoleln(" - "+WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount()+" nodes stored and sorted.");
+		String sameReport = "Table of remaining nodes created and eccentricity and average (betweenness, closeness, eigenvector) sorted.\n";
+		Log.outFileCompleteReport(sameReport+WholeSystem.getSortEccentricityAndAverageRemainingConcepts().toString());
+		Log.outFileShortReport(sameReport);	
+	}
+	
+	
+	public static void getNodeDataWithLeastEccentricityAndAverage() throws Exception {
+		nodeDataWithLeastEccentricityAndAverage = WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getNodeData(nodeDataPos);
+		String sameReport = "Node data with least eccentricity and average: "
+	               +nodeDataWithLeastEccentricityAndAverage.getShortName()
+	               +" (position in group: "+nodeDataPos+")";
+		Log.consoleln("- "+sameReport);
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);	
+	}
+	
+	public static void storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted() {
+		// store the current informations of the environment and node that will be deleted (because it can be recovered)
+		oldSystemGraphData = currentSystemGraphData;
+		currentNode = nodeDataWithLeastEccentricityAndAverage.getStreamNode();
+		currentEdgeSet = new ArrayList<Edge>();
+		for(Edge currentEdge : currentNode.getEdgeSet()) {
+			currentEdgeSet.add(currentEdge);
+		}
+	}
+	
+	public static void recoverEnvironmentAndNodeAndEdges() throws Exception {
+		String sameReport = "Node did not exclude: "+nodeDataWithLeastEccentricityAndAverage.getShortName()
+				      +" (connected component improves to "+currentSystemGraphData.getConnectedComponentsCount()+")";
+		Log.consoleln("- "+sameReport);
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);	
+		WholeSystem.getStreamGraphData().insert(currentNode,currentEdgeSet);
+		// recover the last environment
+		WholeSystem.getListSystemGraphData().remove(iteration);
+		WholeSystem.getConceptsRegister().add(excludedConcept);	
+		currentSystemGraphData = oldSystemGraphData;
+	}
+		
+	public static void reportAfterSelectionMainConcepts_selectedConcepts() throws Exception {
+		String sameReport = "Total concepts:\n"  
+				+ "  "+WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + " selected concepts + " 
+				+ WholeSystem.getQuantityOriginalConcepts() + " original concepts = " 
+				+ (WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts()) + " total concepts"
+				+ "  (goal "+WholeSystem.getGoalConceptsQuantity()
+				+ " to " + WholeSystem.getMaxConceptsQuantity() + ")\n"
+				+ "  Connected component count: " + currentSystemGraphData.getConnectedComponentsCount()
+				+ " (base: " + baseConnectedComponentCount + ")\n" 
+				+ "  Stream Graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes() + " nodes, " 
+				+ WholeSystem.getStreamGraphData().getRealTotalEdges() + " edges";
+		Log.consoleln("- "+sameReport);
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);	
+	}
+	public static void reportAfterSelectionMainConcepts_remainingConcepts() throws Exception {
+		String sameReport = "Total concepts:\n"  
+				+ "  "+WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + " remaining concepts + " 
+				+ WholeSystem.getQuantityOriginalConcepts() + " original concepts = " 
+				+ (WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts()) + " total concepts"
+				+ "  (goal "+WholeSystem.getGoalConceptsQuantity()
+				+ " to " + WholeSystem.getMaxConceptsQuantity() + ")\n"
+				+ "  Connected component count: " + currentSystemGraphData.getConnectedComponentsCount()
+				+ " (base: " + baseConnectedComponentCount + ")\n" 
+				+ "  Stream Graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes() + " nodes, " 
+				+ WholeSystem.getStreamGraphData().getRealTotalEdges() + " edges";
+		Log.consoleln("- "+sameReport);
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);	
+	}
+
 	public static void parseVocabulary(Wrapterms parser) throws Exception {
 		Log.console("- Parsing vocabulary");
 		parser = new Wrapterms(new FileInputStream(Config.nameVocabularyFile));
@@ -617,38 +719,6 @@ public class MainProcess {
 		Log.consoleln(" - "+WholeSystem.getConceptMap().size()+" proposition created (" + n + " repeated propositions - eliminated).");
 		String sameReport = "Built "+WholeSystem.getConceptMap().size()+" raw propositions of the concept map (" + 
 		                     n + " repeated propositions - eliminated):\n" + WholeSystem.getConceptMap().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);		
-	}
-	public static void upgradeConceptMap_heuristic_01_removeLinkNumber()  throws Exception {
-		Log.console("- Upgrading the concept map with first heuristic (remove link number)");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_01_removeLinkNumber();
-		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Heuristic 01: upgraded "+n+" concept map propositions with remove of link number:\n" + WholeSystem.getConceptMap().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);		
-	}
-	public static void upgradeConceptMap_heuristic_02_vocabularyTable()  throws Exception {
-		Log.console("- Upgrading the concept map with second heuristic (change links with vocabulary table)");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_02_vocabularyTable();
-		Log.consoleln(" - " + n + " links name changed.");
-		String sameReport = "Heuristic 02: upgraded "+n+" concept map propositions with use of link vocabulary table:\n" + WholeSystem.getConceptMap().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);		
-	}
-	public static void upgradeConceptMap_heuristic_03_categoryInTargetConcept()  throws Exception {
-		Log.console("- Upgrading the concept map with third heuristic");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_03_categoryInTargetConcept();
-		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Heuristic 03: upgraded "+n+" concept map propositions with change of category in target concept:\n" + WholeSystem.getConceptMap().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);		
-	}
-	public static void upgradeConceptMap_heuristic_04_categoryInSourceConcept()  throws Exception {
-		Log.console("- Upgrading the concept map with fourth heuristic");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_04_categoryInSourceConcept();
-		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Heuristic 04: upgraded "+n+" concept map propositions with change of category in source concept:\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
@@ -670,48 +740,60 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);
 	}
 	
-	
-	public static void getNodeDataWithLeastEccentricityAndAverage() throws Exception {
-		// get the node that has the least average				
-		nodeDataWithLeastEccentricityAndAverage = WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getNodeData(nodeDataPos);
-		Log.consoleln("- Node data with least eccentricity and average: "+
-		               nodeDataWithLeastEccentricityAndAverage.getShortName()+" (pos: "+nodeDataPos+")");
-	}
-	
-	public static void storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted() {
-		// store the current informations of the environment and node that will be deleted (because it can be recovered)
-		oldSystemGraphData = currentSystemGraphData;
-		currentNode = nodeDataWithLeastEccentricityAndAverage.getStreamNode();
-		currentEdgeSet = new ArrayList<Edge>();
-		for(Edge currentEdge : currentNode.getEdgeSet()) {
-			currentEdgeSet.add(currentEdge);
-		}
-	}
-	
-	public static void recoverEnvironmentAndNodeAndEdges() {
-		Log.consoleln("- Node did not exclude: "+nodeDataWithLeastEccentricityAndAverage.getShortName()
-				      +" (connected component improves to "+currentSystemGraphData.getConnectedComponentsCount()+")");
-		WholeSystem.getStreamGraphData().insert(currentNode,currentEdgeSet);
-		// recover the last environment
-		WholeSystem.getListSystemGraphData().remove(iteration);
-		WholeSystem.getConceptsRegister().add(excludedConcept);	
-		Log.consoleln("- Node recovered. Component connected: "+currentSystemGraphData.getConnectedComponentsCount());
-		Log.consoleln(" (Stream graph: "+WholeSystem.getStreamGraphData().getTotalNodes() + " nodes)");
-		currentSystemGraphData = oldSystemGraphData;
-	}
-		
-	public static void reportAfterSelectionMainConcepts() {
-		String sameReport = "- Total concepts:\n"  
-				+ "  "+WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + " selected concepts + " 
-				+ WholeSystem.getQuantityOriginalConcepts() + " original concepts = " 
-				+ (WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts()) + " total concepts\n"
-				+ "  Connected component count: " + currentSystemGraphData.getConnectedComponentsCount()
-				+ " (base: " + baseConnectedComponentCount + ")\n" 
-				+ "  Stream Graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes() + " nodes, " 
-				+ WholeSystem.getStreamGraphData().getRealTotalEdges() + " edges";
-		Log.consoleln(sameReport);;
-	}
 
+	
+	public static void upgradeConceptMap_heuristic_01_removeLinkNumber()  throws Exception {
+		Log.console("- Upgrading the concept map with first heuristic (remove link id number)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_01_removeLinkNumber();
+		Log.consoleln(" - " + n + " propositions changed.");
+		String sameReport = "Heuristic 01: upgraded "+n+" concept map propositions with remove of link number:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	public static void upgradeConceptMap_heuristic_02_vocabularyTable()  throws Exception {
+		Log.console("- Upgrading the concept map with second heuristic (change links with vocabulary table)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_02_vocabularyTable();
+		Log.consoleln(" - " + n + " links name changed.");
+		String sameReport = "Heuristic 02: upgraded "+n+" concept map propositions with use of link vocabulary table:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	public static void upgradeConceptMap_heuristic_03_categoryInTargetConcept()  throws Exception {
+		Log.console("- Upgrading the concept map with third heuristic (change category in target concepts and links)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_03_categoryInTargetConcept();
+		Log.consoleln(" - " + n + " propositions changed.");
+		String sameReport = "Heuristic 03: upgraded "+n+" concept map propositions with change of category in target concept:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	public static void upgradeConceptMap_heuristic_04_categoryInSourceConcept()  throws Exception {
+		Log.console("- Upgrading the concept map with fourth heuristic (change category in source concetp)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_04_categoryInSourceConcept();
+		Log.consoleln(" - " + n + " propositions changed.");
+		String sameReport = "Heuristic 04: upgraded "+n+" concept map propositions with change of category in source concept:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	public static void upgradeConceptMap_heuristic_05_removeSelfReference()  throws Exception {
+		Log.console("- Upgrading the concept map with fifth heuristic (remove self references)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_05_removeSelfReference();
+		Log.consoleln(" - " + n + " propositions changed.");
+		String sameReport = "Heuristic 05: upgraded "+n+" concept map propositions with remotions of the self reference:\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	public static void upgradeConceptMap_heuristic_06_createOriginalConceptsWithZeroDegree()  throws Exception {
+		Log.console("- Upgrading the concept map with sixth heuristic (create original concepts with zero degrees)");
+		ConceptsGroup originalConcepts = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_06_createOriginalConceptsWithZeroDegree(currentSystemGraphData);
+		Log.consoleln(" - " + originalConcepts.size() + " propositions changed.");
+		String sameReport = "Heuristic 06: upgraded "+originalConcepts.size()+" alone original concepts created:\n" + 
+							originalConcepts + "\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	
+	
+	
 	public static void end() throws Exception {
 		Log.consoleln("- Closing.");
 		if(Config.graphStreamVisualization) 

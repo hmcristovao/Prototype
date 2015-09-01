@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "00"; 
+	String  testNumber = "21"; 
 	
 	String nameFileCompletReport = "C:\\Users\\Henrique\\Documents\\log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "C:\\Users\\Henrique\\Documents\\log\\short_report_"+Config.testNumber+".txt";
@@ -17,9 +17,10 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - INPUT FILES 
     //
-	String nameUserTermsFile    = "userterms\\terms"+Config.testNumber+".txt";
-	String nameQueryDefaultFile = "query_model\\query.txt";
-	String nameVocabularyFile   = "vocabulary\\linkvocabulary.txt";
+	String nameUserTermsFile       = "userterms\\terms"+Config.testNumber+".txt";
+	String nameQueryDefaultFile    = "query_model\\query.txt";
+	String nameVocabularyFile      = "vocabulary\\linkvocabulary.txt";
+	String nameUselessConceptsFile = "vocabulary\\uselessconcepts.txt";
 	
 	
 	// ============================================================================
@@ -115,9 +116,9 @@ public interface Config {
 	// N-degree filter used in all system
 	int nDegreeFilter = 2;
 	// since iteration number x to apply n-degree filter trigger
-	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;  // better set: 2
+	int iterationTriggerApplyNDegreeFilterAlgorithm = 5;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 5000;  // better set: 5000
+	int quantityNodesToApplyNdegreeFilter = 10000;  // better set: 5000
 	
 	// ============================================================================
 	// CONFIG - REPORT 

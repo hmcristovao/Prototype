@@ -233,7 +233,6 @@ public class SetQuerySparql {
 			out.append(n++);
 			out.append(": ");
 			out.append(x.toStringShort());
-			out.append("\n");
 		}
 		return out.toString();
 	}
