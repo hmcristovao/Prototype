@@ -1,8 +1,9 @@
 package rdf;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
-public class ListRDF {
+public class ListRDF  implements Serializable {
 	private LinkedList<OneRDF> list;
 	
 	public ListRDF() {

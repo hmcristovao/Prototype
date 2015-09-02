@@ -1,17 +1,13 @@
 package rdf;
 
-import com.hp.hpl.jena.rdf.model.Statement;
+import java.io.Serializable;
 
-public class OneRDF {
-	
-	private Statement statement;
-	
+public class OneRDF  implements Serializable {
 	private ItemRDF subject;
 	private ItemRDF predicate;
 	private ItemRDF object;
 	
-	public OneRDF(Statement statement, ItemRDF subject, ItemRDF predicate, ItemRDF object) {
-		this.statement = statement;
+	public OneRDF(ItemRDF subject, ItemRDF predicate, ItemRDF object) {
 		this.subject   = subject;
 		this.predicate = predicate;
 		this.object    = object;
@@ -26,10 +22,6 @@ public class OneRDF {
 	public ItemRDF getObject() {
 		return this.object;
 	}
-	public Statement getStatement() {
-		return this.statement;
-	}
-	
 	@Override
 	public String toString() {
 		return  "\nsubject = " + this.getSubject() + 

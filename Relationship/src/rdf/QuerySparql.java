@@ -32,6 +32,9 @@ public class QuerySparql {
 	public ListRDF getListRDF() {
 		return this.listRDF;
 	}
+	public void setListRDF(ListRDF listRDF) {
+		this.listRDF = listRDF;
+	}
 	public Model getModel() {
 		return this.model;
 	}

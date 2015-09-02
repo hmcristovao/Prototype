@@ -1,16 +1,17 @@
-// v4.8 - change selected concepts for remainig concepts  
+// v4.9 - insert persistence of RDFs. Don't working.  
 
 package main;
 
-import graph.GephiGraphData;
 import graph.NodeData;
-import graph.NodesTableArray;
 import graph.QuantityNodesEdges;
 import graph.SystemGraphData;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,8 @@ import org.graphstream.graph.Node;
 import org.graphstream.stream.gephi.JSONSender;
 
 import parse.*;
+import rdf.QuerySparql;
+import rdf.RDFsPersistenceTable;
 import rdf.SetQuerySparql;
 import user.*;
 
@@ -28,7 +31,7 @@ public class MainProcess {
 	public static int iteration, baseConnectedComponentCount, nodeDataPos;
 	public static SetQuerySparql  currentSetQuerySparql;
 	public static SystemGraphData currentSystemGraphData, oldSystemGraphData;
-	public static NodeData nodeDataWithLeastEccentricityAndAverage;
+	public static NodeData nodeDataWithLeastEccentricityAndAverage;  // used for selectedConcepts(off) and remainigConcepts
 	public static Node currentNode;
 	public static List<Edge> currentEdgeSet;
 	public static Concept excludedConcept;
@@ -40,11 +43,12 @@ public class MainProcess {
 			parseTerms(parser);
 			parseUselessConcepts(parser);
 			parseVocabulary(parser);
+			readPersistenceRDFsTable();
 			do {
 				indicateIterationNumber();
 				updateCurrentSetQuerySparqlVar();
 				assemblyQueries();
-				collectRDFs();
+				collectRDFsAllQueries();
 				removeConceptsWithZeroRdfs();  // exit whether original concept has zero RDFs
 				createCurrentSystemGraphData();
 				connectStreamVisualization();
@@ -81,7 +85,7 @@ public class MainProcess {
 				iteration++;
 			} while(true);
 			indicateAlgorithmIntermediateStage1(); // after iterations loop
-			
+			savePersistenceRDFsTable();
 			// very aggressive in removing nodes
 			//deleteCommonNodes_remainOriginalAndSelectedConcepts();
 			
@@ -108,7 +112,8 @@ public class MainProcess {
 			while(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
 				  && nodeDataPos < WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount()) {
 			
-				getNodeDataWithLeastEccentricityAndAverage();
+				//getNodeDataWithLeastEccentricityAndAverageFromSelectedConcepts();
+				getNodeDataWithLeastEccentricityAndAverageFromRemainingConcepts();
 				storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted();
 				// delete the node in the stream graph
 				excludedConcept = WholeSystem.getStreamGraphData().deleteNode(currentNode);
@@ -223,6 +228,69 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
+	public static void parseVocabulary(Wrapterms parser) throws Exception {
+		Log.console("- Parsing vocabulary");
+		parser = new Wrapterms(new FileInputStream(Config.nameVocabularyFile));
+		parser.parseSystemVocabulary(WholeSystem.getVocabularyTable());
+		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " sentences parsed.");
+		String sameReport = "Quantity of vocabulary sentences parsed: " + WholeSystem.getVocabularyTable().size() +   
+                " (file: "+Config.nameVocabularyFile+")\n" +
+				"\nVocabulary table parsed:\n" + WholeSystem.getVocabularyTable().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
+	}
+	public static void readPersistenceRDFsTable() throws Exception {
+		Log.console("- Reading persistence RDFs table");
+		try {
+			ObjectInputStream buffer = new ObjectInputStream(new FileInputStream(Config.namePersistenceRDFsTableFile));
+			WholeSystem.setRdfsPersistenceTable((RDFsPersistenceTable)buffer.readObject());
+			buffer.close();
+			Log.consoleln(" - " + WholeSystem.getRdfsPersistenceTable().size() + " concepts read of file "+
+			              Config.namePersistenceRDFsTableFile + ".");
+			String sameReport = "Persistence RDFs table read to "+WholeSystem.getRdfsPersistenceTable().size() + " concepts of file "+
+					             Config.namePersistenceRDFsTableFile + ".";
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);			
+		}
+		catch(FileNotFoundException e) {
+			Log.console(" - file "+Config.namePersistenceRDFsTableFile+" created for the first time");
+			String sameReport = "Persistence RDFs table file created for the first time: "+Config.namePersistenceRDFsTableFile + ".";
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);			
+		}
+	}
+	// record in file all RDFs that are in main memory
+	public static void savePersistenceRDFsTable() throws Exception {
+		Log.console("- Saving concepts with its RDFs in file");
+		// at first add new concepts in WholeSystem.rdfsPersistenceTable
+		int countNewConcepts = 0;
+		for(QuerySparql querySparql : currentSetQuerySparql.getListQuerySparql()) {
+			if(!WholeSystem.getRdfsPersistenceTable().containsKey(querySparql.getConcept().getBlankName())) {
+				WholeSystem.getRdfsPersistenceTable().put(querySparql.getConcept().getBlankName(), querySparql.getListRDF());
+				countNewConcepts++;
+			}
+		}
+		// whether it exists new concepts still do not recorded, then record all concepts/RDFs in file
+		if(countNewConcepts > 0) {
+			ObjectOutputStream buffer = new ObjectOutputStream(new FileOutputStream(Config.namePersistenceRDFsTableFile));
+			buffer.writeObject(WholeSystem.getRdfsPersistenceTable()) ; 
+			buffer.flush(); 
+			buffer.close();
+			Log.consoleln(" - " + countNewConcepts + " new concepts and "+WholeSystem.getRdfsPersistenceTable().size() + " total concepts saved.");
+			String sameReport = "Saved "+countNewConcepts+" new concepts and "+ WholeSystem.getRdfsPersistenceTable().size() + 
+					" total concepts in the file "+Config.namePersistenceRDFsTableFile + ".";
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);
+		}
+		// but whether all concepts already recorded, do nothing
+		else {
+			Log.consoleln(" - do not exist new concepts.");
+			String sameReport = "Do not exist new concepts to save.";
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);			
+		}
+	}
+	
 	public static void indicateIterationNumber() throws Exception {
 		Log.consoleln("\n*** Iteration "+iteration+" ***");
 		String sameReport = Config.starsLine+"Iteration "+iteration+Config.starsLine;
@@ -264,9 +332,9 @@ public class MainProcess {
         Log.outFileCompleteReport(sameReport + currentSetQuerySparql.toString());
 		Log.outFileShortReport(sameReport + currentSetQuerySparql.toStringShort());
 	}
-	public static void collectRDFs() throws Exception {
+	public static void collectRDFsAllQueries() throws Exception {
 		Log.console("- Collecting RDFs");
-		int num =  currentSetQuerySparql.collectRDFs();
+		int num =  currentSetQuerySparql.collectRDFsAllQueries();
 		Log.consoleln(" - "+num+" new RDFs triples collected.");
 		// extract collected quantity of RDFs to each concept
 		StringBuffer conceptsOut = new StringBuffer();
@@ -482,13 +550,13 @@ public class MainProcess {
 	public static void buildGexfGraphFile(Config.time time) throws Exception {
 		String nameFileGexf = null;
 		if(time == Config.time.whileIteration) 
-			nameFileGexf = Config.nameFileGexfGraph + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
+			nameFileGexf = Config.nameGexfGraphFile + "_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
 		else if(time == Config.time.afterIteration)
-	   		nameFileGexf = Config.nameFileGexfGraph + "_after_iterations.gexf";
+	   		nameFileGexf = Config.nameGexfGraphFile + "_after_iterations.gexf";
 		else if(time == Config.time.afterSelectionMainConcepts)
-	   		nameFileGexf = Config.nameFileGexfGraph + "_after_selection_main_concepts.gexf";
+	   		nameFileGexf = Config.nameGexfGraphFile + "_after_selection_main_concepts.gexf";
 		else if(time == Config.time.finalGraph)
-			nameFileGexf = Config.nameFileGexfGraph + "_final.gexf";	
+			nameFileGexf = Config.nameGexfGraphFile + "_final.gexf";	
 		Log.console("- Building GEXF Graph File");
 		currentSystemGraphData.getGephiGraphData().buildGexfGraphFile(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
@@ -638,7 +706,7 @@ public class MainProcess {
 	}
 	
 	
-	public static void getNodeDataWithLeastEccentricityAndAverage() throws Exception {
+	public static void getNodeDataWithLeastEccentricityAndAverageFromSelectedConcepts() throws Exception {
 		nodeDataWithLeastEccentricityAndAverage = WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getNodeData(nodeDataPos);
 		String sameReport = "Node data with least eccentricity and average: "
 	               +nodeDataWithLeastEccentricityAndAverage.getShortName()
@@ -647,7 +715,15 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);	
 	}
-	
+	public static void getNodeDataWithLeastEccentricityAndAverageFromRemainingConcepts() throws Exception {
+		nodeDataWithLeastEccentricityAndAverage = WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getNodeData(nodeDataPos);
+		String sameReport = "Node data with least eccentricity and average: "
+	               +nodeDataWithLeastEccentricityAndAverage.getShortName()
+	               +" (position in group: "+nodeDataPos+")";
+		Log.consoleln("- "+sameReport);
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);	
+	}
 	public static void storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted() {
 		// store the current informations of the environment and node that will be deleted (because it can be recovered)
 		oldSystemGraphData = currentSystemGraphData;
@@ -702,17 +778,6 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);	
 	}
 
-	public static void parseVocabulary(Wrapterms parser) throws Exception {
-		Log.console("- Parsing vocabulary");
-		parser = new Wrapterms(new FileInputStream(Config.nameVocabularyFile));
-		parser.parseSystemVocabulary(WholeSystem.getVocabularyTable());
-		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " sentences parsed.");
-		String sameReport = "Quantity of vocabulary sentences parsed: " + WholeSystem.getVocabularyTable().size() +   
-                " (file: "+Config.nameVocabularyFile+")\n" +
-				"\nVocabulary table parsed:\n" + WholeSystem.getVocabularyTable().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);
-	}
 	public static void buildRawConceptMapFromStreamGraph()  throws Exception {
 		Log.console("- Building raw propositions of the concept map");
 		int n =currentSystemGraphData.buildRawConceptMapFromStreamGraph();
@@ -723,7 +788,7 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);		
 	}
 	public static void buildGexfGraphFileFromConceptMap() throws Exception {
-		String nameFileGexf = Config.nameFileGexfGraph + "_concept_map.gexf";
+		String nameFileGexf = Config.nameGexfGraphFile + "_concept_map.gexf";
 		Log.console("- Building GEXF Graph File from final concept map");
 		WholeSystem.getConceptMap().buildGexfGraphFileFromConceptMap(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
@@ -733,9 +798,9 @@ public class MainProcess {
 	}
 	public static void buildTxtFileFromConceptMap() throws Exception {
 		Log.console("- Building TXT final Concept Map");
-		WholeSystem.getConceptMap().buildTxtFileFromConceptMap(Config.nameFileTxtConceptMap);
-		Log.consoleln(" (generated file: " + Config.nameFileTxtConceptMap + ").");
-		String sameReport = "TXT concept map generated: " + Config.nameFileTxtConceptMap;
+		WholeSystem.getConceptMap().buildTxtFileFromConceptMap(Config.nameTxtConceptMapFile);
+		Log.consoleln(" (generated file: " + Config.nameTxtConceptMapFile + ").");
+		String sameReport = "TXT concept map generated: " + Config.nameTxtConceptMapFile;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}

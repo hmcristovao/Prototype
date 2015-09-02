@@ -10,6 +10,7 @@ import java.util.LinkedList;
 
 public class WholeSystem {
 	private static UselessConceptsTable uselessConceptsTable = new UselessConceptsTable();
+	private static RDFsPersistenceTable rdfsPersistenceTable = new RDFsPersistenceTable(); 
 	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
 	private static ConceptsGroup conceptsRegister = new ConceptsGroup();
 	private static int quantityOriginalConcepts;  // it will be filled from method MainProcess.parseTerms()
@@ -36,6 +37,14 @@ public class WholeSystem {
 		WholeSystem.goalConceptsQuantity = (int)( ( Math.log(1.0/(double)originalConceptsQuantity)/Math.log(2.0) )
 				                           * 2.0 + Config.conceptsQuantityCalulationFactor) + originalConceptsQuantity;
 		WholeSystem.maxConceptsQuantity = WholeSystem.goalConceptsQuantity + Config.conceptsMinMaxRange;
+	}
+	
+	
+	public static RDFsPersistenceTable getRdfsPersistenceTable() {
+		return WholeSystem.rdfsPersistenceTable;
+	}
+	public static void setRdfsPersistenceTable(RDFsPersistenceTable rdfsPersistenceTable) {
+		WholeSystem.rdfsPersistenceTable = rdfsPersistenceTable;
 	}
 	public static StreamGraphData getStreamGraphData() {
 		return WholeSystem.streamGraphData;

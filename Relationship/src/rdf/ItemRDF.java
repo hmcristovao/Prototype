@@ -1,8 +1,10 @@
 package rdf;
 
+import java.io.Serializable;
+
 import user.Concept;
 
-public class ItemRDF {
+public class ItemRDF implements Serializable {
 	
 	private String fullName;           // complete: contains address 
 	private String shortUnderlineName; // still contains underline

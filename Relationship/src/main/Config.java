@@ -26,9 +26,9 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - OUTPUT FILES  (.GEXF and .TXT concept map) 
     //
-	String nameFileGexfGraph      = "graph\\graph"+Config.testNumber;
-	String nameFileTxtConceptMap  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
-	String nameFileCmapConceptMap = "conceptmap\\conceptmap"+Config.testNumber+".cmap";
+	String nameGexfGraphFile      = "graph\\graph"+Config.testNumber;
+	String nameTxtConceptMapFile  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
+	String nameCmapConceptMapFile = "conceptmap\\conceptmap"+Config.testNumber+".cmap";
     enum time {whileIteration, afterIteration, afterSelectionMainConcepts, finalGraph };
 
 	
@@ -49,6 +49,7 @@ public interface Config {
 	String markQueryReplacement = "#######";
 	
 	String originalConceptAddress = "http://dbpedia.org/resource/";
+	String namePersistenceRDFsTableFile = "persistenceRdfs\\persistenceRdfs.dat";
 	
 	// ============================================================================
 	// CONFIG - GRAPHs 
@@ -80,7 +81,7 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 8;   // better set: 8
+	int minIteration = 2;   // better set: 8
 	int maxIteration = 12;  // better set: 12
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 

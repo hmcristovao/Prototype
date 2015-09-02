@@ -150,49 +150,74 @@ public class SetQuerySparql {
 	}
 	
 	//  read all RDF triples belongs to each query concept 
-	public int collectRDFs() throws Exception {
+	public int collectRDFsAllQueries() throws Exception {
 		int total = 0, subTotal;
 		for(int i=0; i < this.getListQuerySparql().size(); i++) {
 			QuerySparql querySparql = this.getListQuerySparql().get(i);
-			String queryStr = querySparql.getQueryString().getQueryStrString();
-
-			Query query = QueryFactory.create(queryStr);
-			QueryEngineHTTP queryEngineHTTP = (QueryEngineHTTP)QueryExecutionFactory.sparqlService(Config.selectedServiceSnorqlEndPoint,  query);
-			queryEngineHTTP.setModelContentType(WebContent.contentTypeJSONLD);
-			Model model = queryEngineHTTP.execConstruct();
 			
-			querySparql.setModel(model);
-			ListRDF listRDF = querySparql.getListRDF();
-			StmtIterator stmtIterator = model.listStatements();
-
-			subTotal = 0;
-			while (stmtIterator.hasNext()) {
-				// read elements of the model
-				Statement statement = stmtIterator.nextStatement();  
-				Resource  subject   = statement.getSubject();     
-				Property  predicate = statement.getPredicate();   
-				RDFNode   object    = statement.getObject();
-				
-				// create complete registerRDF 
-				ItemRDF subjectRDF   = new SubjectRDF(subject.toString(), subject);
-				ItemRDF predicateRDF = new PredicateRDF(predicate.toString(), predicate);
-				ItemRDF objectRDF    = new ObjectRDF(object.toString(), object);
-				OneRDF  oneRDF       = new OneRDF(statement, subjectRDF, predicateRDF, objectRDF);
-				
-				// insert complete item into listQuerySparql of the RDFs
-				listRDF.getList().add(oneRDF);
-				total++;
-				subTotal++;
-				
-				this.incTotalRDFs();
-			}
-			queryEngineHTTP.close();
+			subTotal = collectRDFsOneQuery(querySparql);
+			
 			// update rdfs quantity in concept
 			querySparql.getConcept().setQuantityRdfs(subTotal);
 			// if exist concept into WholeSystem then update its quantity
 			WholeSystem.getConceptsRegister().getConcept(querySparql.getConcept().getBlankName()).setQuantityRdfs(subTotal);
+		
+			total += subTotal;
 		}
 		return total;
+	}
+	
+	//  read all RDF triples belongs to one query concept 
+	private int collectRDFsOneQuery(QuerySparql querySparql) throws Exception {
+		int count = 0;
+		// if concept exists in persistence data, read it
+		if(WholeSystem.getRdfsPersistenceTable().containsKey(querySparql.getConcept().getBlankName()))
+			count = readPersistenceRDFsOneQuery(querySparql);
+		// else, read it of the Internet DataBase
+		else
+			count = readInternetDataBaseOneQuery(querySparql);
+		return count;
+	}
+	
+	private int readPersistenceRDFsOneQuery(QuerySparql querySparql) {
+		String strConcept = querySparql.getConcept().getBlankName();
+		querySparql.setListRDF(WholeSystem.getRdfsPersistenceTable().get(strConcept));
+		return querySparql.getListRDF().size();
+	}
+	
+	private int readInternetDataBaseOneQuery(QuerySparql querySparql) {
+		String queryStr = querySparql.getQueryString().getQueryStrString();
+		Query query = QueryFactory.create(queryStr);
+		QueryEngineHTTP queryEngineHTTP = (QueryEngineHTTP)QueryExecutionFactory.sparqlService(Config.selectedServiceSnorqlEndPoint,  query);
+		queryEngineHTTP.setModelContentType(WebContent.contentTypeJSONLD);
+		Model model = queryEngineHTTP.execConstruct();
+
+		querySparql.setModel(model);
+		ListRDF listRDF = querySparql.getListRDF();
+		StmtIterator stmtIterator = model.listStatements();
+
+		int count = 0;
+		while (stmtIterator.hasNext()) {
+			// read elements of the model
+			Statement statement = stmtIterator.nextStatement();  
+			Resource  subject   = statement.getSubject();     
+			Property  predicate = statement.getPredicate();   
+			RDFNode   object    = statement.getObject();
+
+			// create complete registerRDF 
+			ItemRDF subjectRDF   = new ItemRDF(subject.toString());
+			ItemRDF predicateRDF = new ItemRDF(predicate.toString());
+			ItemRDF objectRDF    = new ItemRDF(object.toString());
+			OneRDF  oneRDF       = new OneRDF(subjectRDF, predicateRDF, objectRDF);
+
+			// insert complete item into listQuerySparql of the RDFs
+			listRDF.getList().add(oneRDF);
+			count++;
+
+			this.incTotalRDFs();
+		}
+		queryEngineHTTP.close();
+		return count;
 	}
 	
 	// consider basicConcept without underline character
