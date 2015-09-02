@@ -1,4 +1,4 @@
-// v4.9 - insert persistence of RDFs. Don't working.  
+// v4.91 - problem: useless concept do not capture...  
 
 package main;
 
@@ -60,7 +60,7 @@ public class MainProcess {
 				   && WholeSystem.getStreamGraphData().getTotalNodes() > Config.quantityNodesToApplyNdegreeFilter) 
  					applyNDegreeFilterTrigger();
 				if(iteration >= Config.iterationTriggerApplyKCoreFilterAlgorithm) 
-					applyKCoreFilterTrigger();
+					applyKCoreFilterTrigger(2);
 				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
 				classifyConnectedComponent();
@@ -90,7 +90,7 @@ public class MainProcess {
 			//deleteCommonNodes_remainOriginalAndSelectedConcepts();
 			
 			// new:
-			applyKCoreFilterTrigger();  // cut alone (almost) selected nodes
+			applyKCoreFilterTrigger(3);  // cut alone (almost) selected nodes
 			
 			iteration++;
 			createCurrentSystemGraphData();
@@ -140,11 +140,11 @@ public class MainProcess {
 				}
 			} 
 			// verify whether the goal was achieved: quantity of selected concepts + original concepts == goal of total concepts
-			if(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
+			if(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
 				Log.consoleln("- Goal achieved!!!"); 
 			else {
 				Log.consoleln("- Goal did not achieve.");
-				if(WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getMaxConceptsQuantity())
+				if(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getMaxConceptsQuantity())
 					Log.consoleln("   (However, it is less than the maximum "+WholeSystem.getMaxConceptsQuantity()+" nodes)");
 			}
 			// reportAfterSelectionMainConcepts_selectedConcepts();
@@ -158,6 +158,7 @@ public class MainProcess {
 			//
 			// create a GEXF file, like as concept map
             buildGexfGraphFile(Config.time.finalGraph);
+            showUselessConceptsStatistic();
             buildRawConceptMapFromStreamGraph();
 			upgradeConceptMap_heuristic_01_removeLinkNumber();
 			upgradeConceptMap_heuristic_02_vocabularyTable();
@@ -221,7 +222,7 @@ public class MainProcess {
 		Log.console("- Parsing useless concepts");
 		parser = new Wrapterms(new FileInputStream(Config.nameUselessConceptsFile));
 		parser.parseUselessConcepts(WholeSystem.getUselessConceptsTable());
-		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " concepts parsed.");
+		Log.consoleln(" - " + WholeSystem.getUselessConceptsTable().size() + " concepts parsed.");
 		String sameReport = "Quantity of useless concepts parsed: " + WholeSystem.getUselessConceptsTable().size() +   
                 " (file: "+Config.nameUselessConceptsFile+")\n" +
 				"\nUseless concepts parsed:\n" + WholeSystem.getUselessConceptsTable().toString();
@@ -334,8 +335,10 @@ public class MainProcess {
 	}
 	public static void collectRDFsAllQueries() throws Exception {
 		Log.console("- Collecting RDFs");
-		int num =  currentSetQuerySparql.collectRDFsAllQueries();
-		Log.consoleln(" - "+num+" new RDFs triples collected.");
+		Count numRdfsInInternet = new Count(0);
+		Count numRdfsInFile     = new Count(0);
+		int num =  currentSetQuerySparql.collectRDFsAllQueries(numRdfsInInternet, numRdfsInFile);
+		Log.consoleln(" - "+num+" new RDFs triples collected ("+numRdfsInInternet+" in internet, "+numRdfsInFile+" in file).");
 		// extract collected quantity of RDFs to each concept
 		StringBuffer conceptsOut = new StringBuffer();
 		DecimalFormat formater =  new DecimalFormat("00000");
@@ -346,7 +349,7 @@ public class MainProcess {
 			conceptsOut.append(currentSetQuerySparql.getListQuerySparql().get(i).getConcept().getBlankName());
 			conceptsOut.append("\"");
 		}
-		String sameReport = "Total collected RDFs: " + num + "\n" + conceptsOut.toString();
+		String sameReport = "Total collected RDFs: " + num + " ("+numRdfsInInternet+" in internet, "+numRdfsInFile+" in file)\n" + conceptsOut.toString();
         Log.outFileCompleteReport(sameReport + "\n\n" + currentSetQuerySparql.toString());
 		Log.outFileShortReport(sameReport);
 	}
@@ -396,16 +399,17 @@ public class MainProcess {
 	// discard useless concepts (use WholeSystem.uselessConceptsTable to do this operation)
 	public static void buildStreamGraphData_buildEdgeTable_fromRdfs() throws Exception {
 		Log.console("- Building Stream Graph Data");
-		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData_buildEdgeTable_fromRdfs(currentSetQuerySparql);
+		Count countUselessRDFs = new Count(0);
+		QuantityNodesEdges quantityNodesEdges = WholeSystem.getStreamGraphData().buildStreamGraphData_buildEdgeTable_fromRdfs(currentSetQuerySparql, countUselessRDFs);
 		Log.consoleln(" - "+quantityNodesEdges.getNumNodes()+" new nodes, "+quantityNodesEdges.getNumEdges()+" new edges in Stream Graph - " +
-		              quantityNodesEdges.getUselessRDF() + " useless RDFs.");
+				countUselessRDFs + " useless RDFs.");
 		Log.consoleln("- Creating edge hash table - "+WholeSystem.getEdgesTable().size()+" edges.");
 		String sameReport = "Stream Graph Data created (graph used in the preview): \n" + 
 		        quantityNodesEdges.getNumNodes() + " new nodes, " + 
 				quantityNodesEdges.getNumEdges() + " new edges in the visualization graph.\n" +
 		        WholeSystem.getStreamGraphData().getRealTotalNodes() + " total nodes, " +
 		        WholeSystem.getStreamGraphData().getRealTotalEdges() + " total edges\n" +
-	            quantityNodesEdges.getUselessRDF() + " useless RDFs.";
+		        countUselessRDFs + " useless RDFs.";
 		String sameReport2 = "\n\nEdge hash table created:" + 
 				"\n("+WholeSystem.getEdgesTable().size()+" edges).";
         Log.outFileCompleteReport(sameReport + WholeSystem.getStreamGraphData().toString() + sameReport2 + "\n"+WholeSystem.getEdgesTable().toString());
@@ -450,19 +454,19 @@ public class MainProcess {
         Log.outFileCompleteReport(sameReport + "\n\n" + WholeSystem.getStreamGraphData().toString() );
 		Log.outFileShortReport(sameReport);
 	}			
-	public static void applyKCoreFilterTrigger() throws Exception {
-		Log.console("- Starting "+Config.kCoreFilter+"-core filter algorithm ");
+	public static void applyKCoreFilterTrigger(int k) throws Exception {
+		Log.console("- Starting "+ k +"-core filter algorithm ");
 		int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
 		int numOldEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		// call algorithm:
-		int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyKCoreFilterTrigger(Config.kCoreFilter);
+		int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyKCoreFilterTrigger(k);
 		int numCurrentNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
 		int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes");
 		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
 		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges");
 		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
-		String sameReport = "Runned "+Config.kCoreFilter+"-core filter algorithm\n" +
+		String sameReport = "Runned " + k + "-core filter algorithm\n" +
 				(numOldNodes - numCurrentNodes) +" deleted nodes" +
 				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
 				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
@@ -743,7 +747,9 @@ public class MainProcess {
 		WholeSystem.getStreamGraphData().insert(currentNode,currentEdgeSet);
 		// recover the last environment
 		WholeSystem.getListSystemGraphData().remove(iteration);
-		WholeSystem.getConceptsRegister().add(excludedConcept);	
+		// whether excludedConcept is selected concept, then insert it again into WholeSystem.conceptsRegister
+		if(excludedConcept != null)
+			WholeSystem.getConceptsRegister().add(excludedConcept);	
 		currentSystemGraphData = oldSystemGraphData;
 	}
 		
@@ -766,7 +772,7 @@ public class MainProcess {
 		String sameReport = "Total concepts:\n"  
 				+ "  "+WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + " remaining concepts + " 
 				+ WholeSystem.getQuantityOriginalConcepts() + " original concepts = " 
-				+ (WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts()) + " total concepts"
+				+ (WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts()) + " total concepts"
 				+ "  (goal "+WholeSystem.getGoalConceptsQuantity()
 				+ " to " + WholeSystem.getMaxConceptsQuantity() + ")\n"
 				+ "  Connected component count: " + currentSystemGraphData.getConnectedComponentsCount()
@@ -778,6 +784,13 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);	
 	}
 
+	public static void showUselessConceptsStatistic() throws Exception {
+		Log.consoleln("- Recording in log statistic of useless concepts.");
+		String sameReport = "Statistic of useless concepts:\n" + WholeSystem.getUselessConceptsTable().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
+	}
+	
 	public static void buildRawConceptMapFromStreamGraph()  throws Exception {
 		Log.console("- Building raw propositions of the concept map");
 		int n =currentSystemGraphData.buildRawConceptMapFromStreamGraph();
@@ -832,7 +845,7 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);		
 	}
 	public static void upgradeConceptMap_heuristic_04_categoryInSourceConcept()  throws Exception {
-		Log.console("- Upgrading the concept map with fourth heuristic (change category in source concetp)");
+		Log.console("- Upgrading the concept map with fourth heuristic (change category in source concept)");
 		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_04_categoryInSourceConcept();
 		Log.consoleln(" - " + n + " propositions changed.");
 		String sameReport = "Heuristic 04: upgraded "+n+" concept map propositions with change of category in source concept:\n" + WholeSystem.getConceptMap().toString();

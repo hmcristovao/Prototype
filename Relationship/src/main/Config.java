@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "21"; 
+	String  testNumber = "00"; 
 	
 	String nameFileCompletReport = "C:\\Users\\Henrique\\Documents\\log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "C:\\Users\\Henrique\\Documents\\log\\short_report_"+Config.testNumber+".txt";
@@ -81,8 +81,8 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 2;   // better set: 8
-	int maxIteration = 12;  // better set: 12
+	int minIteration = 10;  // better set: 8
+	int maxIteration = 15;  // better set: 12
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 4;
@@ -108,7 +108,7 @@ public interface Config {
 	int withoutConnectedComponent = -1;
 	
 	// K-core used in all system
-	int kCoreFilter = 2;
+	// int kCoreFilter = 2;
 	// since iteration number x to apply K-core filter trigger
 	int iterationTriggerApplyKCoreFilterAlgorithm = 5;  // better set: 5
 	// quantity of nodes to shoot K-core n algorithm

@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import main.Config;
+import main.Count;
 import main.Log;
 import main.WholeSystem;
 
@@ -131,7 +132,7 @@ public class StreamGraphData {
 	//    in the second iteration so foth, just add new data (RDFs) into StreamGraphData and EdgeTable
     // (build stream graph from rdfs in set query Sparql)
 	// discard useless concepts (use WholeSystem.uselessConceptsTable to do this operation)
-	public QuantityNodesEdges buildStreamGraphData_buildEdgeTable_fromRdfs(SetQuerySparql setQuerySparql) {
+	public QuantityNodesEdges buildStreamGraphData_buildEdgeTable_fromRdfs(SetQuerySparql setQuerySparql, Count countUselessRDFs) {
 		QuerySparql querySparql;
 		ListRDF listRDF;
 		OneRDF oneRDF;
@@ -147,7 +148,7 @@ public class StreamGraphData {
 				quantityNodesEdges.reset();
 				
 				// it maps RDF data to Graph data:
-				this.insertRDF_withinTheStreamGraph(oneRDF, quantityNodesEdges);
+				this.insertRDF_withinTheStreamGraph(oneRDF, quantityNodesEdges, countUselessRDFs);
 				
 				this.incTotalNodes(quantityNodesEdges.getNumNodes());
 				this.incTotalEdges(quantityNodesEdges.getNumEdges());
@@ -163,7 +164,7 @@ public class StreamGraphData {
 	// work with only one triple RDF each time
 	// discard useless concepts (use WholeSystem.uselessConceptsTable to do this operation)
 	// return whether it can or it can not insert RDF as graph element
-	private void insertRDF_withinTheStreamGraph(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges) { 
+	private void insertRDF_withinTheStreamGraph(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges, Count countUselessRDFs) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
 		ItemRDF predicateRDF = oneRDF.getPredicate();
@@ -171,9 +172,10 @@ public class StreamGraphData {
 		
 		// verify whether one of nodes belong to RDF is useless
 		// in this case, discard RDF
+-----conferir porque o Category:Main topic classifications está passando
 		if(WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(subjectRDF.getShortBlankName()) ||
 		   WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(predicateRDF.getShortBlankName())) {
-			quantityNodesEdges.incUselessRDF();
+			countUselessRDFs.incCount();;
 			return;
 		}
 		

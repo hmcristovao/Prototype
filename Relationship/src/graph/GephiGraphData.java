@@ -93,7 +93,7 @@ public class GephiGraphData {
 	}
 
 	public QuantityNodesEdges getRealQuantityNodesEdges() {
-		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges(this.gephiGraph.getNodeCount(),this.gephiGraph.getEdgeCount(),0);
+		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges(this.gephiGraph.getNodeCount(),this.gephiGraph.getEdgeCount());
 		return quantityNodesEdges;
 	}
 	

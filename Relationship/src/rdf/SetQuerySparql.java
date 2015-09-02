@@ -9,6 +9,7 @@ import java.util.LinkedList;
 import org.apache.jena.riot.WebContent;
 
 import main.Config;
+import main.Count;
 import main.Log;
 import main.WholeSystem;
 import user.Concept;
@@ -150,12 +151,12 @@ public class SetQuerySparql {
 	}
 	
 	//  read all RDF triples belongs to each query concept 
-	public int collectRDFsAllQueries() throws Exception {
+	public int collectRDFsAllQueries(Count numRdfsInInternet, Count numRdfsInFile) throws Exception {
 		int total = 0, subTotal;
 		for(int i=0; i < this.getListQuerySparql().size(); i++) {
 			QuerySparql querySparql = this.getListQuerySparql().get(i);
 			
-			subTotal = collectRDFsOneQuery(querySparql);
+			subTotal = collectRDFsOneQuery(querySparql, numRdfsInInternet, numRdfsInFile);
 			
 			// update rdfs quantity in concept
 			querySparql.getConcept().setQuantityRdfs(subTotal);
@@ -168,14 +169,18 @@ public class SetQuerySparql {
 	}
 	
 	//  read all RDF triples belongs to one query concept 
-	private int collectRDFsOneQuery(QuerySparql querySparql) throws Exception {
+	private int collectRDFsOneQuery(QuerySparql querySparql, Count numRdfsInInternet, Count numRdfsInFile) throws Exception {
 		int count = 0;
 		// if concept exists in persistence data, read it
-		if(WholeSystem.getRdfsPersistenceTable().containsKey(querySparql.getConcept().getBlankName()))
+		if(WholeSystem.getRdfsPersistenceTable().containsKey(querySparql.getConcept().getBlankName())) {
 			count = readPersistenceRDFsOneQuery(querySparql);
+			numRdfsInFile.incCount(count);
+		}
 		// else, read it of the Internet DataBase
-		else
+		else {
 			count = readInternetDataBaseOneQuery(querySparql);
+			numRdfsInInternet.incCount(count);
+		}
 		return count;
 	}
 	
