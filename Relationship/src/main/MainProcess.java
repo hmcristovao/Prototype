@@ -7,9 +7,9 @@ import graph.QuantityNodesEdges;
 import graph.SystemGraphData;
 
 
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -386,22 +386,22 @@ public class MainProcess {
 		Log.console("- Starting "+n+"-degree filter algorithm "+
 				"(iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + ", quantity of nodes greater than " + 
 				Config.quantityNodesToApplyNdegreeFilter + ")");
-			
+		Count quantityDeletedSelectedConcepts = new Count(0);	
 		int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
 		int numOldEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		// call algorithm:
-		int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyNdegreeFilterTrigger(n);
+		WholeSystem.getStreamGraphData().applyNdegreeFilterTrigger(n, quantityDeletedSelectedConcepts);
 		int numCurrentNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
 		int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes");
-		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
+		Log.console(" ("+ quantityDeletedSelectedConcepts +" selected concepts)");
 		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges.");
 		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
 		String sameReport = "Runned "+n+"-degree filter algorithm "+
 				"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " + 
 				Config.quantityNodesToApplyNdegreeFilter + ")\n" +
 				(numOldNodes - numCurrentNodes) +" deleted nodes" +
-				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
+				"("+ quantityDeletedSelectedConcepts +" selected concepts)" + 
 				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
 				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
 				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.";
@@ -410,19 +410,20 @@ public class MainProcess {
 	}			
 	public static void applyKCoreFilterTrigger(int k) throws Exception {
 		Log.console("- Starting "+ k +"-core filter algorithm ");
+		Count quantityDeletedSelectedConcepts = new Count(0);	
 		int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
 		int numOldEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		// call algorithm:
-		int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyKCoreFilterTrigger(k);
+		WholeSystem.getStreamGraphData().applyKCoreFilterTrigger(k, quantityDeletedSelectedConcepts);
 		int numCurrentNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
 		int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes");
-		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
+		Log.console(" ("+ quantityDeletedSelectedConcepts +" selected concepts)");
 		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges");
 		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
 		String sameReport = "Runned " + k + "-core filter algorithm\n" +
 				(numOldNodes - numCurrentNodes) +" deleted nodes" +
-				"("+ numDeletedOriginalConcepts +" selected concepts)" + 
+				"("+ quantityDeletedSelectedConcepts +" selected concepts)" + 
 				" and "+ (numOldEdges - numCurrentEdges) +" deleted edges" +
 				"\nOld Stream Graph: "+numOldNodes+" nodes, "+numOldEdges+" edges." +
 				"\nRemained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.";

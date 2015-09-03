@@ -333,20 +333,19 @@ public class StreamGraphData {
     */
 	
 	// Apply K-core on the Graph
-	// return quantity of selected concepts that was deleted
-	public int applyKCoreFilterTrigger(int k) {
-		int totalQuantityDeletedSelectedConcepts = 0;
-		int quantityDeletedSelectedConcepts = 0;
+	// return quantity of concepts deleted
+	public int applyKCoreFilterTrigger(int k, Count quantityDeletedSelectedConcepts) {
+		int total = 0, subtotal;
 		do {
-			quantityDeletedSelectedConcepts = this.applyNdegreeFilterTrigger(k);
-			totalQuantityDeletedSelectedConcepts += quantityDeletedSelectedConcepts;
-		}while(quantityDeletedSelectedConcepts != 0);
-		return totalQuantityDeletedSelectedConcepts;
+			subtotal = this.applyNdegreeFilterTrigger(k, quantityDeletedSelectedConcepts);
+			total += subtotal;
+		}while(subtotal != 0);
+		return total;
 	}
 	
 	// Apply n-degree filter on the Graph
-	// return quantity of selected concepts that was deleted
-	public int applyNdegreeFilterTrigger(int n) {
+	// return quantity of concepts deleted
+	public int applyNdegreeFilterTrigger(int n, Count quantityDeletedSelectedConcepts) {
 		LinkedList<Node> auxList = new LinkedList<Node>();
 		// at first select the candidates nodes and put them in an auxiliary list
 		for( Node node : this.streamGraph.getEachNode() ) {
@@ -358,17 +357,16 @@ public class StreamGraphData {
 				}
 			}
 		}
-		// second: delete the selected nodes and their respectives edges
-		int quantityDeletedSelectedConcepts = 0;
+		// second: delete the nodes and their respectives edges
+		int total = 0;
 		for( Node node : auxList ) {
 			Concept excludedConcept = this.deleteNode(node);
-			// figure out quantity of deleted nodes
-			if(excludedConcept == null)
-				quantityDeletedSelectedConcepts++;
-			else if(!excludedConcept.isOriginal())
-				quantityDeletedSelectedConcepts++;
+			total++;
+			// figure out quantity of deleted selected nodes
+			if(excludedConcept != null)
+				quantityDeletedSelectedConcepts.incCount();
 		} 
-		return quantityDeletedSelectedConcepts;
+		return total;
 	}
 	
 	// remove node of the concepts register, if it is the case
