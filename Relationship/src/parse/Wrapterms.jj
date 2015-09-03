@@ -30,7 +30,7 @@ TOKEN : {
                             < CHARACTER >
                         )?
       > |
-      < SEPARATORS:  ( "\n" | "\r" | "\t" | "," | ";" | "/" | " " )+ > 
+      < SEPARATORS:  ( "\n" | "\r" | "\t" | "," | ";" | " " )+ > 
  }
 /*
 Grammar (read of user terms):

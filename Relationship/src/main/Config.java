@@ -50,6 +50,7 @@ public interface Config {
 	
 	String originalConceptAddress = "http://dbpedia.org/resource/";
 	String namePersistenceRDFsTableFile = "persistenceRdfs\\persistenceRdfs.dat";
+	String dirRdfsPersistenceFiles = "persistenceRdfs";
 	
 	// ============================================================================
 	// CONFIG - GRAPHs 
@@ -119,7 +120,7 @@ public interface Config {
 	// since iteration number x to apply n-degree filter trigger
 	int iterationTriggerApplyNDegreeFilterAlgorithm = 2;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 25000;  // better set: 25000
+	int quantityNodesToApplyNdegreeFilter = 20000;  // better set: 20000
 	
 	// ============================================================================
 	// CONFIG - REPORT 

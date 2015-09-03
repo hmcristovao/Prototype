@@ -1,4 +1,4 @@
-// v5.00 - Working!  
+// v5.1 - add individual RDFs files. Working!  
 
 package main;
 
@@ -6,12 +6,11 @@ import graph.NodeData;
 import graph.QuantityNodesEdges;
 import graph.SystemGraphData;
 
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +20,6 @@ import org.graphstream.graph.Node;
 import org.graphstream.stream.gephi.JSONSender;
 
 import parse.*;
-import rdf.QuerySparql;
-import rdf.RDFsPersistenceTable;
 import rdf.SetQuerySparql;
 import user.*;
 
@@ -43,7 +40,7 @@ public class MainProcess {
 			parseTerms(parser);
 			parseUselessConcepts(parser);
 			parseVocabulary(parser);
-			readPersistenceRDFsTable();
+			readRdfsFileNameToRdfsFileTable();
 			do {
 				indicateIterationNumber();
 				updateCurrentSetQuerySparqlVar();
@@ -85,7 +82,7 @@ public class MainProcess {
 				iteration++;
 			} while(true);
 			indicateAlgorithmIntermediateStage1(); // after iterations loop
-			savePersistenceRDFsTable();
+			//savePersistenceRDFsTable();
 
 			// while count nodes > goal * 20, apply k-core 
 			for(int k=2; WholeSystem.getStreamGraphData().getRealTotalNodes() > WholeSystem.getGoalConceptsQuantity()*20; k++) 
@@ -240,56 +237,13 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
-	public static void readPersistenceRDFsTable() throws Exception {
-		Log.console("- Reading persistence RDFs table");
-		try {
-			ObjectInputStream buffer = new ObjectInputStream(new FileInputStream(Config.namePersistenceRDFsTableFile));
-			WholeSystem.setRdfsPersistenceTable((RDFsPersistenceTable)buffer.readObject());
-			buffer.close();
-			Log.consoleln(" - " + WholeSystem.getRdfsPersistenceTable().size() + " concepts read of file "+
-			              Config.namePersistenceRDFsTableFile + ".");
-			String sameReport = "Persistence RDFs table read to "+WholeSystem.getRdfsPersistenceTable().size() + " concepts of file "+
-					             Config.namePersistenceRDFsTableFile + ".";
-			Log.outFileCompleteReport(sameReport);
-			Log.outFileShortReport(sameReport);			
-		}
-		catch(FileNotFoundException e) {
-			Log.console(" - file "+Config.namePersistenceRDFsTableFile+" created for the first time");
-			String sameReport = "Persistence RDFs table file created for the first time: "+Config.namePersistenceRDFsTableFile + ".";
-			Log.outFileCompleteReport(sameReport);
-			Log.outFileShortReport(sameReport);			
-		}
-	}
-	// record in file all RDFs that are in main memory
-	public static void savePersistenceRDFsTable() throws Exception {
-		Log.console("- Saving concepts with its RDFs in file");
-		// at first add new concepts in WholeSystem.rdfsPersistenceTable
-		int countNewConcepts = 0;
-		for(QuerySparql querySparql : currentSetQuerySparql.getListQuerySparql()) {
-			if(!WholeSystem.getRdfsPersistenceTable().containsKey(querySparql.getConcept().getBlankName())) {
-				WholeSystem.getRdfsPersistenceTable().put(querySparql.getConcept().getBlankName(), querySparql.getListRDF());
-				countNewConcepts++;
-			}
-		}
-		// whether it exists new concepts still do not recorded, then record all concepts/RDFs in file
-		if(countNewConcepts > 0) {
-			ObjectOutputStream buffer = new ObjectOutputStream(new FileOutputStream(Config.namePersistenceRDFsTableFile));
-			buffer.writeObject(WholeSystem.getRdfsPersistenceTable()) ; 
-			buffer.flush(); 
-			buffer.close();
-			Log.consoleln(" - " + countNewConcepts + " new concepts and "+WholeSystem.getRdfsPersistenceTable().size() + " total concepts saved.");
-			String sameReport = "Saved "+countNewConcepts+" new concepts and "+ WholeSystem.getRdfsPersistenceTable().size() + 
-					" total concepts in the file "+Config.namePersistenceRDFsTableFile + ".";
-			Log.outFileCompleteReport(sameReport);
-			Log.outFileShortReport(sameReport);
-		}
-		// but whether all concepts already recorded, do nothing
-		else {
-			Log.consoleln(" - do not exist new concepts.");
-			String sameReport = "Do not exist new concepts to save.";
-			Log.outFileCompleteReport(sameReport);
-			Log.outFileShortReport(sameReport);			
-		}
+	public static void readRdfsFileNameToRdfsFileTable() throws Exception {
+		Log.console("- Reading RDFs files names to put in table");
+		WholeSystem.getRdfsFileTable().init(Config.dirRdfsPersistenceFiles);  
+ 		Log.consoleln(" - " + WholeSystem.getRdfsFileTable().size() + " RDFs files identified.");
+		String sameReport = "RDFs files identified: "+WholeSystem.getRdfsFileTable().size()+".";
+		Log.outFileCompleteReport(sameReport+"\n"+WholeSystem.getRdfsFileTable());
+		Log.outFileShortReport(sameReport);			
 	}
 	
 	public static void indicateIterationNumber() throws Exception {

@@ -1,8 +1,12 @@
 package rdf;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
@@ -172,7 +176,7 @@ public class SetQuerySparql {
 	private int collectRDFsOneQuery(QuerySparql querySparql, Count numRdfsInInternet, Count numRdfsInFile) throws Exception {
 		int count = 0;
 		// if concept exists in persistence data, read it
-		if(WholeSystem.getRdfsPersistenceTable().containsKey(querySparql.getConcept().getBlankName())) {
+		if(WholeSystem.getRdfsFileTable().containsKey(querySparql.getConcept().getBlankName())) {
 			count = readPersistenceRDFsOneQuery(querySparql);
 			numRdfsInFile.incCount(count);
 		}
@@ -180,13 +184,22 @@ public class SetQuerySparql {
 		else {
 			count = readInternetDataBaseOneQuery(querySparql);
 			numRdfsInInternet.incCount(count);
+			// and save it in file
+			String fileName = RdfsFilesTable.formatToFileName(querySparql.getConcept().getBlankName());
+			ObjectOutputStream buffer = new ObjectOutputStream(new FileOutputStream(Config.dirRdfsPersistenceFiles+"\\"+fileName));
+			buffer.writeObject(querySparql.getListRDF()) ; 
+			buffer.flush(); 
+			buffer.close();
 		}
 		return count;
 	}
 	
-	private int readPersistenceRDFsOneQuery(QuerySparql querySparql) {
+	private int readPersistenceRDFsOneQuery(QuerySparql querySparql) throws Exception {
 		String strConcept = querySparql.getConcept().getBlankName();
-		querySparql.setListRDF(WholeSystem.getRdfsPersistenceTable().get(strConcept));
+		String fileName   = RdfsFilesTable.formatToFileName(strConcept);
+		ObjectInputStream buffer = new ObjectInputStream(new FileInputStream(Config.dirRdfsPersistenceFiles+"\\"+fileName));
+		querySparql.setListRDF((ListRDF)buffer.readObject());
+		buffer.close();
 		return querySparql.getListRDF().size();
 	}
 	
