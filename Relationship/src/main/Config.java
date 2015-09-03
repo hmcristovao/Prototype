@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "00"; 
+	String  testNumber = "26"; 
 	
 	String nameFileCompletReport = "C:\\Users\\Henrique\\Documents\\log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "C:\\Users\\Henrique\\Documents\\log\\short_report_"+Config.testNumber+".txt";
@@ -108,7 +108,7 @@ public interface Config {
 	int withoutConnectedComponent = -1;
 	
 	// K-core used in all system
-	// int kCoreFilter = 2;
+	int kCoreFilter = 2;
 	// since iteration number x to apply K-core filter trigger
 	int iterationTriggerApplyKCoreFilterAlgorithm = 5;  // better set: 5
 	// quantity of nodes to shoot K-core n algorithm
@@ -117,9 +117,9 @@ public interface Config {
 	// N-degree filter used in all system
 	int nDegreeFilter = 2;
 	// since iteration number x to apply n-degree filter trigger
-	int iterationTriggerApplyNDegreeFilterAlgorithm = 5;  // better set: 2
+	int iterationTriggerApplyNDegreeFilterAlgorithm = 2;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 10000;  // better set: 5000
+	int quantityNodesToApplyNdegreeFilter = 25000;  // better set: 25000
 	
 	// ============================================================================
 	// CONFIG - REPORT 

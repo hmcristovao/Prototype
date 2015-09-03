@@ -1,4 +1,4 @@
-// v4.91 - problem: useless concept do not capture...  
+// v5.00 - Working!  
 
 package main;
 
@@ -58,9 +58,9 @@ public class MainProcess {
 					copyAllObjectsLastIteration();
 				if(iteration >= Config.iterationTriggerApplyNDegreeFilterAlgorithm 
 				   && WholeSystem.getStreamGraphData().getTotalNodes() > Config.quantityNodesToApplyNdegreeFilter) 
- 					applyNDegreeFilterTrigger();
+ 					applyNDegreeFilterTrigger(Config.nDegreeFilter);
 				if(iteration >= Config.iterationTriggerApplyKCoreFilterAlgorithm) 
-					applyKCoreFilterTrigger(2);
+					applyKCoreFilterTrigger(Config.kCoreFilter);
 				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
 				classifyConnectedComponent();
@@ -86,11 +86,10 @@ public class MainProcess {
 			} while(true);
 			indicateAlgorithmIntermediateStage1(); // after iterations loop
 			savePersistenceRDFsTable();
-			// very aggressive in removing nodes
-			//deleteCommonNodes_remainOriginalAndSelectedConcepts();
-			
-			// new:
-			applyKCoreFilterTrigger(3);  // cut alone (almost) selected nodes
+
+			// while count nodes > goal * 20, apply k-core 
+			for(int k=2; WholeSystem.getStreamGraphData().getRealTotalNodes() > WholeSystem.getGoalConceptsQuantity()*20; k++) 
+				applyKCoreFilterTrigger(k); 
 			
 			iteration++;
 			createCurrentSystemGraphData();
@@ -207,12 +206,13 @@ public class MainProcess {
 		Log.consoleln("- Starting.");
 	}
 	public static void parseTerms(Wrapterms parser) throws Exception {
-		Log.consoleln("- Parsing user terms.");
+		Log.console("- Parsing user terms");
 		parser = new Wrapterms(new FileInputStream(Config.nameUserTermsFile));
 		WholeSystem.insertListSetQuerySparql(new SetQuerySparql());
 		parser.parseUserTerms(WholeSystem.getListSetQuerySparql().getFirst());
 		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
 		WholeSystem.initGoalMaxConceptsQuantity();
+		Log.consoleln(" - " + WholeSystem.getQuantityOriginalConcepts() + " terms parsed.");
 		String sameReport = "Quantity of terms parsed: " + WholeSystem.getQuantityOriginalConcepts() + 
 				            " (file: "+Config.nameUserTermsFile+")\n"; 
 		Log.outFileCompleteReport(sameReport + WholeSystem.getConceptsRegister().getOriginalConcepts().toStringLong());
@@ -428,22 +428,22 @@ public class MainProcess {
         Log.outFileCompleteReport(sameReport + WholeSystem.getListSetQuerySparql().get(iteration-1).toString());
 		Log.outFileShortReport(sameReport + WholeSystem.getListSetQuerySparql().get(iteration-1).toStringShort());
 	}
-	public static void applyNDegreeFilterTrigger() throws Exception {
-		Log.console("- Starting "+Config.nDegreeFilter+"-degree filter algorithm "+
+	public static void applyNDegreeFilterTrigger(int n) throws Exception {
+		Log.console("- Starting "+n+"-degree filter algorithm "+
 				"(iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + ", quantity of nodes greater than " + 
 				Config.quantityNodesToApplyNdegreeFilter + ")");
 			
 		int numOldNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
 		int numOldEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		// call algorithm:
-		int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyNdegreeFilterTrigger(Config.nDegreeFilter);
+		int numDeletedOriginalConcepts = WholeSystem.getStreamGraphData().applyNdegreeFilterTrigger(n);
 		int numCurrentNodes = WholeSystem.getStreamGraphData().getRealTotalNodes();
 		int numCurrentEdges = WholeSystem.getStreamGraphData().getRealTotalEdges();
 		Log.console(" - "+ (numOldNodes - numCurrentNodes) +" deleted nodes");
 		Log.console(" ("+ numDeletedOriginalConcepts +" selected concepts)");
 		Log.consoleln(" and "+ (numOldEdges - numCurrentEdges) +" deleted edges.");
 		Log.consoleln("- Remained Stream Graph: "+numCurrentNodes+" nodes, "+numCurrentEdges+" edges.");
-		String sameReport = "Runned "+Config.nDegreeFilter+"-degree filter algorithm "+
+		String sameReport = "Runned "+n+"-degree filter algorithm "+
 				"(triggered: iteration " + Config.iterationTriggerApplyNDegreeFilterAlgorithm + " or more, and quantity of nodes greater than " + 
 				Config.quantityNodesToApplyNdegreeFilter + ")\n" +
 				(numOldNodes - numCurrentNodes) +" deleted nodes" +
@@ -714,7 +714,7 @@ public class MainProcess {
 		nodeDataWithLeastEccentricityAndAverage = WholeSystem.getSortEccentricityAndAverageSelectedConcepts().getNodeData(nodeDataPos);
 		String sameReport = "Node data with least eccentricity and average: "
 	               +nodeDataWithLeastEccentricityAndAverage.getShortName()
-	               +" (position in group: "+nodeDataPos+")";
+	               +" (position in group: "+nodeDataPos+"/"+WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount()+")";
 		Log.consoleln("- "+sameReport);
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);	
@@ -740,7 +740,7 @@ public class MainProcess {
 	
 	public static void recoverEnvironmentAndNodeAndEdges() throws Exception {
 		String sameReport = "Node did not exclude: "+nodeDataWithLeastEccentricityAndAverage.getShortName()
-				      +" (connected component improves to "+currentSystemGraphData.getConnectedComponentsCount()+")";
+				      +" (connected component improves "+baseConnectedComponentCount+" to "+currentSystemGraphData.getConnectedComponentsCount()+")";
 		Log.consoleln("- "+sameReport);
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);	

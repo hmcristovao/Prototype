@@ -148,7 +148,7 @@ public class StreamGraphData {
 				quantityNodesEdges.reset();
 				
 				// it maps RDF data to Graph data:
-				this.insertRDF_withinTheStreamGraph(oneRDF, quantityNodesEdges, countUselessRDFs);
+				this.insertRDF_withinStreamGraph(oneRDF, quantityNodesEdges, countUselessRDFs);
 				
 				this.incTotalNodes(quantityNodesEdges.getNumNodes());
 				this.incTotalEdges(quantityNodesEdges.getNumEdges());
@@ -164,7 +164,7 @@ public class StreamGraphData {
 	// work with only one triple RDF each time
 	// discard useless concepts (use WholeSystem.uselessConceptsTable to do this operation)
 	// return whether it can or it can not insert RDF as graph element
-	private void insertRDF_withinTheStreamGraph(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges, Count countUselessRDFs) { 
+	private void insertRDF_withinStreamGraph(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges, Count countUselessRDFs) { 
 		// split elements of RDF:
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
 		ItemRDF predicateRDF = oneRDF.getPredicate();
@@ -172,10 +172,9 @@ public class StreamGraphData {
 		
 		// verify whether one of nodes belong to RDF is useless
 		// in this case, discard RDF
------conferir porque o Category:Main topic classifications está passando
 		if(WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(subjectRDF.getShortBlankName()) ||
-		   WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(predicateRDF.getShortBlankName())) {
-			countUselessRDFs.incCount();;
+		   WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(objectRDF.getShortBlankName())) {
+			countUselessRDFs.incCount();
 			return;
 		}
 		
