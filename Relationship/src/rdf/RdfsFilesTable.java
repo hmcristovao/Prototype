@@ -44,6 +44,14 @@ public class RdfsFilesTable  implements Serializable   {
 	}
 	
 	public String toString() {
-		return this.table.toString();
+		StringBuffer out = new StringBuffer();
+		Iterator<String> i = this.table.keySet().iterator(); 
+		while(i.hasNext()) {
+		   String concept = (String)i.next(); 
+		   String fileName = this.table.get(concept);
+		   out.append(fileName);
+		   out.append(", ");
+		}
+		return out.toString();
 	}
 }

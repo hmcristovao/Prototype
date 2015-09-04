@@ -77,6 +77,9 @@ public interface Config {
 	
 	enum Category {no, yes, was};
 	
+	boolean directedStreamGraph = false;
+	boolean directedGephiGraph  = true;  // only accept true 
+ 
 	
 	// ============================================================================
 	// CONFIG - ANALYSIS 
@@ -118,7 +121,7 @@ public interface Config {
 	// N-degree filter used in all system
 	int nDegreeFilter = 2;
 	// since iteration number x to apply n-degree filter trigger
-	int iterationTriggerApplyNDegreeFilterAlgorithm = 2;  // better set: 2
+	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
 	int quantityNodesToApplyNdegreeFilter = 20000;  // better set: 20000
 	

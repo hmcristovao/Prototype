@@ -71,6 +71,9 @@ public class ConceptsGroup {
 		}		
 		return result;
 	}
+	
+	// rather must WholeSystem.getOriginalConcepts()
+	// because it static and faster
 	public ConceptsGroup getOriginalConcepts() {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
@@ -80,6 +83,8 @@ public class ConceptsGroup {
 		}		
 		return result;
 	}
+	
+	
 	public ConceptsGroup getSelectedBetweennessClosenessConcepts() {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
@@ -210,7 +215,6 @@ public class ConceptsGroup {
 	// and can not be equal to original concept 
 	public ConceptsGroup duplicateConceptsWithoutCategory(int iteration) {
 		ConceptsGroup result = new ConceptsGroup();
-		ConceptsGroup originalConcepts = WholeSystem.getConceptsRegister().getOriginalConcepts();
 		for(Concept concept : this.list) {
 			if( concept.getCategory() == Config.Category.yes && 
 				concept.getIteration() == iteration &&
@@ -218,7 +222,7 @@ public class ConceptsGroup {
 				  concept.getStatus() == Config.Status.selectedEigenvectorConcept
 				)) {
 				    // verify whether it is not original concept
-				    if(originalConcepts.getConcept(Concept.extractCategory(concept.getBlankName())) != null)
+				    if(WholeSystem.getOriginalConcepts().getConcept(Concept.extractCategory(concept.getBlankName())) != null)
 				    	continue;
 					// create new concept without "Category"
 					Concept newConceptWithoutCategory = new Concept(

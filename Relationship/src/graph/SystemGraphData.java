@@ -157,7 +157,7 @@ public class SystemGraphData {
 				System.err.println("After remotion, target node was lost in edge: "+streamEdge.toString());
 			else {
 				// only insert the edge if it is ok
-				gephiEdge  = graphFactory.newEdge(streamEdge.toString(), gephiNodeSource, gephiNodeTarget, 1, true);
+				gephiEdge  = graphFactory.newEdge(streamEdge.toString(), gephiNodeSource, gephiNodeTarget, 1, Config.directedGephiGraph);
 				
 				// put "label" if configured to this
 				if(Config.edgeLabelFileGephi)  // or add to all, if configured to this

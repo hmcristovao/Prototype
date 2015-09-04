@@ -1,4 +1,4 @@
-// v5.1 - add individual RDFs files. Working!  
+// v5.2 - under construction... level of relationship between original concepts  
 
 package main;
 
@@ -61,6 +61,9 @@ public class MainProcess {
 				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
 				classifyConnectedComponent();
+				
+				calculateRelationshipLevelBetweenOriginalConcepts();  // somente se connect > 1
+				
                 buildGexfGraphFile(Config.time.whileIteration);
 				// conditionals set to continue the iteration
 				if(breakIteration())
@@ -209,11 +212,12 @@ public class MainProcess {
 		parser.parseUserTerms(WholeSystem.getListSetQuerySparql().getFirst());
 		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
 		WholeSystem.initGoalMaxConceptsQuantity();
+		WholeSystem.setOriginalConcepts(WholeSystem.getConceptsRegister().getOriginalConcepts());
 		Log.consoleln(" - " + WholeSystem.getQuantityOriginalConcepts() + " terms parsed.");
 		String sameReport = "Quantity of terms parsed: " + WholeSystem.getQuantityOriginalConcepts() + 
 				            " (file: "+Config.nameUserTermsFile+")\n"; 
-		Log.outFileCompleteReport(sameReport + WholeSystem.getConceptsRegister().getOriginalConcepts().toStringLong());
-		Log.outFileShortReport(sameReport + WholeSystem.getConceptsRegister().getOriginalConcepts().toString());
+		Log.outFileCompleteReport(sameReport + WholeSystem.getOriginalConcepts().toStringLong());
+		Log.outFileShortReport(sameReport + WholeSystem.getOriginalConcepts().toString());
 	}
 	public static void parseUselessConcepts(Wrapterms parser) throws Exception {
 		Log.console("- Parsing useless concepts");
@@ -488,6 +492,20 @@ public class MainProcess {
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
+	public static void calculateRelationshipLevelBetweenOriginalConcepts() throws Exception {
+		Log.console("- Calculating level of relationship between original concepts - ");
+		int num = 0;
+		if(currentSystemGraphData.getConnectedComponentsCount() > 1)
+			num = WholeSystem.getStreamGraphData().calculateRelationshipLevelBetweenOriginalConcepts();
+		int maximumLevel=0;
+		for(int i=1; i < WholeSystem.getQuantityOriginalConcepts(); i++)
+			maximumLevel += i;
+		String sameReport = "level: " + num + "/" + maximumLevel + " ("+ (int)(((double)(maximumLevel-num)/maximumLevel)*100)+"% complete).";
+		Log.consoleln(sameReport);
+		String sameReport2 = "Calculated level of relationship between original concepts\n";
+        Log.outFileCompleteReport(sameReport+sameReport2);
+		Log.outFileShortReport(sameReport+sameReport2);
+	}	
 	// work with current gephi graph (wherefore is better before to use: buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph())
 	public static void classifyConnectedComponent() throws Exception {
 		Log.console("- Classifying connected component");
@@ -678,7 +696,7 @@ public class MainProcess {
 		nodeDataWithLeastEccentricityAndAverage = WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getNodeData(nodeDataPos);
 		String sameReport = "Node data with least eccentricity and average: "
 	               +nodeDataWithLeastEccentricityAndAverage.getShortName()
-	               +" (position in group: "+nodeDataPos+")";
+	               +" (position in group: "+nodeDataPos+"/"+WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount()+")";
 		Log.consoleln("- "+sameReport);
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);	

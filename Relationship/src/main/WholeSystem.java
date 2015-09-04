@@ -13,6 +13,7 @@ public class WholeSystem {
 	private static RdfsFilesTable rdfsFilesTable = new RdfsFilesTable();
 	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
 	private static ConceptsGroup conceptsRegister = new ConceptsGroup();
+	private static ConceptsGroup originalConcepts = null;  // will be filled in MainProcess.parseTerms()
 	private static int quantityOriginalConcepts;  // it will be filled from method MainProcess.parseTerms()
 	private static EdgesTableHash edgesTable = new EdgesTableHash(); 
 	private static LinkedList<SetQuerySparql> listSetQuerySparql = new LinkedList<SetQuerySparql>();
@@ -50,6 +51,12 @@ public class WholeSystem {
 	}
 	public static ConceptsGroup getConceptsRegister() {
 		return WholeSystem.conceptsRegister;
+	}
+	public static ConceptsGroup getOriginalConcepts() {
+		return WholeSystem.originalConcepts;
+	}
+	public static void setOriginalConcepts(ConceptsGroup conceptsGroup) {
+		WholeSystem.originalConcepts = conceptsGroup;
 	}
 	public static EdgesTableHash getEdgesTable() {
 		return WholeSystem.edgesTable;

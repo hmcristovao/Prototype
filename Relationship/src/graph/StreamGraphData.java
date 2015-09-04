@@ -8,6 +8,8 @@ import main.Count;
 import main.Log;
 import main.WholeSystem;
 
+import org.graphstream.algorithm.APSP;
+import org.graphstream.algorithm.AStar;
 import org.graphstream.algorithm.BetweennessCentrality;
 import org.graphstream.algorithm.measure.ClosenessCentrality;
 import org.graphstream.algorithm.measure.EigenvectorCentrality;
@@ -32,6 +34,7 @@ enum Deleted { yes, no, yesConcept};
 
 public class StreamGraphData {
 	private Graph streamGraph;
+	private AStar astar;
 	private QuantityNodesEdges total;
     private QuantityNodesEdges duplicated;
     private QuantityNodesEdges deleted;
@@ -45,6 +48,7 @@ public class StreamGraphData {
 				Config.maxNodes,
 				Config.minEdges
 				);
+		this.astar = new AStar(this.streamGraph);
 		this.total      = new QuantityNodesEdges();
 		this.duplicated = new QuantityNodesEdges();
 		this.deleted    = new QuantityNodesEdges();
@@ -238,7 +242,7 @@ public class StreamGraphData {
 			// work with predicate RDF
 			try {
 				// case 01
-				edge = this.streamGraph.addEdge(predicateRDF.getShortBlankName(), subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),true);
+				edge = this.streamGraph.addEdge(predicateRDF.getShortBlankName(), subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),Config.directedStreamGraph);
 				edge.addAttribute("fullname",           predicateRDF.getFullName());
 				edge.addAttribute("shortunderlinename", predicateRDF.getShortUnderlineName());
 				edge.addAttribute("shortblankname",     predicateRDF.getShortBlankName());
@@ -258,7 +262,7 @@ public class StreamGraphData {
 				try {
 					// insert a count element in the id edge and try again
                     String newNameEdge = WholeSystem.getEdgesTable().getNewName(predicateRDF.getShortBlankName());  // add "#n" in the edge name
-					edge = this.streamGraph.addEdge(newNameEdge, subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),true);
+					edge = this.streamGraph.addEdge(newNameEdge, subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),Config.directedStreamGraph);
 					quantityNodesEdges.incNumEdges();
 					if(Config.edgeLabelStreamGephi)
 						// add modifier to differentiate each link into the graph
@@ -398,12 +402,11 @@ public class StreamGraphData {
 			this.streamGraph.removeEdge(edge);
 		}
 		// remove the node of the Stream Graph
-		Node x = this.streamGraph.removeNode(node);
+		this.streamGraph.removeNode(node);
 		return equivalentConcept;
 	}
 	
-	// delete a node and all edges linked it
-	// return true if node is a concept
+	// recover a node deleted and all edges linked it
 	public void insert(Node node, List<Edge> edges) {
 		this.incTotalNodesDeleted(-1);
 		this.incTotalEdgesDeleted(-1*edges.size());
@@ -427,10 +430,11 @@ public class StreamGraphData {
 		for( Edge edge : edges ) {
 			Node nodeSource = edge.getSourceNode();
 			Node nodeTarget = edge.getTargetNode();
-			this.streamGraph.addEdge(edge.getId(), nodeSource, nodeTarget, true);
+			this.streamGraph.addEdge(edge.getId(), nodeSource, nodeTarget, Config.directedStreamGraph);
 		}
 	}
 
+	// at moment, this method is not being used in main algorithm
 	public void deleteCommonNodes_remainOriginalAndSelectedConcepts() {
 		ArrayList<Node> lista = new ArrayList<Node>();
 		for(Node node : this.streamGraph.getNodeSet()) {
@@ -440,6 +444,22 @@ public class StreamGraphData {
 		}
 		for(Node node: lista)
 			this.deleteNode(node);
+	}
+	
+    // level=0 indicate that it has all paths
+	// level=n indicate that do not have n paths
+	public int calculateRelationshipLevelBetweenOriginalConcepts() {
+		int level = 0;
+		ConceptsGroup originalConcepts = WholeSystem.getOriginalConcepts();
+		int size = WholeSystem.getOriginalConcepts().size();		
+		for(int i=0; i < size-1; i++) {
+			for(int j=i+1; j < size; j++) {
+				this.astar.compute(originalConcepts.getConcept(i).getBlankName(),originalConcepts.getConcept(j).getBlankName());
+				if(this.astar.noPathFound())
+					level++;	
+			}
+		}
+		return level;
 	}
 	
 	public static String nodeToString(Node node) {
