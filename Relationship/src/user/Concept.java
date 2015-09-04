@@ -4,23 +4,25 @@ import parse.Token;
 import main.*;
 
 public class Concept {
-	private String           fullName;  // with address and underline
-	private String           blankName;
-	private String           underlineName; // with underline
-	private Config.Status    status;
-	private int              iteration;
-	private Config.Category  category;
-	private boolean          wasCategory;
-	private int              quantityRdfs;
-	private int              registerConnectedComponent[];  // indexed by iteration number
+	private String        fullName;  // with address and underline
+	private String        blankName;
+	private String        underlineName; // with underline
+	private ConceptStatus conceptStatus;
+	private int           iteration;
+	private ConceptCategory  	  conceptCategory;
+	private int           quantityRdfs;
+	private int           registerConnectedComponent[];  // indexed by iteration number
 
-	public Concept(String fullName, String blankName, Config.Status status, int iteration, Config.Category category, int quantityRdfs, int connectedComponent) {
+	public enum ConceptStatus {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus};
+	public enum ConceptCategory {no, yes, was};
+	
+	public Concept(String fullName, String blankName, ConceptStatus conceptStatus, int iteration, ConceptCategory conceptCategory, int quantityRdfs, int connectedComponent) {
 		this.fullName                   = fullName;
 		this.blankName                  = blankName.trim();
 		this.underlineName              = Concept.blankToUnderline(this.blankName);
-		this.status                     = status;
+		this.conceptStatus              = conceptStatus;
 		this.iteration                  = iteration;
-		this.category                   = (Concept.verifyIfCategory(this.blankName)==true) ? Config.Category.yes : Config.Category.no;
+		this.conceptCategory            = (Concept.verifyIfCategory(this.blankName)==true) ? ConceptCategory.yes : ConceptCategory.no;
 		this.quantityRdfs               = quantityRdfs;
 		this.registerConnectedComponent = new int[Config.maxIteration];
 		for(int i=0; i<Config.maxIteration; i++)
@@ -29,7 +31,7 @@ public class Concept {
 	}
 	public Concept(Token token) {
 		// it is before the first iteration
-		this(Config.originalConceptAddress+Concept.blankToUnderline(token.image), token.image, Config.Status.originalConcept, 0, Config.Category.no, 0, Config.withoutConnectedComponent);  
+		this(Config.originalConceptAddress+Concept.blankToUnderline(token.image), token.image, ConceptStatus.originalConcept, 0, ConceptCategory.no, 0, Config.withoutConnectedComponent);  
 	}
 		
 	public String getFullName() {
@@ -38,33 +40,33 @@ public class Concept {
 	public String getBlankName() {
 		return this.blankName;
 	}
-	public Config.Status getStatus() {
-		return this.status;
+	public ConceptStatus getStatus() {
+		return this.conceptStatus;
 	}
 	public int getIteration() {
 		return this.iteration;
 	}
 	public boolean isOriginal() {
-		return this.status == Config.Status.originalConcept;
+		return this.conceptStatus == ConceptStatus.originalConcept;
 	}
 	public String getUnderlineConcept() {
 		return this.underlineName;
 	}
-	public Config.Category getCategory() {
-		return this.category;
+	public ConceptCategory getCategory() {
+		return this.conceptCategory;
 	}
-	public static String categoryToString(Config.Category category) {
-		if(category == Config.Category.no)
+	public static String categoryToString(ConceptCategory conceptCategory) {
+		if(conceptCategory == ConceptCategory.no)
 			return "no";
-		else if(category == Config.Category.yes)
+		else if(conceptCategory == ConceptCategory.yes)
 			return "yes";
-		else if(category == Config.Category.was)
+		else if(conceptCategory == ConceptCategory.was)
 			return "was";
 		else
 			return "error";
 	}
 	public String strCategory() {
-		return Concept.categoryToString(this.category);
+		return Concept.categoryToString(this.conceptCategory);
 	}
 	public int getQuantityRdfs() {
 		return this.quantityRdfs;
@@ -112,33 +114,33 @@ public class Concept {
 		return fullName;
 	}
 
-	public static String statusToString(Config.Status status) {
-		if(status == Config.Status.commonConcept)
+	public static String statusToString(ConceptStatus conceptStatus) {
+		if(conceptStatus == ConceptStatus.commonConcept)
 			return "common";
-		else if(status == Config.Status.originalConcept)
+		else if(conceptStatus == ConceptStatus.originalConcept)
 			return "original";
-		else if(status == Config.Status.selectedBetweennessClosenessConcept)
+		else if(conceptStatus == ConceptStatus.selectedBetweennessClosenessConcept)
 			return "betweenness+closeness";
-		else if(status == Config.Status.selectedEigenvectorConcept)
+		else if(conceptStatus == ConceptStatus.selectedEigenvectorConcept)
 			return "eigenvector";
-		else if(status == Config.Status.selected)
+		else if(conceptStatus == ConceptStatus.selected)
 			return "selected";
 		else 
 			return "";
 	}
-	public static Config.Status stringToStatus(String str) {
+	public static ConceptStatus stringToStatus(String str) {
 		if(str.equals("common"))
-			return Config.Status.commonConcept;
+			return ConceptStatus.commonConcept;
 		else if(str.equals("original"))
-			return Config.Status.originalConcept;
+			return ConceptStatus.originalConcept;
 		else if(str.equals("betweenness+closeness"))
-			return Config.Status.selectedBetweennessClosenessConcept;
+			return ConceptStatus.selectedBetweennessClosenessConcept;
 		else if(str.equals("eigenvector"))
-			return Config.Status.commonConcept;
+			return ConceptStatus.commonConcept;
 		else if(str.equals("selected"))
-			return Config.Status.selected;
+			return ConceptStatus.selected;
 		else 
-			return Config.Status.noStatus;
+			return ConceptStatus.noStatus;
 	}
 	
 	@Override
@@ -160,16 +162,16 @@ public class Concept {
 
 	public String toStringShort() {
 		return this.blankName +
-	           " - "  + Concept.statusToString(this.status) +
+	           " - "  + Concept.statusToString(this.conceptStatus) +
 	           " (it: " + this.iteration + ")";
 	}
 	public String toStringLong() {
 		String out = "[fullName: "  + this.fullName +    "]" +
 					 "[blankName: " + this.blankName +    "]" +
 					 "[underline: " + this.underlineName +"]" + 
-				     "[category: "  + this.strCategory() + "]" +
+				     "[conceptCategory: "  + this.strCategory() + "]" +
 				     "[rdf quantity: "+ this.quantityRdfs + "]" +
-					 "[status: "    + Concept.statusToString(this.status) + "]" +
+					 "[conceptStatus: "    + Concept.statusToString(this.conceptStatus) + "]" +
 				     "[iteration: " + this.iteration + "]" +
 					 "[connected components: ";
 		for(int i=0; i<this.registerConnectedComponent.length; i++) 
@@ -181,10 +183,10 @@ public class Concept {
 	public String toString() {
 		String out = this.underlineName + 
 				     " / "  + this.blankName +
-		             " - "  + Concept.statusToString(this.status) +
+		             " - "  + Concept.statusToString(this.conceptStatus) +
 		             " (i: " + this.iteration + ")";
-		if(this.category == Config.Category.yes || this.category == Config.Category.was)
-			out += " - (category: " + this.strCategory() + ")";
+		if(this.conceptCategory == ConceptCategory.yes || this.conceptCategory == ConceptCategory.was)
+			out += " - (conceptCategory: " + this.strCategory() + ")";
 		return out;
 	}
 }

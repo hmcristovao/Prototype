@@ -11,7 +11,7 @@ import java.util.LinkedList;
 public class WholeSystem {
 	private static UselessConceptsTable uselessConceptsTable = new UselessConceptsTable();
 	private static RdfsFilesTable rdfsFilesTable = new RdfsFilesTable();
-	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in time.  Only one to store all iterations.
+	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in Time.  Only one to store all iterations.
 	private static ConceptsGroup conceptsRegister = new ConceptsGroup();
 	private static ConceptsGroup originalConcepts = null;  // will be filled in MainProcess.parseTerms()
 	private static int quantityOriginalConcepts;  // it will be filled from method MainProcess.parseTerms()

@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 
 import user.Concept;
+import user.Concept.ConceptStatus;
 import user.ConceptsGroup;
 import main.*;
 
@@ -41,7 +42,7 @@ public class NodesTableArray {
 	public int calculateOriginalConceptQuantity() {
 		int originalQuantity = 0;
 		for(int i=0; i<this.max; i++) {
-			if(this.table[i].getStatus() == Config.Status.originalConcept)
+			if(this.table[i].getStatus() == ConceptStatus.originalConcept)
 			   originalQuantity++;
 		}
 		return originalQuantity;
@@ -50,7 +51,7 @@ public class NodesTableArray {
 		ConceptsGroup conceptsGroup = new ConceptsGroup();
 		Concept concept;
 		for(int i=0; i<this.count; i++) {
-			if(this.table[i].getStatus() == Config.Status.originalConcept) {
+			if(this.table[i].getStatus() == ConceptStatus.originalConcept) {
 				concept = WholeSystem.getConceptsRegister().getConcept(this.table[i].getShortName());
 				// concept = new Concept(this.table[i].getStrIdNode(), this.table[i].getShortName(), this.table[i].getStatus(), 0, Config.Category.no, 0, Config.withoutConnectedComponent);  
 				conceptsGroup.add(concept);

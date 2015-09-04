@@ -5,6 +5,8 @@ import graph.NodeData;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import user.Concept.ConceptCategory;
+import user.Concept.ConceptStatus;
 import main.Config;
 import main.Log;
 import main.WholeSystem;
@@ -43,7 +45,7 @@ public class ConceptsGroup {
 	public int getQuantityOriginalConcept() {
 		int count = 0;
 		for(Concept concept : this.list) {
-			if(concept.getStatus() == Config.Status.originalConcept) {
+			if(concept.getStatus() == ConceptStatus.originalConcept) {
 				count++;
 			}
 		}		
@@ -55,14 +57,14 @@ public class ConceptsGroup {
 	public ConceptsGroup getCurrentConcepts(int iteration) {  // original and selected concepts of all previous iterations (except the current iteration) 
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if( concept.getStatus() == Config.Status.originalConcept)
+			if( concept.getStatus() == ConceptStatus.originalConcept)
 			   result.add(concept);
 			else if(iteration > 0) {
 				// get all concepts in each previous iterations
 				for(int i=0; i<iteration; i++) {
-					if( ( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept || 
-						  concept.getStatus() == Config.Status.selectedEigenvectorConcept ||
-						  concept.getStatus() == Config.Status.selected ) && 				  
+					if( ( concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept || 
+						  concept.getStatus() == ConceptStatus.selectedEigenvectorConcept ||
+						  concept.getStatus() == ConceptStatus.selected ) && 				  
 						  concept.getIteration() == i ) {
 						result.add(concept);
 					}
@@ -77,7 +79,7 @@ public class ConceptsGroup {
 	public ConceptsGroup getOriginalConcepts() {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if(concept.getStatus() == Config.Status.originalConcept) {
+			if(concept.getStatus() == ConceptStatus.originalConcept) {
 				result.add(concept);
 			}
 		}		
@@ -88,7 +90,7 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedBetweennessClosenessConcepts() {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if(concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept) {
+			if(concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept) {
 				result.add(concept);
 			}
 		}		
@@ -97,7 +99,7 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedEigenvectorConcepts() {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if(concept.getStatus() == Config.Status.selectedEigenvectorConcept) {
+			if(concept.getStatus() == ConceptStatus.selectedEigenvectorConcept) {
 				result.add(concept);
 			}
 		}		
@@ -106,7 +108,7 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedBetweennessClosenessConcepts(int iteration) {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if(concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept &&
+			if(concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept &&
 			   concept.getIteration() == iteration) {
 				result.add(concept);
 			}
@@ -116,7 +118,7 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedEigenvectorConcepts(int iteration) {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if(concept.getStatus() == Config.Status.selectedEigenvectorConcept &&
+			if(concept.getStatus() == ConceptStatus.selectedEigenvectorConcept &&
 			   concept.getIteration() == iteration) {
 				result.add(concept);
 			}
@@ -126,7 +128,7 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedBetweennessClosenessConcepts(int iteration, int connectedComponent) {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if(concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept &&
+			if(concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept &&
 			   concept.getIteration() == iteration &&
 			   concept.getConnectedComponent(iteration) == connectedComponent
 			  ) {
@@ -138,7 +140,7 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedEigenvectorConcepts(int iteration, int connectedComponent) {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if(concept.getStatus() == Config.Status.selectedEigenvectorConcept &&
+			if(concept.getStatus() == ConceptStatus.selectedEigenvectorConcept &&
 			   concept.getIteration() == iteration &&
 			   concept.getConnectedComponent(iteration) == connectedComponent
 			  ) {
@@ -150,9 +152,9 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedConcepts(int iteration, int connectedComponent) {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if( ( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
-				  concept.getStatus() == Config.Status.selectedEigenvectorConcept ||
-				  concept.getStatus() == Config.Status.selected 				  
+			if( ( concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept ||
+				  concept.getStatus() == ConceptStatus.selectedEigenvectorConcept ||
+				  concept.getStatus() == ConceptStatus.selected 				  
 					) &&
 			    concept.getIteration() == iteration &&
 			    concept.getConnectedComponent(iteration) == connectedComponent
@@ -165,9 +167,9 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedConcepts(int iteration) {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if( ( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
-				  concept.getStatus() == Config.Status.selectedEigenvectorConcept ||
-				  concept.getStatus() == Config.Status.selected 				  
+			if( ( concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept ||
+				  concept.getStatus() == ConceptStatus.selectedEigenvectorConcept ||
+				  concept.getStatus() == ConceptStatus.selected 				  
 				) &&
 				concept.getIteration() == iteration
 				) {
@@ -179,9 +181,9 @@ public class ConceptsGroup {
 	public ConceptsGroup getSelectedConcepts() {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
-				concept.getStatus() == Config.Status.selectedEigenvectorConcept  ||
-                concept.getStatus() == Config.Status.selected 				  
+			if( concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept ||
+				concept.getStatus() == ConceptStatus.selectedEigenvectorConcept  ||
+                concept.getStatus() == ConceptStatus.selected 				  
 			   ) {
 			   result.add(concept);
 			}
@@ -210,27 +212,27 @@ public class ConceptsGroup {
 		return true;
 	}
 
-	// if is concept "Category", add pure concept too 
+	// if is concept "ConceptCategory", add pure concept too 
 	// only concepts of current iteration and selected by betweenness+closeness and eigenvector
 	// and can not be equal to original concept 
 	public ConceptsGroup duplicateConceptsWithoutCategory(int iteration) {
 		ConceptsGroup result = new ConceptsGroup();
 		for(Concept concept : this.list) {
-			if( concept.getCategory() == Config.Category.yes && 
+			if( concept.getCategory() == ConceptCategory.yes && 
 				concept.getIteration() == iteration &&
-				( concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
-				  concept.getStatus() == Config.Status.selectedEigenvectorConcept
+				( concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept ||
+				  concept.getStatus() == ConceptStatus.selectedEigenvectorConcept
 				)) {
 				    // verify whether it is not original concept
 				    if(WholeSystem.getOriginalConcepts().getConcept(Concept.extractCategory(concept.getBlankName())) != null)
 				    	continue;
-					// create new concept without "Category"
+					// create new concept without "ConceptCategory"
 					Concept newConceptWithoutCategory = new Concept(
 							Concept.extractCategoryFullName(concept.getFullName()),
 							Concept.extractCategory(concept.getBlankName()), 
-							Config.Status.selected, 
+							ConceptStatus.selected, 
     						iteration,
-    						Config.Category.was,
+    						ConceptCategory.was,
     						0,    // still is not possible to know the quantity RDFs because it was not yet search rdfs
     						-1);  // it is not possible to know the component connected  (??? need to be filled ???)
     				// this.add(newConceptWithoutCategory); não é possível alterar o lista do laço...
@@ -251,26 +253,26 @@ public class ConceptsGroup {
 		Concept concept = this.hash.get(blankName);
 		if(concept == null)
 			return false;
-		return concept.getStatus() == Config.Status.originalConcept;
+		return concept.getStatus() == ConceptStatus.originalConcept;
 	}
 	public boolean isSelectedBetweennessClosenessConcept(String blankName) {
 		Concept concept = this.hash.get(blankName);
 		if(concept == null)
 			return false;
-		return concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept;
+		return concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept;
 	}
 	public boolean isSelectedEigenvectorConcept(String blankName) {
 		Concept concept = this.hash.get(blankName);
 		if(concept == null)
 			return false;
-		return concept.getStatus() == Config.Status.selectedEigenvectorConcept;
+		return concept.getStatus() == ConceptStatus.selectedEigenvectorConcept;
 	}
 	public boolean isSelectedConcept(String blankName) {
 		Concept concept = this.hash.get(blankName);
 		if(concept == null)
 			return false;
-		return concept.getStatus() == Config.Status.selectedBetweennessClosenessConcept ||
-			   concept.getStatus() == Config.Status.selectedEigenvectorConcept;
+		return concept.getStatus() == ConceptStatus.selectedBetweennessClosenessConcept ||
+			   concept.getStatus() == ConceptStatus.selectedEigenvectorConcept;
 	}
 	public boolean isConcept(String blankName) {
 		return this.hash.containsKey(blankName);
@@ -291,10 +293,10 @@ public class ConceptsGroup {
 			return -1;
 		return concept.getConnectedComponent(iteration);
 	}
-	public Config.Status getStatus(String blankName) {
+	public ConceptStatus getStatus(String blankName) {
 		Concept concept = this.hash.get(blankName);
 		if(concept == null)
-			return Config.Status.noStatus;
+			return ConceptStatus.noStatus;
 		return concept.getStatus();
 	}
 	public Concept getConcept(int pos) {

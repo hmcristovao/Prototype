@@ -30,15 +30,18 @@ import rdf.SetQuerySparql;
 import user.Concept;
 import user.ConceptsGroup;
 
-enum Deleted { yes, no, yesConcept}; 
 
 public class StreamGraphData {
+	
 	private Graph streamGraph;
 	private AStar astar;
+	private int currentLevelRelationshipBetweenOriginalConcepts;
+	private boolean isChangedStreamGraph;  // used to avoid recalculate levelRelationship unnecessarily
 	private QuantityNodesEdges total;
     private QuantityNodesEdges duplicated;
     private QuantityNodesEdges deleted;
 		
+	public enum DeletedStatus { yes_SelectedConcept, yes_CommonConcept, no_RecoveredNode, no_OriginalConcept, no_NotFound }; 
 
 	public StreamGraphData() {
 		this.streamGraph = new SingleGraph(
@@ -49,6 +52,7 @@ public class StreamGraphData {
 				Config.minEdges
 				);
 		this.astar = new AStar(this.streamGraph);
+		this.isChangedStreamGraph = true;
 		this.total      = new QuantityNodesEdges();
 		this.duplicated = new QuantityNodesEdges();
 		this.deleted    = new QuantityNodesEdges();
@@ -56,6 +60,15 @@ public class StreamGraphData {
 	
 	public Graph getStreamGraph() {
 		return this.streamGraph;
+	}
+	public int getCurrentLevelRelationshipBetweenOriginalConcepts() {
+		return this.currentLevelRelationshipBetweenOriginalConcepts;
+	}
+	public boolean isChangedStreamGraph() {
+		return this.isChangedStreamGraph;
+	}
+	public boolean setChangedStreamGraph(boolean value) {
+		return this.isChangedStreamGraph = value;
 	}
 	
 	// intern control of quantity of nodes and edges
@@ -162,10 +175,11 @@ public class StreamGraphData {
 				quantityNodesEdgesOut.incNumEdges(quantityNodesEdges.getNumEdges());
 			}
 		}
+		this.setChangedStreamGraph(true);
 		return quantityNodesEdgesOut;
 	}
 	// only used by buildStreamGraphData_buildEdgeTable
-	// work with only one triple RDF each time
+	// work with only one triple RDF each Time
 	// discard useless concepts (use WholeSystem.uselessConceptsTable to do this operation)
 	// return whether it can or it can not insert RDF as graph element
 	private void insertRDF_withinStreamGraph(OneRDF oneRDF, QuantityNodesEdges quantityNodesEdges, Count countUselessRDFs) { 
@@ -327,7 +341,7 @@ public class StreamGraphData {
 		Node node;
 		for(Concept concept : newConcepts.getList()) {
 			node = this.streamGraph.getNode(concept.getBlankName());
-			// some nodes will not be found because they are from "Category"
+			// some nodes will not be found because they are from "ConceptCategory"
 			if(node != null) {
 			   node.addAttribute("label", concept.getBlankName());  // the process enters here, but this act do not updade the graph visualization!!!
 			   //node.changeAttribute("label", concept.getBlankName());  // it is also not working
@@ -338,18 +352,19 @@ public class StreamGraphData {
 	
 	// Apply K-core on the Graph
 	// return quantity of concepts deleted
-	public int applyKCoreFilterTrigger(int k, Count quantityDeletedSelectedConcepts) {
+	public int applyKCoreFilterTrigger(int k, boolean isForcedRelationship, Count quantityDeletedSelectedConcepts, Count quantityRecoveredNodes) {
 		int total = 0, subtotal;
 		do {
-			subtotal = this.applyNdegreeFilterTrigger(k, quantityDeletedSelectedConcepts);
+			subtotal = this.applyNdegreeFilterTrigger(k, isForcedRelationship, quantityDeletedSelectedConcepts, quantityRecoveredNodes);
 			total += subtotal;
 		}while(subtotal != 0);
+		this.setChangedStreamGraph(true);
 		return total;
 	}
 	
 	// Apply n-degree filter on the Graph
 	// return quantity of concepts deleted
-	public int applyNdegreeFilterTrigger(int n, Count quantityDeletedSelectedConcepts) {
+	public int applyNdegreeFilterTrigger(int n, boolean isForcedRelationship, Count quantityDeletedSelectedConcepts, Count quantityRecoveredNodes) {
 		LinkedList<Node> auxList = new LinkedList<Node>();
 		// at first select the candidates nodes and put them in an auxiliary list
 		for( Node node : this.streamGraph.getEachNode() ) {
@@ -363,47 +378,78 @@ public class StreamGraphData {
 		}
 		// second: delete the nodes and their respectives edges
 		int total = 0;
+		DeletedStatus deletedStatus;
 		for( Node node : auxList ) {
-			Concept excludedConcept = this.deleteNode(node);
+			deletedStatus = this.deleteNode(node, isForcedRelationship);
 			total++;
-			// figure out quantity of deleted selected nodes
-			if(excludedConcept != null)
+			// figure out quantities...
+			if(deletedStatus == DeletedStatus.yes_SelectedConcept)
 				quantityDeletedSelectedConcepts.incCount();
+			else if(deletedStatus == DeletedStatus.no_RecoveredNode)
+				quantityRecoveredNodes.incCount();
 		} 
+		this.setChangedStreamGraph(true);
 		return total;
 	}
 	
 	// remove node of the concepts register, if it is the case
 	// NEVER it delete an original concept
 	// delete a node and all edges linked it
-	// return equivalente concept (or null whether it is not a concept selected)
-	public Concept deleteNode(Node node) {
+	// return equivalente concept (or null whether it is not a concept selected or whether did not exclude)
+	public DeletedStatus deleteNode(Node node, boolean isForcedRelationship) {
 		Concept equivalentConcept = null;
 		// verify whether exist equivalent concept
 		if(WholeSystem.getConceptsRegister().isConcept((String)node.getAttribute("shortblankname"))) {
 			equivalentConcept = WholeSystem.getConceptsRegister().getConcept((String)node.getAttribute("shortblankname"));
 			// if original concept, do not delete
 		    if(equivalentConcept.isOriginal()) { 
-		        return equivalentConcept;
-		    }
-		    else {
-		    	// if not original, remove it of the general concepts register
-				WholeSystem.getConceptsRegister().removeConcept(equivalentConcept.getBlankName());
+		        return DeletedStatus.no_OriginalConcept;
 		    }
 		}
 		
-		this.incTotalNodesDeleted();
-		this.incTotalEdgesDeleted(node.getEdgeSet().size());
-		this.incTotalNodes(-1);
-		this.incTotalEdges(-1*node.getEdgeSet().size());
-		
+		// if isForcedRelationship then store environment to a possible recovery later
+		Node savedNode =  null;
+		List<Edge> savedEdges = null;
+		int savedLevelRelationship=0;
+		if(isForcedRelationship) {
+			savedNode = node;
+			savedEdges = new ArrayList<Edge>();
+			savedLevelRelationship = this.calculateRelationshipLevelBetweenOriginalConcepts();
+			for(Edge edge : node.getEdgeSet()) 
+				savedEdges.add(edge);
+		}
+
 		// remove all edges linked with this node
 		for( Edge edge : node.getEachEdge()) {
 			this.streamGraph.removeEdge(edge);
 		}
 		// remove the node of the Stream Graph
-		this.streamGraph.removeNode(node);
-		return equivalentConcept;
+		if(this.streamGraph.removeNode(node) == null)
+			return DeletedStatus.no_NotFound;
+		
+		// if isForcedRelationship then verify whether levelRelationship changed
+		int newLevelRelationship;
+		if(isForcedRelationship) {
+			newLevelRelationship = this.calculateRelationshipLevelBetweenOriginalConcepts();
+			// if level improved then came back and recover the saved environment (node and edges)
+			if(newLevelRelationship > savedLevelRelationship) {
+				WholeSystem.getStreamGraphData().insert(savedNode, savedEdges);
+				this.currentLevelRelationshipBetweenOriginalConcepts = savedLevelRelationship;
+				return DeletedStatus.no_RecoveredNode;
+			}
+		}
+		// if it's ok, then terminates the operation of remotion
+		this.incTotalNodesDeleted();
+		this.incTotalEdgesDeleted(node.getEdgeSet().size());
+		this.incTotalNodes(-1);
+		this.incTotalEdges(-1*node.getEdgeSet().size());
+
+		// remove the concept of conceptsRegister (if applicable)
+		if(equivalentConcept != null) {
+			WholeSystem.getConceptsRegister().removeConcept(equivalentConcept.getBlankName());
+			return DeletedStatus.yes_SelectedConcept;
+		}
+		return DeletedStatus.yes_CommonConcept;
 	}
 	
 	// recover a node deleted and all edges linked it
@@ -432,33 +478,44 @@ public class StreamGraphData {
 			Node nodeTarget = edge.getTargetNode();
 			this.streamGraph.addEdge(edge.getId(), nodeSource, nodeTarget, Config.directedStreamGraph);
 		}
+		this.setChangedStreamGraph(true);
 	}
 
 	// at moment, this method is not being used in main algorithm
 	public void deleteCommonNodes_remainOriginalAndSelectedConcepts() {
-		ArrayList<Node> lista = new ArrayList<Node>();
+		ArrayList<Node> auxLista = new ArrayList<Node>();
 		for(Node node : this.streamGraph.getNodeSet()) {
 			// if it is not original or selected concepts, separate it to delete it and all its edges
 			if(!WholeSystem.getConceptsRegister().isConcept(node.getId())) 
-				lista.add(node);  // it's ok because it is not possible remove directly of streamGraph (there is a bug in this operation)
+				auxLista.add(node);  // it's ok because it is not possible remove directly of streamGraph (there is a bug in this operation)
 		}
-		for(Node node: lista)
-			this.deleteNode(node);
+		for(Node node: auxLista)
+			this.deleteNode(node, false);
+		
+		this.setChangedStreamGraph(true);
 	}
 	
     // level=0 indicate that it has all paths
 	// level=n indicate that do not have n paths
 	public int calculateRelationshipLevelBetweenOriginalConcepts() {
-		int level = 0;
-		ConceptsGroup originalConcepts = WholeSystem.getOriginalConcepts();
-		int size = WholeSystem.getOriginalConcepts().size();		
-		for(int i=0; i < size-1; i++) {
-			for(int j=i+1; j < size; j++) {
-				this.astar.compute(originalConcepts.getConcept(i).getBlankName(),originalConcepts.getConcept(j).getBlankName());
-				if(this.astar.noPathFound())
-					level++;	
+		int level=0;
+		// calculate only whether stream graph was changed
+		if(this.isChangedStreamGraph) {
+			ConceptsGroup originalConcepts = WholeSystem.getOriginalConcepts();
+			int size = WholeSystem.getOriginalConcepts().size();		
+			for(int i=0; i < size-1; i++) {
+				for(int j=i+1; j < size; j++) {
+					this.astar.compute(originalConcepts.getConcept(i).getBlankName(),originalConcepts.getConcept(j).getBlankName());
+					if(this.astar.noPathFound())
+						level++;	
+				}
 			}
+			this.setChangedStreamGraph(false);
+			this.currentLevelRelationshipBetweenOriginalConcepts = level;
 		}
+		// else get the store value
+		else
+			level = this.currentLevelRelationshipBetweenOriginalConcepts;
 		return level;
 	}
 	

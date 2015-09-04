@@ -100,7 +100,7 @@ public class ConceptMap {
 		}
 		return n;
 	}
-	// the prefix "Category:" in target concept is changed to:
+	// the prefix "ConceptCategory:" in target concept is changed to:
 	// link: "belongs to"
 	// target concept: "... category"
 	public int upgradeConceptMap_heuristic_03_categoryInTargetConcept() {
@@ -119,7 +119,7 @@ public class ConceptMap {
 		}
 		return n;
 	}
-	// the prefix "Category:" in source concept is changed to:
+	// the prefix "ConceptCategory:" in source concept is changed to:
 	// source concept: "... category"
 	public int upgradeConceptMap_heuristic_04_categoryInSourceConcept() {
 		int n = 0;

@@ -29,9 +29,7 @@ public interface Config {
 	String nameGexfGraphFile      = "graph\\graph"+Config.testNumber;
 	String nameTxtConceptMapFile  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
 	String nameCmapConceptMapFile = "conceptmap\\conceptmap"+Config.testNumber+".cmap";
-    enum time {whileIteration, afterIteration, afterSelectionMainConcepts, finalGraph };
-
-	
+    	
 	// ============================================================================
 	// CONFIG - RDFs 
     //
@@ -73,10 +71,6 @@ public interface Config {
 	boolean edgeLabelFileGephi   = true;
 	boolean nodeLabelFileGephi   = false; // original concepts always have label in Stream Gephi
 
-	enum Status {commonConcept, originalConcept, selected, selectedBetweennessClosenessConcept, selectedEigenvectorConcept, noStatus};
-	
-	enum Category {no, yes, was};
-	
 	boolean directedStreamGraph = false;
 	boolean directedGephiGraph  = true;  // only accept true 
  
@@ -85,7 +79,7 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 10;  // better set: 8
+	int minIteration = 5;  // better set: 8
 	int maxIteration = 15;  // better set: 12
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
@@ -95,17 +89,17 @@ public interface Config {
 	double proporcionBetweennessCloseness = 0.5;
 	// precision added up to rounding
 	double precisionBetweennessCloseness = 1.0;
-	// maximum limit to quantity of new concepts in each connected component (excluding the addition of nodes by "Category:")
+	// maximum limit to quantity of new concepts in each connected component (excluding the addition of nodes by "ConceptCategory:")
 	double maxBetweennessCloseness = 6;
 
 	// quantity of nodes to selection (about the quantity total of original nodes)
 	double proporcionEigenvector = 1.3;
 	// precision added up to rounding
 	double precisionEigenvector = 0.5; 
-	// maximum limit to quantity of new concepts in each connected component (excluding the addition of nodes by "Category:")
+	// maximum limit to quantity of new concepts in each connected component (excluding the addition of nodes by "ConceptCategory:")
 	double maxEigenvector = 8; 
 
-	// make the duplication of concept: from with "Category:" to without one
+	// make the duplication of concept: from with "ConceptCategory:" to without one
 	boolean additionNewConceptWithoutCategory = true;
 	
 	// indicate concepts that do not belong to connected component (for example: original conpects)
@@ -124,6 +118,8 @@ public interface Config {
 	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
 	int quantityNodesToApplyNdegreeFilter = 20000;  // better set: 20000
+	int quantityNodesToApplyNdegreeFilter_levelHardToDiscardRelationship  = 2000; 
+	int quantityNodesToApplyNdegreeFilter_levelSoftToApplyRelationship    = 500; 
 	
 	// ============================================================================
 	// CONFIG - REPORT 

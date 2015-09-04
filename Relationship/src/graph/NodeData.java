@@ -2,6 +2,7 @@
 package graph;
 
 import user.Concept;
+import user.Concept.ConceptStatus;
 import main.Config;
 
 public class NodeData {
@@ -11,7 +12,7 @@ public class NodeData {
 	private String fullName;  // is the same as fullName in the Concept class
 	private org.graphstream.graph.Node streamNode;
 	private org.gephi.graph.api.Node gephiNode;
-	private Config.Status status;
+	private ConceptStatus conceptStatus;
 
 	// extra attributes
 	private String homepageAttribute;
@@ -34,13 +35,13 @@ public class NodeData {
 					String fullName,
 					org.graphstream.graph.Node streamNode, 
 					org.gephi.graph.api.Node gephiNode,
-					Config.Status status) {
+					ConceptStatus conceptStatus) {
 		this.strIdNode         = strIdNode;
 		this.shortName         = shortName;
 		this.fullName          = fullName;
 		this.streamNode        = streamNode;
 		this.gephiNode         = gephiNode;
-		this.status	    	   = status;
+		this.conceptStatus	    	   = conceptStatus;
 		this.homepageAttribute = null;
 		this.abstractAttribute = null;
 		this.commentAttribute  = null;
@@ -51,11 +52,11 @@ public class NodeData {
 					String fullName,
 					StreamGraphData streamGraphData, 
 					GephiGraphData gephiGraphData, 
-					Config.Status status) {
+					ConceptStatus conceptStatus) {
 		this(strIdNode, shortName, fullName,
 			 streamGraphData.getStreamGraph().getNode(strIdNode), 
 			 gephiGraphData.getGephiGraph().getNode(strIdNode), 
-			 status);
+			 conceptStatus);
 	}
 	public String getStrIdNode() {
 		return this.strIdNode;
@@ -72,11 +73,11 @@ public class NodeData {
 	public org.gephi.graph.api.Node getGephiNode() {
 		return this.gephiNode;
 	}
-	public Config.Status getStatus() {
-		return this.status;
+	public ConceptStatus getStatus() {
+		return this.conceptStatus;
 	}
-	public void setStatus(Config.Status status) {
-		this.status = status;
+	public void setStatus(ConceptStatus conceptStatus) {
+		this.conceptStatus = conceptStatus;
 	}
 
 	public String getHomepageAttribute() {
@@ -161,7 +162,7 @@ public class NodeData {
 	public String toString() {
 		return  "Id: " + this.getStrIdNode() +
 				"\nFull name:           " + this.getFullName() +
-				"\nStatus:              " + Concept.statusToString(this.status) +
+				"\nStatus:              " + Concept.statusToString(this.conceptStatus) +
 				"\nConnected component: " + this.getConnectedComponent() +
 				"\nBetweenness:         " + this.getBetweenness() +
 				"\nCloseness:           " + this.getCloseness() +

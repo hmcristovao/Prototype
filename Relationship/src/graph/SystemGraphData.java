@@ -12,6 +12,8 @@ import org.gephi.statistics.plugin.ConnectedComponents;
 import org.graphstream.graph.Graph;
 
 import user.Concept;
+import user.Concept.ConceptCategory;
+import user.Concept.ConceptStatus;
 import user.ConceptsGroup;
 
 public class SystemGraphData {
@@ -98,7 +100,7 @@ public class SystemGraphData {
 		this.nodesTableArray = new NodesTableArray(WholeSystem.getStreamGraphData().getRealTotalNodes());
 		NodeData newNodeData = null;
 		QuantityNodesEdges quantityNodesEdges = new QuantityNodesEdges();
-		Config.Status status;
+		ConceptStatus conceptStatus;
 		// get "label" attribute
 		AttributeColumn labelAttributeColumn = this.getGephiGraphData().getAttributeModel().getNodeTable().getColumn("Label");
 		// first: each node, add in GephiGraph, nodesTableArray and nodesTableHash
@@ -119,10 +121,10 @@ public class SystemGraphData {
 			// add node in gephiGraphData
 			this.gephiGraphData.getGephiGraph().addNode(gephiNode);
 			
-			status = WholeSystem.getConceptsRegister().getStatus(shortBlankName);
+			conceptStatus = WholeSystem.getConceptsRegister().getStatus(shortBlankName);
 
 			// create a new NodeData object
-			newNodeData = new NodeData(idNode, shortBlankName, fullName, streamNode, gephiNode, status);
+			newNodeData = new NodeData(idNode, shortBlankName, fullName, streamNode, gephiNode, conceptStatus);
 			// add attributes to new nodeData
 			if(streamNode.getAttribute("homepage") != null) 
 				newNodeData.setHomepageAttribute(streamNode.getAttribute("homepage").toString());
@@ -278,8 +280,8 @@ public class SystemGraphData {
 				newBasicTable.insert(nodeData);
 				// fill the Group Original Concepts
 				// concept = WholeSystem.getConceptsRegister().getConcept(nodeData.getShortName());
-				concept = new Concept(nodeData.getFullName(),nodeData.getShortName(), nodeData.getStatus(), 0, Config.Category.no, 0, Config.withoutConnectedComponent);
-				if(concept.getStatus() == Config.Status.originalConcept)
+				concept = new Concept(nodeData.getFullName(),nodeData.getShortName(), nodeData.getStatus(), 0, ConceptCategory.no, 0, Config.withoutConnectedComponent);
+				if(concept.getStatus() == ConceptStatus.originalConcept)
 					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().add(concept);
 			}
 			this.ranks.getMeasuresRankTable(i).setBasicTable(newBasicTable);
@@ -335,11 +337,11 @@ public class SystemGraphData {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j);
 				// changes status only of nodes still not selected or not original concept
 				if(!WholeSystem.getConceptsRegister().isConcept(currentNodeData.getShortName())) {
-					this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).setStatus(Config.Status.selectedBetweennessClosenessConcept);
+					this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j).setStatus(ConceptStatus.selectedBetweennessClosenessConcept);
 					k++;
 					// add this node in the general register concepts
 					Concept concept = new Concept(currentNodeData.getFullName(),currentNodeData.getShortName(), 
-							                      Config.Status.selectedBetweennessClosenessConcept, iteration, Config.Category.no, 
+							                      ConceptStatus.selectedBetweennessClosenessConcept, iteration, ConceptCategory.no, 
 							                      0,  // still do not possible to know the quantity of rdfs
 							                      i);
 					WholeSystem.getConceptsRegister().add(concept);
@@ -372,11 +374,11 @@ public class SystemGraphData {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j);
 				// changes status only of nodes still not selected or not original concept
 				if(!WholeSystem.getConceptsRegister().isConcept(currentNodeData.getShortName())) {
-					this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).setStatus(Config.Status.selectedEigenvectorConcept);
+					this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j).setStatus(ConceptStatus.selectedEigenvectorConcept);
 					k++;
 					// add this node in the general register concepts
 					Concept concept = new Concept(currentNodeData.getFullName(),currentNodeData.getShortName(), 
-							                      Config.Status.selectedEigenvectorConcept, iteration, Config.Category.no, 
+							                      ConceptStatus.selectedEigenvectorConcept, iteration, ConceptCategory.no, 
 							                      0, // still do not possible to know the quantity of rdfs 
 							                      i);
 					WholeSystem.getConceptsRegister().add(concept);
