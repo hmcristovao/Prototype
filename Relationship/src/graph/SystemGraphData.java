@@ -332,7 +332,7 @@ public class SystemGraphData {
 			// mark the level of the firt nodes to new status, except original nodes
 			for(int j=0, k=0; k < countConnectedComponentSelectNodes &&
 					          j < this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getCount() &&
-					          k < Config.maxBetweennessCloseness; 
+					          k < (Config.maxBetweennessCloseness / this.connectedComponentsCount + 0.5); 
 				j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j);
 				// changes status only of nodes still not selected or not original concept
@@ -369,7 +369,7 @@ public class SystemGraphData {
 			// mark the level of the firt nodes to new status, except original nodes
 			for(int j=0, k=0; k < countConnectedComponentSelectNodes && 
 					          j < this.ranks.getMeasuresRankTable(i).getEigenvector().getCount() &&
-					          k < Config.maxEigenvector;  
+					          k < ( Config.maxEigenvector / this.connectedComponentsCount + 0.5);  
 				j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j);
 				// changes status only of nodes still not selected or not original concept

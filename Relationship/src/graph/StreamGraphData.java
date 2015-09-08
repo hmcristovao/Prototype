@@ -1,7 +1,9 @@
 package graph;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import main.Config;
 import main.Count;
@@ -18,6 +20,7 @@ import org.graphstream.graph.EdgeRejectedException;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.IdAlreadyInUseException;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.Path;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.graph.implementations.SingleGraph;
 
@@ -395,7 +398,7 @@ public class StreamGraphData {
 	// remove node of the concepts register, if it is the case
 	// NEVER it delete an original concept
 	// delete a node and all edges linked it
-	// return equivalente concept (or null whether it is not a concept selected or whether did not exclude)
+	// return status of remotion: yes_SelectedConcept, yes_CommonConcept, no_RecoveredNode, no_OriginalConcept, no_NotFound
 	public DeletedStatus deleteNode(Node node, boolean isForcedRelationship) {
 		Concept equivalentConcept = null;
 		// verify whether exist equivalent concept
@@ -407,7 +410,7 @@ public class StreamGraphData {
 		    }
 		}
 		
-		// if isForcedRelationship then store environment to a possible recovery later
+		// if isForcedRelationship then store environment to a possible posterior recovery
 		Node savedNode =  null;
 		List<Edge> savedEdges = null;
 		int savedLevelRelationship=0;
@@ -415,6 +418,7 @@ public class StreamGraphData {
 			savedNode = node;
 			savedEdges = new ArrayList<Edge>();
 			savedLevelRelationship = this.calculateRelationshipLevelBetweenOriginalConcepts();
+Log.consoleln("trying remove node: "+node.getId()+" saved level: "+savedLevelRelationship);
 			for(Edge edge : node.getEdgeSet()) 
 				savedEdges.add(edge);
 		}
@@ -423,9 +427,20 @@ public class StreamGraphData {
 		for( Edge edge : node.getEachEdge()) {
 			this.streamGraph.removeEdge(edge);
 		}
+		
+		if(node.getId().equals("Audiobook"))
+			Log.consoleln("\n\nACHEI AUDIOBOOK\n"+this.streamGraph.getNodeCount());
+		
 		// remove the node of the Stream Graph
 		if(this.streamGraph.removeNode(node) == null)
 			return DeletedStatus.no_NotFound;
+
+		if(node.getId().equals("Audiobook"))
+			Log.consoleln("\n\nDEPOIS da EXCLUSÂO\n"+this.streamGraph.getNodeCount());
+
+		
+		// indicate that the network was changed
+		this.setChangedStreamGraph(true);
 		
 		// if isForcedRelationship then verify whether levelRelationship changed
 		int newLevelRelationship;
@@ -433,11 +448,16 @@ public class StreamGraphData {
 			newLevelRelationship = this.calculateRelationshipLevelBetweenOriginalConcepts();
 			// if level improved then came back and recover the saved environment (node and edges)
 			if(newLevelRelationship > savedLevelRelationship) {
+Log.consoleln("node recored: "+node.getId()+" saved level: "+newLevelRelationship);
 				WholeSystem.getStreamGraphData().insert(savedNode, savedEdges);
 				this.currentLevelRelationshipBetweenOriginalConcepts = savedLevelRelationship;
 				return DeletedStatus.no_RecoveredNode;
 			}
+			else
+Log.consoleln("node deleted: "+node.getId()+" saved level: "+newLevelRelationship);
+Log.consoleln("Dentro do delete - this.currentLevelRelationshipBetweenOriginalConcepts = "+this.currentLevelRelationshipBetweenOriginalConcepts);
 		}
+
 		// if it's ok, then terminates the operation of remotion
 		this.incTotalNodesDeleted();
 		this.incTotalEdgesDeleted(node.getEdgeSet().size());
@@ -502,22 +522,110 @@ public class StreamGraphData {
 		// calculate only whether stream graph was changed
 		if(this.isChangedStreamGraph) {
 			ConceptsGroup originalConcepts = WholeSystem.getOriginalConcepts();
+			this.astar.init(this.streamGraph);
+			AStar astar2 = new AStar(this.streamGraph);
+Log.consoleln("DENTRO do calculate: "+this.streamGraph.getNodeCount());
 			int size = WholeSystem.getOriginalConcepts().size();		
 			for(int i=0; i < size-1; i++) {
 				for(int j=i+1; j < size; j++) {
-					this.astar.compute(originalConcepts.getConcept(i).getBlankName(),originalConcepts.getConcept(j).getBlankName());
-					if(this.astar.noPathFound())
-						level++;	
+					astar2.compute(originalConcepts.getConcept(i).getBlankName(),originalConcepts.getConcept(j).getBlankName());
+					Log.consoleln("calculando o path de: "+originalConcepts.getConcept(i).getBlankName()+" e "+originalConcepts.getConcept(j).getBlankName()+ " (level: "+level);
+					if(astar2.noPathFound()) {
+						Log.consoleln("Não achou caminho para: "+originalConcepts.getConcept(i).getBlankName()+" e "+originalConcepts.getConcept(j).getBlankName()+ " (level: "+level);
+						level++;
+					}
+					else {
+//						Path path = astar2.getShortestPath();
+//						Log.console("path nodes: ");
+//						for(Node node : path.getEachNode())
+//							Log.console("-"+node.getId()+"-");
+//						
+//						Log.console("path edges: ");
+//						for(Edge edge : path.getEachEdge())
+//							Log.console("-"+edge.getId()+"-");
+					}
 				}
 			}
 			this.setChangedStreamGraph(false);
 			this.currentLevelRelationshipBetweenOriginalConcepts = level;
+Log.consoleln("\nlevel calculated: "+level);
 		}
 		// else get the store value
-		else
+		else {
+Log.consoleln("\ndo not calculate level");
 			level = this.currentLevelRelationshipBetweenOriginalConcepts;
+		}
+Log.consoleln("Dentro do calculate - this.currentLevelRelationshipBetweenOriginalConcepts = "+this.currentLevelRelationshipBetweenOriginalConcepts);
 		return level;
 	}
+	
+	public void extratcPathBetweenTwoNodes(String id1, String id2) {
+		this.astar.compute(id1, id2);
+		if(this.astar.noPathFound()) {
+			Log.consoleln("**********************Path not found:");
+		   return;
+		}
+		else {
+			Path path = astar.getShortestPath();
+			Log.consoleln("**********************Path found:");
+			for(Node node : path.getEachNode())
+				Log.consoleln("Node: " + node.getId());
+			for(Edge edge : path.getEachEdge())
+				Log.consoleln("Edge: " + edge.getId());
+			
+		return;
+		}
+	}
+	
+	
+	public int filterStreamGraphWithNodesAndEdgesBelongToShortestPathsOfFinalHeadNodes(NodesTableArray finalHeadNodes) throws Exception {
+		// seleciona todos os nodes e edges dos paths, que irão permanecer no gráfico
+		Map<String, Node> finalNodes = new HashMap<String, Node>();
+		Map<String, Edge> finalEdges = new HashMap<String, Edge>();
+		int countPaths = 0;
+		for(int i=0; i < finalHeadNodes.getCount()-1; i++) {
+			for(int j=i+1; j < finalHeadNodes.getCount(); j++) {
+				countPaths++;
+				this.astar.compute(finalHeadNodes.getNodeData(i).getShortName(), finalHeadNodes.getNodeData(j).getShortName());
+				if(!this.astar.noPathFound()) {
+					Path path = astar.getShortestPath();
+					for(Node node : path.getEachNode())
+						finalNodes.put(node.getId(), node);
+					for(Edge edge : path.getEachEdge())
+						finalEdges.put(edge.getId(), edge);
+				}
+			}
+		}
+		Log.consoleln("Count final head nodes: "+finalHeadNodes.getCount());
+		Log.consoleln("Count paths: "+countPaths);
+		Log.consoleln("Nodes belongs to path: "+finalNodes.size());
+		Log.consoleln("Edges belongs to path: "+finalNodes.size());
+		
+		// separate nodes and edges that do NOT were selecte, to posterior remotion
+		List<Node> nodesToRemove = new ArrayList<Node>();
+//		List<Edge> edgesToRemove = new ArrayList<Edge>();
+		for(Node node : this.streamGraph.getEachNode()) {
+			if(!finalNodes.containsKey(node.getId()))
+				nodesToRemove.add(node);
+		}
+//		for(Edge edge : this.streamGraph.getEachEdge()) {
+//			if(!finalEdges.containsKey(edge.getId()))
+//				edgesToRemove.add(edge);
+//		}
+//		
+		// remove in the stream graph all nodes and edges that do NOT were selected
+		for(Node node : nodesToRemove) {
+			this.streamGraph.removeNode(node);
+		}
+//		for(Edge edge : edgesToRemove) {
+//			this.streamGraph.removeEdge(edge);
+//		}
+		return countPaths;
+	}
+	
+	
+	
+	
 	
 	public static String nodeToString(Node node) {
 		StringBuffer str = new StringBuffer();

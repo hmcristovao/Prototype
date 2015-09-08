@@ -226,7 +226,7 @@ public class ConceptsGroup {
 				    // verify whether it is not original concept
 				    if(WholeSystem.getOriginalConcepts().getConcept(Concept.extractCategory(concept.getBlankName())) != null)
 				    	continue;
-					// create new concept without "ConceptCategory"
+					// create new concept without "Category"
 					Concept newConceptWithoutCategory = new Concept(
 							Concept.extractCategoryFullName(concept.getFullName()),
 							Concept.extractCategory(concept.getBlankName()), 

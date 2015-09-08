@@ -169,7 +169,7 @@ public class Concept {
 		String out = "[fullName: "  + this.fullName +    "]" +
 					 "[blankName: " + this.blankName +    "]" +
 					 "[underline: " + this.underlineName +"]" + 
-				     "[conceptCategory: "  + this.strCategory() + "]" +
+				     "[category: "  + this.strCategory() + "]" +
 				     "[rdf quantity: "+ this.quantityRdfs + "]" +
 					 "[conceptStatus: "    + Concept.statusToString(this.conceptStatus) + "]" +
 				     "[iteration: " + this.iteration + "]" +
@@ -186,7 +186,7 @@ public class Concept {
 		             " - "  + Concept.statusToString(this.conceptStatus) +
 		             " (i: " + this.iteration + ")";
 		if(this.conceptCategory == ConceptCategory.yes || this.conceptCategory == ConceptCategory.was)
-			out += " - (conceptCategory: " + this.strCategory() + ")";
+			out += " - (category: " + this.strCategory() + ")";
 		return out;
 	}
 }

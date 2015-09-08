@@ -119,7 +119,7 @@ public class ConceptMap {
 		}
 		return n;
 	}
-	// the prefix "ConceptCategory:" in source concept is changed to:
+	// the prefix "Category:" in source concept is changed to:
 	// source concept: "... category"
 	public int upgradeConceptMap_heuristic_04_categoryInSourceConcept() {
 		int n = 0;

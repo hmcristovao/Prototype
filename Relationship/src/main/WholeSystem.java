@@ -15,6 +15,7 @@ public class WholeSystem {
 	private static ConceptsGroup conceptsRegister = new ConceptsGroup();
 	private static ConceptsGroup originalConcepts = null;  // will be filled in MainProcess.parseTerms()
 	private static int quantityOriginalConcepts;  // it will be filled from method MainProcess.parseTerms()
+	private static int quantityPathsBetweenOriginalConcetps; // it will be filled from method MainProcess.parseTerms()
 	private static EdgesTableHash edgesTable = new EdgesTableHash(); 
 	private static LinkedList<SetQuerySparql> listSetQuerySparql = new LinkedList<SetQuerySparql>();
 	private static LinkedList<SystemGraphData> listSystemGraphData = new LinkedList<SystemGraphData>();;
@@ -23,13 +24,16 @@ public class WholeSystem {
 	private static NodesTableArray sortEccentricityAndAverageSelectedConcepts;  // it will be filled at algorithm final fase 
 	private static NodesTableArray sortEccentricityAndAverageRemainingConcepts; // it will be filled at algorithm final fase 
 	private static VocabularyTable vocabularyTable = new VocabularyTable();
-	private static ConceptMap conceptMap = new ConceptMap();;
+	private static ConceptMap conceptMap = new ConceptMap();
 	
 	public static void initQuantityOriginalConcepts(int quantity) {
 		WholeSystem.quantityOriginalConcepts = quantity;
 	}
 	public static int getQuantityOriginalConcepts() {
 		return WholeSystem.quantityOriginalConcepts;
+	}
+	public static int getQuantityPathsBetweenOriginalConcetps() {
+		return WholeSystem.quantityPathsBetweenOriginalConcetps;
 	}
 	
 	// goalConcepts = log2(1 / #original_concepts) * 2 + factor) + #original_concepts
@@ -38,6 +42,12 @@ public class WholeSystem {
 		WholeSystem.goalConceptsQuantity = (int)( ( Math.log(1.0/(double)originalConceptsQuantity)/Math.log(2.0) )
 				                           * 2.0 + Config.conceptsQuantityCalulationFactor) + originalConceptsQuantity;
 		WholeSystem.maxConceptsQuantity = WholeSystem.goalConceptsQuantity + Config.conceptsMinMaxRange;
+	}
+	public static void initQuantityPathsBetweenOriginalConcetps() {
+		int maximumPaths=0;
+		for(int i=1; i < WholeSystem.quantityOriginalConcepts; i++)
+			maximumPaths += i;
+		WholeSystem.quantityPathsBetweenOriginalConcetps = maximumPaths;
 	}
 	
 	public static RdfsFilesTable getRdfsFileTable() {

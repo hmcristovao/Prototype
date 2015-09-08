@@ -1,8 +1,10 @@
-// v5.3 - under construction... level of relationship between original concepts  
+// v5.31 - error - (NÃO RESOLVI: APÓS REMOÇÃO DE NÓ EM STREAM GRAPH, A CLASSE ASTAR NÃO CONSIDERA)
+// CONTÉM CÓDIGO NO ALGORITMO PRINCIPAL PARA EXCLUIR NÓS VERIFICANDO CADA PATH ENTRE OS ORIGINAL CONCEPTS
 
 package main;
 
 import graph.NodeData;
+import graph.NodesTableArray;
 import graph.QuantityNodesEdges;
 import graph.StreamGraphData.DeletedStatus;
 import graph.SystemGraphData;
@@ -16,6 +18,7 @@ import java.util.List;
 
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
+import org.graphstream.graph.Path;
 import org.graphstream.stream.gephi.JSONSender;
 
 import parse.*;
@@ -55,17 +58,16 @@ public class MainProcess {
 				if(iteration >= 1) 
 					copyAllObjectsLastIteration();
 				if(iteration >= Config.iterationTriggerApplyNDegreeFilterAlgorithm 
-				   && WholeSystem.getStreamGraphData().getRealTotalNodes() > Config.quantityNodesToApplyNdegreeFilter) 
+				   && WholeSystem.getStreamGraphData().getRealTotalNodes() > Config.quantityNodesToApplyNdegreeFilter
+				   && WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount() == 1) 
  					applyNDegreeFilterTrigger(Config.nDegreeFilter, false);
 //				if(iteration >= Config.iterationTriggerApplyKCoreFilterAlgorithm) 
 //					applyKCoreFilterTrigger(Config.kCoreFilter);
 				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
 				classifyConnectedComponent();
-				
-				calculateRelationshipLevelBetweenOriginalConcepts();  // somente se connect > 1
-				
-                buildGexfGraphFile(Time.whileIteration);
+				calculateRelationshipLevelBetweenOriginalConcepts();  // only whether connected component > 1
+				buildGexfGraphFile(Time.whileIteration);
 				// conditionals set to continue the iteration
 				if(breakIteration())
 					break;
@@ -86,16 +88,47 @@ public class MainProcess {
 				iteration++;
 			} while(true);
 			indicateAlgorithmIntermediateStage1(); // after iterations loop
-
-//			// while count nodes > goal * 20, apply k-core 
-//			for(int k=2; WholeSystem.getStreamGraphData().getRealTotalNodes() > WholeSystem.getGoalConceptsQuantity()*20; k++) 
-//				applyKCoreFilterTrigger(k); 
-
-			for(int n=2; WholeSystem.getStreamGraphData().getRealTotalNodes() > Config.quantityNodesToApplyNdegreeFilter_levelHardToDiscardRelationship; n++) 
-				applyNDegreeFilterTrigger(n, false); 
 			
-			for(int n=2; WholeSystem.getStreamGraphData().getRealTotalNodes() > Config.quantityNodesToApplyNdegreeFilter_levelSoftToApplyRelationship; n++) 
-				applyNDegreeFilterTrigger(n, true); 
+			//
+			// only entry in this stage if connected component = 1
+			//
+			
+			// remove nodes with degree 2 (this nodes are not paths between another nodes)
+			if(WholeSystem.getStreamGraphData().getRealTotalNodes() > Config.quantityNodesToApplyNdegreeFilter_levelSoftToApplyRelationship) {
+				applyKCoreFilterTrigger(2, false); 
+				calculateRelationshipLevelBetweenOriginalConcepts_allCases();  // regardless of the value of connected component
+			}
+//			if(WholeSystem.getStreamGraphData().getRealTotalNodes() > Config.quantityNodesToApplyNdegreeFilter_levelSoftToApplyRelationship) {
+//				applyNDegreeFilterTrigger(4, true);	
+//				calculateRelationshipLevelBetweenOriginalConcepts_allCases();  // regardless of the value of connected component
+//			}
+			
+			
+			// selecão dos nós básicos (head) para o gráfico final
+			// quantidade que entra na lista
+			int maximumHeadNodes = WholeSystem.getQuantityOriginalConcepts();
+			ConceptsGroup selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
+			maximumHeadNodes += selectedConcepts.size();
+			NodesTableArray finalHeadNodes = new NodesTableArray(maximumHeadNodes);
+			// inclui os originais
+			for(int i=0; i<WholeSystem.getOriginalConcepts().size(); i++) {
+				Concept concept = WholeSystem.getOriginalConcepts().getConcept(i);
+				NodeData nodeData = currentSystemGraphData.getNodeData(concept.getBlankName());
+				finalHeadNodes.insert(nodeData);
+			}
+			// inclui os seleciondados
+//			for(int i=0; i<selectedConcepts.size(); i++) {
+//				Concept concept = selectedConcepts.getConcept(i);
+//				NodeData nodeData = currentSystemGraphData.getNodeData(concept.getBlankName());
+//				finalHeadNodes.insert(nodeData);
+//			}
+
+			Log.consoleln("- Remained Stream Graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes()+" nodes, "+
+					WholeSystem.getStreamGraphData().getRealTotalEdges()+" edges.");
+			WholeSystem.getStreamGraphData().filterStreamGraphWithNodesAndEdgesBelongToShortestPathsOfFinalHeadNodes(finalHeadNodes);			
+			Log.consoleln("- Remained Stream Graph: "+WholeSystem.getStreamGraphData().getRealTotalNodes()+" nodes, "+
+					WholeSystem.getStreamGraphData().getRealTotalEdges()+" edges.");
+			
 
 			iteration++;
 			createCurrentSystemGraphData();
@@ -146,11 +179,14 @@ public class MainProcess {
 				}
 			} 
 			// verify whether the goal was achieved: quantity of selected concepts + original concepts == goal of total concepts
-			if(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
+			if(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() 
+			   + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
 				Log.consoleln("- Goal achieved!!!"); 
 			else {
 				// aqui entra  um processo para eliminar nós segundo o Realtionship, que é mais fraco que connected component
 				Log.consoleln("- Goal did not achieve.");
+				reportAfterSelectionMainConcepts_remainingConcepts();
+
 				indicateAlgorithmIntermediateStage3(); // selection main concepts through calculate of level of relationship between original concepts
 
 				iteration++;
@@ -167,11 +203,12 @@ public class MainProcess {
 				// loop while:
 				// 1. quantity of selected concepts + original concepts > goal of total concepts, AND
 				// 2. there are not concepts to try the remotion (because the quantity of level of relationship is improving)
-				while(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
+				while(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() 
+						+ WholeSystem.getQuantityOriginalConcepts() > WholeSystem.getGoalConceptsQuantity()
 						&& nodeDataPos < WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount()) {
 
-					getNodeDataWithLeastEccentricityAndAverageFromRemainingConcepts();
-					storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted();
+					getNodeDataWithLeastEccentricityAndAverageFromRemainingConcepts();  
+					storeCurrentInformationsAboutEnvironmentAndNodeWillBeDeleted();   // set currentNode
 					// delete the node in the stream graph
 					currentConcept = WholeSystem.getConceptsRegister().getConcept(currentNode.getId());
 					DeletedStatus deletedStatus = WholeSystem.getStreamGraphData().deleteNode(currentNode, true);
@@ -180,7 +217,7 @@ public class MainProcess {
 					iteration++;
 					createCurrentSystemGraphData();
 					buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();				
-					// if connected component quantity improved then recover the deleted node, edges (to stream graph)
+					// if the node did not delete, recover the environment and forward to next position in table (next least average node) 
 					if(deletedStatus == DeletedStatus.no_RecoveredNode) {
 						recoverEnvironment();
 						nodeDataPos++;
@@ -196,16 +233,20 @@ public class MainProcess {
 						createSortEccentricityAndAverageOnlyRemainingConcepts(); 
 					}
 				} 
+				classifyConnectedComponent(); 
 				// verify whether the goal was achieved: quantity of selected concepts + original concepts == goal of total concepts
-				if(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getGoalConceptsQuantity())
+				if(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() 
+			       <= WholeSystem.getGoalConceptsQuantity())
 					Log.consoleln("- Goal achieved!!!"); 
 				else {
-					if(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() <= WholeSystem.getMaxConceptsQuantity())
+					if(WholeSystem.getSortEccentricityAndAverageRemainingConcepts().getCount() + WholeSystem.getQuantityOriginalConcepts() 
+					   <= WholeSystem.getMaxConceptsQuantity())
 						Log.consoleln("   (However, it is less than the maximum "+WholeSystem.getMaxConceptsQuantity()+" nodes)");
 					else
 						Log.consoleln("- Goal did not achieve, after use of two methods (connected component and relationship between original concepts).");
 				}
 			}
+
 			// reportAfterSelectionMainConcepts_selectedConcepts();
 			reportAfterSelectionMainConcepts_remainingConcepts();
 
@@ -218,6 +259,8 @@ public class MainProcess {
 			// create a GEXF file, like as concept map
             buildGexfGraphFile(Time.finalGraph);
             showUselessConceptsStatistic();
+
+            
             buildRawConceptMapFromStreamGraph();
 			upgradeConceptMap_heuristic_01_removeLinkNumber();
 			upgradeConceptMap_heuristic_02_vocabularyTable();
@@ -273,6 +316,7 @@ public class MainProcess {
 		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
 		WholeSystem.initGoalMaxConceptsQuantity();
 		WholeSystem.setOriginalConcepts(WholeSystem.getConceptsRegister().getOriginalConcepts());
+		WholeSystem.initQuantityPathsBetweenOriginalConcetps();
 		Log.consoleln(" - " + WholeSystem.getQuantityOriginalConcepts() + " terms parsed.");
 		String sameReport = "Quantity of terms parsed: " + WholeSystem.getQuantityOriginalConcepts() + 
 				            " (file: "+Config.nameUserTermsFile+")\n"; 
@@ -324,7 +368,7 @@ public class MainProcess {
 	}
 	public static void indicateAlgorithmIntermediateStage2() throws Exception {
 		String sameReport = "Current concepts quantity: "+
-		        WholeSystem.getStreamGraphData().getTotalNodes()+" stream graph  ("+
+		        WholeSystem.getStreamGraphData().getRealTotalNodes()+" stream graph  ("+
 		        WholeSystem.getQuantityOriginalConcepts() + " original concepts).  "+
                 "Goal of concepts quantity: "+
 		        WholeSystem.getGoalConceptsQuantity()+ " good, "+
@@ -336,7 +380,7 @@ public class MainProcess {
 	}
 	public static void indicateAlgorithmIntermediateStage3() throws Exception {
 		String sameReport = "Current concepts quantity: "+
-		        WholeSystem.getStreamGraphData().getTotalNodes()+" stream graph  ("+
+		        WholeSystem.getStreamGraphData().getRealTotalNodes()+" stream graph  ("+
 		        WholeSystem.getQuantityOriginalConcepts() + " original concepts).  "+
                 "Goal of concepts quantity: "+
 		        WholeSystem.getGoalConceptsQuantity()+ " good, "+
@@ -459,6 +503,7 @@ public class MainProcess {
         Log.outFileCompleteReport(sameReport + WholeSystem.getListSetQuerySparql().get(iteration-1).toString());
 		Log.outFileShortReport(sameReport + WholeSystem.getListSetQuerySparql().get(iteration-1).toStringShort());
 	}
+	// isForcedReationship determines that the node will only remove if the level of relationship between original concepts do not change
 	public static void applyNDegreeFilterTrigger(int n, boolean isForcedRelationship) throws Exception {
 		Log.console("- Starting "+n+"-degree filter algorithm "+
 				(isForcedRelationship ? "(" : "(non ") + "forced relationship between original concepts)");
@@ -575,15 +620,26 @@ public class MainProcess {
 		int num = 0;
 		if(currentSystemGraphData.getConnectedComponentsCount() > 1)
 			num = WholeSystem.getStreamGraphData().calculateRelationshipLevelBetweenOriginalConcepts();
-		int maximumLevel=0;
-		for(int i=1; i < WholeSystem.getQuantityOriginalConcepts(); i++)
-			maximumLevel += i;
+		int maximumLevel = WholeSystem.getQuantityPathsBetweenOriginalConcetps();
 		String sameReport = "level: " + num + "/" + maximumLevel + " ("+ (int)(((double)(maximumLevel-num)/maximumLevel)*100)+"% complete).";
 		Log.consoleln(sameReport);
 		String sameReport2 = "Calculated level of relationship between original concepts\n";
         Log.outFileCompleteReport(sameReport+sameReport2);
 		Log.outFileShortReport(sameReport+sameReport2);
 	}	
+
+	// regardless of the value of connected component
+	public static void calculateRelationshipLevelBetweenOriginalConcepts_allCases() throws Exception {
+		Log.console("- Calculating level of relationship between original concepts - ");
+		int num = WholeSystem.getStreamGraphData().calculateRelationshipLevelBetweenOriginalConcepts();
+		int maximumLevel = WholeSystem.getQuantityPathsBetweenOriginalConcetps();
+		String sameReport = "level: " + num + "/" + maximumLevel + " ("+ (int)(((double)(maximumLevel-num)/maximumLevel)*100)+"% complete).";
+		Log.consoleln(sameReport);
+		String sameReport2 = "Calculated level of relationship between original concepts\n";
+        Log.outFileCompleteReport(sameReport+sameReport2);
+		Log.outFileShortReport(sameReport+sameReport2);
+	}	
+	
 	// work with current gephi graph (wherefore is better before to use: buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph())
 	public static void classifyConnectedComponent() throws Exception {
 		Log.console("- Classifying connected component");
@@ -651,19 +707,17 @@ public class MainProcess {
 	}
 	public static void reportSelectedNodesToNewIteration() throws Exception {
 		Log.consoleln("- Reporting selected nodes to new iteration.");
-		Log.outFileCompleteReport("Iteration "+iteration);
-		Log.outFileShortReport("Iteration "+iteration);
-		Log.outFileCompleteReport(currentSystemGraphData.toString());
-		// Log.outFileShortReport(currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
-		String sameReport = currentSystemGraphData.reportSelectedNodes(iteration);			
+		Log.outFileCompleteReport("Current System Graph Data:\n" + currentSystemGraphData.toString());
+		// Log.outFileShortReport("Current System Graph Data:\n" + currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
+		String sameReport = "Final report of iteration "+iteration+"\n"+currentSystemGraphData.reportSelectedNodes(iteration);			
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
 	public static void duplicateConceptsWithoutCategory(int iteration) throws Exception {
-		Log.console("- Duplicating concepts with \"ConceptCategory:\" subword");
+		Log.console("- Duplicating concepts with \"Category:\" subword");
 		ConceptsGroup newConcepts = WholeSystem.getConceptsRegister().duplicateConceptsWithoutCategory(iteration);
 		Log.consoleln(" - "+newConcepts.size()+" new concepts inserted.");
-		String sameReport = "Duplicated "+newConcepts.size()+" concepts with \"ConceptCategory:\" subword:\n"
+		String sameReport = "Duplicated "+newConcepts.size()+" concepts with \"Category:\" subword:\n"
 				            + newConcepts.toString(); 
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);

@@ -20,7 +20,26 @@ industry -> is a industry of
 locationCountry -> is located in
 nationality -> has the nationality
 birthPlace -> birth place
+placeOfBirth -> birth place
 almaMater -> has alma matter
 deathPlace -> death place
 occupation -> has occupacion
 skills -> has skills
+southwest -> is in the southwest
+southeast -> is in the southeast
+northwest -> is in the northwest
+northeast -> is in the northeast
+south -> is in the south
+north -> is in the north
+west -> is in the west
+east -> is in the east
+subdivisionType -> is a subdivision of
+doctoralAdvisor -> had as doctoral advisor
+doctoralStudents -> was doctoral student of
+citizenship -> has citizenship in
+residence -> has residence in
+owner -> is owned by
+knownFor -> is known for
+isPartOf -> is part of
+
+

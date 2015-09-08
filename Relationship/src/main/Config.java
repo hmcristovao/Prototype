@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "26"; 
+	String  testNumber = "24"; 
 	
 	String nameFileCompletReport = "C:\\Users\\Henrique\\Documents\\log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "C:\\Users\\Henrique\\Documents\\log\\short_report_"+Config.testNumber+".txt";
@@ -39,7 +39,6 @@ public interface Config {
 	String serviceSnorqlEndpoint_2 = "http://lod.openlinksw.com/sparql/";
 	String serviceSnorqlEndpoint_3 = "http://www.ida.liu.se/projects/semtech/energy/snorql/";
 	String serviceSnorqlEndpoint_4 = "http://data.nobelprize.org/snorql/";
-	String serviceSnorqlEndpoint_5 = "http://dbpedia.org/snorql";
 
 	String addressBasic = "http://relationship/";
 	String addressImage = "http://commons.wikimedia.org/wiki/File:";
@@ -79,27 +78,27 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 5;  // better set: 8
-	int maxIteration = 15;  // better set: 12
+	int minIteration = 3;  // better set: 8
+	int maxIteration = 50;  // it is necessary a great value to ensure that the connected component is 1  
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
-	double proporcionBetweenness = 4;
+	double proporcionBetweenness = 10;
 
-	// quantity of nodes to selection (about the quantity total of original nodes)
-	double proporcionBetweennessCloseness = 0.5;
-	// precision added up to rounding
-	double precisionBetweennessCloseness = 1.0;
-	// maximum limit to quantity of new concepts in each connected component (excluding the addition of nodes by "ConceptCategory:")
-	double maxBetweennessCloseness = 6;
+	// quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of original nodes)
+	double proporcionBetweennessCloseness = 2.0;
+	// precision added up to rounding the calculate of quantity of each connected component
+	double precisionBetweennessCloseness = 0.5;
+	// maximum limit to quantity of new concepts distributed in all connected component, +0.5 in each component (excluding the addition of nodes by "Category:")
+	double maxBetweennessCloseness = 15;
 
-	// quantity of nodes to selection (about the quantity total of original nodes)
-	double proporcionEigenvector = 1.3;
-	// precision added up to rounding
+	// quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of original nodes)
+	double proporcionEigenvector = 2.0;
+	// precision added up to rounding the calculate of quantity of each connected component
 	double precisionEigenvector = 0.5; 
-	// maximum limit to quantity of new concepts in each connected component (excluding the addition of nodes by "ConceptCategory:")
-	double maxEigenvector = 8; 
+	// maximum limit to quantity of new concepts distributed in all connected component, +0.5 in each component (excluding the addition of nodes by "Category:")
+	double maxEigenvector = 15; 
 
-	// make the duplication of concept: from with "ConceptCategory:" to without one
+	// make the duplication of concept: from with "Category:" to without one
 	boolean additionNewConceptWithoutCategory = true;
 	
 	// indicate concepts that do not belong to connected component (for example: original conpects)
@@ -117,7 +116,7 @@ public interface Config {
 	// since iteration number x to apply n-degree filter trigger
 	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
-	int quantityNodesToApplyNdegreeFilter = 20000;  // better set: 20000
+	int quantityNodesToApplyNdegreeFilter = 5000;  // better set: 20000
 	int quantityNodesToApplyNdegreeFilter_levelHardToDiscardRelationship  = 2000; 
 	int quantityNodesToApplyNdegreeFilter_levelSoftToApplyRelationship    = 500; 
 	
@@ -131,7 +130,7 @@ public interface Config {
 	// CONFIG - CONCEPT MAP 
     //
 	// to calculate min and max concepts to map
-	int conceptsQuantityCalulationFactor = 18;  // goal of concepts quantity: log2(1/original quantity)*2 + (factor)
+	int conceptsQuantityCalulationFactor = 16;  // (factor default: 18) - goal of concepts quantity: log2(1/original quantity)*2 + (factor)
 	int conceptsMinMaxRange = 5;
 	
 }
