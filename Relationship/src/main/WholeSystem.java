@@ -23,6 +23,7 @@ public class WholeSystem {
 	private static int maxConceptsQuantity;  // it will be calculated by WholeSystem.initGoalmaxConceptsQualtity() from MainProcess.parseTerms()
 	private static NodesTableArray sortEccentricityAndAverageSelectedConcepts;  // it will be filled at algorithm final fase 
 	private static NodesTableArray sortEccentricityAndAverageRemainingConcepts; // it will be filled at algorithm final fase 
+	private static NodesTableArray finalHeadNodes; // it will be filled at MainProcess.buildFinalHeadNodesFromOriginalConceptsAndSelectedNodes
 	private static VocabularyTable vocabularyTable = new VocabularyTable();
 	private static ConceptMap conceptMap = new ConceptMap();
 	
@@ -77,6 +78,12 @@ public class WholeSystem {
 	}
 	public static LinkedList<SystemGraphData> getListSystemGraphData() {
 		return WholeSystem.listSystemGraphData;
+	}
+	public static NodesTableArray getFinalHeadNodes() {
+		return WholeSystem.finalHeadNodes;
+	}
+	public static void setFinalHeadNodes(NodesTableArray table) {
+		WholeSystem.finalHeadNodes = table;
 	}
 	public static ConceptMap getConceptMap() {
 		return WholeSystem.conceptMap;

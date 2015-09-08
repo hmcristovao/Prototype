@@ -406,6 +406,33 @@ public class SystemGraphData {
 	}
 	*/
 	
+	public void buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts() throws Exception {
+		// build finalHeadNodes: contains the head nodes to build the paths to final stage
+		int maximumHeadNodes = WholeSystem.getQuantityOriginalConcepts();
+		ConceptsGroup selectedConcepts;
+		if(Config.isSelected)
+			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
+		if(Config.isBetweennessCloseness)
+			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedBetweennessClosenessConcepts();
+		else if(Config.isEigenvector)
+			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedEigenvectorConcepts();
+		
+		maximumHeadNodes += selectedConcepts.size();
+		WholeSystem.setFinalHeadNodes(new NodesTableArray(maximumHeadNodes));
+		// insert original concepts in finalHeadNodes
+		for(int i=0; i<WholeSystem.getOriginalConcepts().size(); i++) {
+			Concept concept = WholeSystem.getOriginalConcepts().getConcept(i);
+			NodeData nodeData = this.getNodeData(concept.getBlankName());
+			WholeSystem.getFinalHeadNodes().insert(nodeData);
+		}
+		// insert selected nodes in finalHeadNodes
+		for(int i=0; i<selectedConcepts.size(); i++) {
+			Concept concept = selectedConcepts.getConcept(i);
+			NodeData nodeData = this.getNodeData(concept.getBlankName());
+			WholeSystem.getFinalHeadNodes().insert(nodeData);
+		}
+	}
+	
 	public String reportSelectedNodes(int iteration) throws Exception {
 		StringBuffer str = new StringBuffer();
 		for(int i=0; i < this.connectedComponentsCount; i++) {

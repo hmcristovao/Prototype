@@ -418,7 +418,6 @@ public class StreamGraphData {
 			savedNode = node;
 			savedEdges = new ArrayList<Edge>();
 			savedLevelRelationship = this.calculateRelationshipLevelBetweenOriginalConcepts();
-Log.consoleln("trying remove node: "+node.getId()+" saved level: "+savedLevelRelationship);
 			for(Edge edge : node.getEdgeSet()) 
 				savedEdges.add(edge);
 		}
@@ -428,17 +427,10 @@ Log.consoleln("trying remove node: "+node.getId()+" saved level: "+savedLevelRel
 			this.streamGraph.removeEdge(edge);
 		}
 		
-		if(node.getId().equals("Audiobook"))
-			Log.consoleln("\n\nACHEI AUDIOBOOK\n"+this.streamGraph.getNodeCount());
-		
 		// remove the node of the Stream Graph
 		if(this.streamGraph.removeNode(node) == null)
 			return DeletedStatus.no_NotFound;
 
-		if(node.getId().equals("Audiobook"))
-			Log.consoleln("\n\nDEPOIS da EXCLUSÂO\n"+this.streamGraph.getNodeCount());
-
-		
 		// indicate that the network was changed
 		this.setChangedStreamGraph(true);
 		
@@ -448,14 +440,10 @@ Log.consoleln("trying remove node: "+node.getId()+" saved level: "+savedLevelRel
 			newLevelRelationship = this.calculateRelationshipLevelBetweenOriginalConcepts();
 			// if level improved then came back and recover the saved environment (node and edges)
 			if(newLevelRelationship > savedLevelRelationship) {
-Log.consoleln("node recored: "+node.getId()+" saved level: "+newLevelRelationship);
 				WholeSystem.getStreamGraphData().insert(savedNode, savedEdges);
 				this.currentLevelRelationshipBetweenOriginalConcepts = savedLevelRelationship;
 				return DeletedStatus.no_RecoveredNode;
 			}
-			else
-Log.consoleln("node deleted: "+node.getId()+" saved level: "+newLevelRelationship);
-Log.consoleln("Dentro do delete - this.currentLevelRelationshipBetweenOriginalConcepts = "+this.currentLevelRelationshipBetweenOriginalConcepts);
 		}
 
 		// if it's ok, then terminates the operation of remotion
@@ -523,70 +511,35 @@ Log.consoleln("Dentro do delete - this.currentLevelRelationshipBetweenOriginalCo
 		if(this.isChangedStreamGraph) {
 			ConceptsGroup originalConcepts = WholeSystem.getOriginalConcepts();
 			this.astar.init(this.streamGraph);
-			AStar astar2 = new AStar(this.streamGraph);
-Log.consoleln("DENTRO do calculate: "+this.streamGraph.getNodeCount());
 			int size = WholeSystem.getOriginalConcepts().size();		
 			for(int i=0; i < size-1; i++) {
 				for(int j=i+1; j < size; j++) {
-					astar2.compute(originalConcepts.getConcept(i).getBlankName(),originalConcepts.getConcept(j).getBlankName());
-					Log.consoleln("calculando o path de: "+originalConcepts.getConcept(i).getBlankName()+" e "+originalConcepts.getConcept(j).getBlankName()+ " (level: "+level);
-					if(astar2.noPathFound()) {
-						Log.consoleln("Não achou caminho para: "+originalConcepts.getConcept(i).getBlankName()+" e "+originalConcepts.getConcept(j).getBlankName()+ " (level: "+level);
+					this.astar.compute(originalConcepts.getConcept(i).getBlankName(),originalConcepts.getConcept(j).getBlankName());
+					if(this.astar.noPathFound()) {
 						level++;
-					}
-					else {
-//						Path path = astar2.getShortestPath();
-//						Log.console("path nodes: ");
-//						for(Node node : path.getEachNode())
-//							Log.console("-"+node.getId()+"-");
-//						
-//						Log.console("path edges: ");
-//						for(Edge edge : path.getEachEdge())
-//							Log.console("-"+edge.getId()+"-");
 					}
 				}
 			}
 			this.setChangedStreamGraph(false);
 			this.currentLevelRelationshipBetweenOriginalConcepts = level;
-Log.consoleln("\nlevel calculated: "+level);
 		}
 		// else get the store value
 		else {
-Log.consoleln("\ndo not calculate level");
 			level = this.currentLevelRelationshipBetweenOriginalConcepts;
 		}
-Log.consoleln("Dentro do calculate - this.currentLevelRelationshipBetweenOriginalConcepts = "+this.currentLevelRelationshipBetweenOriginalConcepts);
 		return level;
 	}
 	
-	public void extratcPathBetweenTwoNodes(String id1, String id2) {
-		this.astar.compute(id1, id2);
-		if(this.astar.noPathFound()) {
-			Log.consoleln("**********************Path not found:");
-		   return;
-		}
-		else {
-			Path path = astar.getShortestPath();
-			Log.consoleln("**********************Path found:");
-			for(Node node : path.getEachNode())
-				Log.consoleln("Node: " + node.getId());
-			for(Edge edge : path.getEachEdge())
-				Log.consoleln("Edge: " + edge.getId());
-			
-		return;
-		}
-	}
-	
-	
-	public int filterStreamGraphWithNodesAndEdgesBelongToShortestPathsOfFinalHeadNodes(NodesTableArray finalHeadNodes) throws Exception {
+	public int filterStreamGraphWithNodesAndEdgesBelongToShortestPathsOfFinalHeadNodes() throws Exception {
 		// seleciona todos os nodes e edges dos paths, que irão permanecer no gráfico
 		Map<String, Node> finalNodes = new HashMap<String, Node>();
 		Map<String, Edge> finalEdges = new HashMap<String, Edge>();
 		int countPaths = 0;
-		for(int i=0; i < finalHeadNodes.getCount()-1; i++) {
-			for(int j=i+1; j < finalHeadNodes.getCount(); j++) {
+		for(int i=0; i < WholeSystem.getFinalHeadNodes().getCount()-1; i++) {
+			for(int j=i+1; j < WholeSystem.getFinalHeadNodes().getCount(); j++) {
 				countPaths++;
-				this.astar.compute(finalHeadNodes.getNodeData(i).getShortName(), finalHeadNodes.getNodeData(j).getShortName());
+				this.astar.compute(WholeSystem.getFinalHeadNodes().getNodeData(i).getShortName(), 
+						           WholeSystem.getFinalHeadNodes().getNodeData(j).getShortName());
 				if(!this.astar.noPathFound()) {
 					Path path = astar.getShortestPath();
 					for(Node node : path.getEachNode())
@@ -596,11 +549,6 @@ Log.consoleln("Dentro do calculate - this.currentLevelRelationshipBetweenOrigina
 				}
 			}
 		}
-		Log.consoleln("Count final head nodes: "+finalHeadNodes.getCount());
-		Log.consoleln("Count paths: "+countPaths);
-		Log.consoleln("Nodes belongs to path: "+finalNodes.size());
-		Log.consoleln("Edges belongs to path: "+finalNodes.size());
-		
 		// separate nodes and edges that do NOT were selecte, to posterior remotion
 		List<Node> nodesToRemove = new ArrayList<Node>();
 //		List<Edge> edgesToRemove = new ArrayList<Edge>();
@@ -623,10 +571,28 @@ Log.consoleln("Dentro do calculate - this.currentLevelRelationshipBetweenOrigina
 		return countPaths;
 	}
 	
+	public boolean isNodeHasLinkWithOriginalConcepts(Node currentNode) {
+		for(Edge edge : currentNode.getEachEdge()) {
+			for(Concept concept : WholeSystem.getOriginalConcepts().getList()) {
+				if(edge.getSourceNode().getId().equals(concept.getBlankName()))
+					return true;
+				if(edge.getTargetNode().getId().equals(concept.getBlankName()))
+					return true;
+			}
+		}
+		return false;
+	}
 	
-	
-	
-	
+	public boolean isNodeHasLinkWithAnEspecificOriginalConcept(Node currentNode, String originalConcept) {
+		for(Edge edge : currentNode.getEachEdge()) {
+			if(edge.getSourceNode().getId().equals(originalConcept))
+				return true;
+			if(edge.getTargetNode().getId().equals(originalConcept))
+				return true;
+		}
+		return false;
+	}
+
 	public static String nodeToString(Node node) {
 		StringBuffer str = new StringBuffer();
 		str.append("\nID: ");

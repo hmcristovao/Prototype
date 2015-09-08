@@ -1,4 +1,6 @@
-influenced -> was influenced for
+schoolTradition -> has school tradition
+shortDescription -> has short description
+influenced -> influenced
 influences -> received influences of
 influencedBy -> influenced by
 field -> belongs to field
@@ -41,5 +43,7 @@ residence -> has residence in
 owner -> is owned by
 knownFor -> is known for
 isPartOf -> is part of
-
+foundationPlace -> has place foundation
+type -> is a type of
+location -> has location in
 

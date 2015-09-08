@@ -4,7 +4,7 @@ public interface Config {
 	// ============================================================================
 	// CONFIG - RUN, LOG AND PRINT 
     //
-	String  testNumber = "24"; 
+	String  testNumber = "00"; 
 	
 	String nameFileCompletReport = "C:\\Users\\Henrique\\Documents\\log\\complete_report_"+Config.testNumber+".txt";
 	String nameFileShortReport   = "C:\\Users\\Henrique\\Documents\\log\\short_report_"+Config.testNumber+".txt";
@@ -78,7 +78,7 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 3;  // better set: 8
+	int minIteration = 6;  // better set: 8
 	int maxIteration = 50;  // it is necessary a great value to ensure that the connected component is 1  
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
@@ -109,7 +109,7 @@ public interface Config {
 	// since iteration number x to apply K-core filter trigger
 	int iterationTriggerApplyKCoreFilterAlgorithm = 5;  // better set: 5
 	// quantity of nodes to shoot K-core n algorithm
-	// int quantityNodesToApplyKcoreFilter = 100;
+	int quantityNodesToApplyKcoreFilter = 700;
 	
 	// N-degree filter used in all system
 	int nDegreeFilter = 2;
@@ -117,8 +117,21 @@ public interface Config {
 	int iterationTriggerApplyNDegreeFilterAlgorithm = 1;  // better set: 2
 	// quantity of nodes to shoot n-degree filter algorithm
 	int quantityNodesToApplyNdegreeFilter = 5000;  // better set: 20000
-	int quantityNodesToApplyNdegreeFilter_levelHardToDiscardRelationship  = 2000; 
-	int quantityNodesToApplyNdegreeFilter_levelSoftToApplyRelationship    = 500; 
+	
+	// choice of nodes to be head (they are used to build the shortest paths)
+	// obs.: the original concepts are always chosen
+	boolean isBetweennessCloseness = true;
+	boolean isEigenvector = false;
+	boolean isSelected = false;
+	
+	// keep all nodes with link to original concepts (in stage after selection of head nodes)
+	// normally this flag improves much more the final quantity of concepts in concept map 
+	boolean isKeepNeighborsOfOriginalConcepts = false;
+	
+	// to fix a bug in Gephi Tool Kit - calculate wrong the quantity of connected component
+	// turn the flag to true and put the especific original concept that is getting alone
+	boolean isFixBugInGephiToolKit = true;
+	String originalConceptWithGephiToolKitBug = "Tim Berners-Lee";
 	
 	// ============================================================================
 	// CONFIG - REPORT 
@@ -130,7 +143,7 @@ public interface Config {
 	// CONFIG - CONCEPT MAP 
     //
 	// to calculate min and max concepts to map
-	int conceptsQuantityCalulationFactor = 16;  // (factor default: 18) - goal of concepts quantity: log2(1/original quantity)*2 + (factor)
+	int conceptsQuantityCalulationFactor = 18;  // (factor default: 18) - goal of concepts quantity: log2(1/original quantity)*2 + (factor)
 	int conceptsMinMaxRange = 5;
 	
 }
