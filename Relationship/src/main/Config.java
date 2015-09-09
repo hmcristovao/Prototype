@@ -28,7 +28,7 @@ public interface Config {
     //
 	String nameGexfGraphFile      = "graph\\graph"+Config.testNumber;
 	String nameTxtConceptMapFile  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
-	String nameCmapConceptMapFile = "conceptmap\\conceptmap"+Config.testNumber+".cmap";
+	String nameClxConceptMapFile  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".clx";
     	
 	// ============================================================================
 	// CONFIG - RDFs 
@@ -145,5 +145,8 @@ public interface Config {
 	// to calculate min and max concepts to map
 	int conceptsQuantityCalulationFactor = 18;  // (factor default: 18) - goal of concepts quantity: log2(1/original quantity)*2 + (factor)
 	int conceptsMinMaxRange = 5;
+	
+	String backGroundcolorOriginalConcept = "200,200,200,255";
+	String borderThicknessConceptWithHint = "2";
 	
 }

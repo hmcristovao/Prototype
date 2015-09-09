@@ -4,27 +4,32 @@ import user.Concept;
 import graph.NodeData;
 
 public class Proposition {
-	private String   sourceConcept;
-	private String   targetConcept;
-	private NodeData sourceNodeData;
-	private NodeData targetNodeData;
-	private String   link;
+	private SimpleConcept sourceConcept;
+	private SimpleConcept targetConcept;
+	private String        link;
 	
-	public Proposition(NodeData sourceConcept, String link, NodeData targetConcept) {
-		this.sourceConcept  = sourceConcept.getShortName();
-		this.targetConcept  = targetConcept.getShortName();
-		this.sourceNodeData = sourceConcept;
-		this.targetNodeData = targetConcept;
+	// used in CXL file (will be filled in ConceptMap.fillAtributesOfFileCXL
+	private String idSourceJoin;     // j#
+	private String idLinkingPhrase;  // l#
+	private String idTargetJoin;     // j#
+	
+	public Proposition(NodeData sourceNodeData, String link, NodeData targetNodeData) {
+		this.sourceConcept  = new SimpleConcept(sourceNodeData);
+		this.targetConcept  = new SimpleConcept(targetNodeData);
 		this.link           = link;
+		this.idSourceJoin   = null;
+		this.idLinkingPhrase= null;
+		this.idTargetJoin   = null;
 	}
 	
 	// special case: alone concept (original concept with zero degree in Stream Graph)
 	public Proposition(Concept concept) {
-		this.sourceConcept  = concept.getBlankName();
+		this.sourceConcept  = new SimpleConcept(concept);
 		this.targetConcept  = null;
-		this.sourceNodeData = null;
-		this.targetNodeData = null;
 		this.link           = null;
+		this.idSourceJoin   = null;
+		this.idLinkingPhrase= null;
+		this.idTargetJoin   = null;
 	}
 
 	public String getLink() {
@@ -33,67 +38,83 @@ public class Proposition {
 	public void setLink(String link) {
 		this.link = link;
 	}
-	public String getSourceConcept() {
+	public SimpleConcept getSourceConcept() {
 		return this.sourceConcept;
 	}
-	public void setSourceConcept(String str) {
-		this.sourceConcept = str;
+	public void setSourceConcept(SimpleConcept simpleConcept) {
+		this.sourceConcept = simpleConcept;
 	}
-	public String getTargetConcept() {
+	public void setSourcetConcept(String label) {
+		this.sourceConcept.setLabel(label);
+	}
+	public SimpleConcept getTargetConcept() {
 		return this.targetConcept;
 	}
-	public void setTargetConcept(String str) {
-		this.targetConcept = str;
+	public void setTargetConcept(SimpleConcept simpleConcept) {
+		this.targetConcept = simpleConcept;
 	}
-	public NodeData getSourceNodeData() {
-		return this.sourceNodeData;
+	public void setTargetConcept(String label) {
+		this.targetConcept.setLabel(label);
 	}
-	public NodeData getTargetNodeData() {
-		return this.targetNodeData;
+	public String getIdSourceConcept() {
+		return this.sourceConcept.getIdConcept();
+	}
+	public String getIdTargetConcept() {
+		return this.targetConcept.getIdConcept();
+	}
+	public void setIdSourceConcept(int n) {
+		this.sourceConcept.setIdConcept("c"+n);
+	}
+	public void setIdSourceConcept(String str) {
+		this.sourceConcept.setIdConcept(str);
+	}
+
+	public String getIdSourceJoin() {
+		return this.idSourceJoin;
+	}
+
+	public void setIdSourceJoin(int n) {
+		this.idSourceJoin = "j"+n;
+	}
+	public void setIdSourceJoin(String str) {
+		this.idSourceJoin = str;
+	}
+
+	public String getIdLinkingPhrase() {
+		return this.idLinkingPhrase;
+	}
+
+	public void setIdLinkingPhrase(int n) {
+		this.idLinkingPhrase = "l"+n;
+	}
+	public void setIdLinkingPhrase(String str) {
+		this.idLinkingPhrase = str;
+	}
+
+	public void setIdTargetConcept(int n) {
+		this.targetConcept.setIdConcept("c"+n);
+	}
+	public void setIdTargetConcept(String str) {
+		this.targetConcept.setIdConcept(str);
+	}
+
+	public String getIdTargetJoin() {
+		return this.idTargetJoin;
+	}
+
+	public void setIdTargetJoin(int n) {
+		this.idTargetJoin = "j"+n;
+	}
+	public void setIdTargetJoin(String str) {
+		this.idTargetJoin = str;
 	}
 
 	
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Proposition))
-			return false;
-		Proposition other = (Proposition) obj;
-		if (link == null) {
-			if (other.link != null)
-				return false;
-		} else if (!link.equals(other.link))
-			return false;
-		if (sourceConcept == null) {
-			if (other.sourceConcept != null)
-				return false;
-		} else if (!sourceConcept.equals(other.sourceConcept))
-			return false;
-		if (sourceNodeData == null) {
-			if (other.sourceNodeData != null)
-				return false;
-		} else if (!sourceNodeData.equals(other.sourceNodeData))
-			return false;
-		if (targetConcept == null) {
-			if (other.targetConcept != null)
-				return false;
-		} else if (!targetConcept.equals(other.targetConcept))
-			return false;
-		if (targetNodeData == null) {
-			if (other.targetNodeData != null)
-				return false;
-		} else if (!targetNodeData.equals(other.targetNodeData))
-			return false;
-		return true;
-	}
 
 	public String toString() {
 		if(this.link == null)
-			return this.sourceConcept;
+			return this.sourceConcept.getLabel();
 		else
-			return this.sourceConcept + " -> " + this.link + " -> " + this.targetConcept;
+			return this.sourceConcept.getLabel() + " -> " + this.link + " -> " + this.targetConcept.getLabel();
 	}
 }

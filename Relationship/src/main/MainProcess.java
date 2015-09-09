@@ -1,4 +1,4 @@
-// v5.5 - fixed bug Gephi Tool Kit. Working!
+// v5.6 - building CLX file...
 
 package main;
 
@@ -184,8 +184,7 @@ public class MainProcess {
             // create the last GEXF file that represent the graph
             buildGexfGraphFile(Time.t4_afterSteadyUniqueConnected);
             showUselessConceptsStatistic();
-
-            
+           
             buildRawConceptMapFromStreamGraph();
 			upgradeConceptMap_heuristic_01_removeLinkNumber();
 			upgradeConceptMap_heuristic_02_vocabularyTable();
@@ -194,9 +193,9 @@ public class MainProcess {
             upgradeConceptMap_heuristic_05_removeSelfReference();
             upgradeConceptMap_heuristic_06_createOriginalConceptsWithZeroDegree();
             
-			// create txt file of final concept map
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
+			buildClxFileFromConceptMap();
 			
 			end();
 		}
@@ -950,6 +949,14 @@ public class MainProcess {
 		WholeSystem.getConceptMap().buildTxtFileFromConceptMap(Config.nameTxtConceptMapFile);
 		Log.consoleln(" (generated file: " + Config.nameTxtConceptMapFile + ").");
 		String sameReport = "TXT concept map generated: " + Config.nameTxtConceptMapFile;
+        Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);
+	}
+	public static void buildClxFileFromConceptMap() throws Exception {
+		Log.console("- Building CLX final Concept Map");
+		WholeSystem.getConceptMap().buildClxFileFromConceptMap(Config.nameClxConceptMapFile);
+		Log.consoleln(" (generated file: " + Config.nameTxtConceptMapFile + ").");
+		String sameReport = "CLX concept map generated: " + Config.nameClxConceptMapFile;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
