@@ -28,7 +28,7 @@ public interface Config {
     //
 	String nameGexfGraphFile      = "graph\\graph"+Config.testNumber;
 	String nameTxtConceptMapFile  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
-	String nameClxConceptMapFile  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".clx";
+	String nameCxlConceptMapFile  = "C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".cxl";
     	
 	// ============================================================================
 	// CONFIG - RDFs 
@@ -78,8 +78,10 @@ public interface Config {
 	// CONFIG - ANALYSIS 
     //
 	// range of the quantity of iterations
-	int minIteration = 6;  // better set: 8
-	int maxIteration = 50;  // it is necessary a great value to ensure that the connected component is 1  
+	int minIterationToVerifyUniqueConnectedComponent             = 6;   // better set: 7
+	int minIterationToVerifyRelationshipBetweenOriginalConcepts  = 10;   // better set: 10
+	// it is necessary a great value to ensure that the connected component = 1 or level relationship between original concepts = 0  
+	int maxIteration = 50;  
 	
 	// proporcion above total original concept (used in the build betweenness+closeness sorted table) 
 	double proporcionBetweenness = 10;

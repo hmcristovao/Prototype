@@ -405,8 +405,9 @@ public class SystemGraphData {
 		}
 	}
 	*/
-	
-	public void buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts() throws Exception {
+
+	// do not permit nodes with betweenness == 0, in last iteration
+	public int buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts(int lastIterationWithinOfLoopWithDistanceMeasuresCalculation) throws Exception {
 		// build finalHeadNodes: contains the head nodes to build the paths to final stage
 		int maximumHeadNodes = WholeSystem.getQuantityOriginalConcepts();
 		ConceptsGroup selectedConcepts;
@@ -426,11 +427,20 @@ public class SystemGraphData {
 			WholeSystem.getFinalHeadNodes().insert(nodeData);
 		}
 		// insert selected nodes in finalHeadNodes
+		int count = 0;
 		for(int i=0; i<selectedConcepts.size(); i++) {
 			Concept concept = selectedConcepts.getConcept(i);
 			NodeData nodeData = this.getNodeData(concept.getBlankName());
-			WholeSystem.getFinalHeadNodes().insert(nodeData);
+			// do not permit nodes with betweenness == 0, in last iteration
+			if(WholeSystem.getListSystemGraphData().get(lastIterationWithinOfLoopWithDistanceMeasuresCalculation).getNodeData(concept.getBlankName()).getBetweenness() > 0) {
+				WholeSystem.getFinalHeadNodes().insert(nodeData);
+			}
+			else {
+				count++;
+				Log.consoleln("descartado: "+WholeSystem.getListSystemGraphData().get(lastIterationWithinOfLoopWithDistanceMeasuresCalculation).getNodeData(concept.getBlankName()).toString());
+			}
 		}
+		return count;
 	}
 	
 	public String reportSelectedNodes(int iteration) throws Exception {

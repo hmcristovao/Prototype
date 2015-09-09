@@ -1,4 +1,4 @@
-// v5.6 - building CLX file...
+// v5.7 - fixed problem with CLX file. Insert new break of loop. Working!
 
 package main;
 
@@ -81,7 +81,7 @@ public class MainProcess {
 				prepareDataToNewIteration();
 				iteration++;
 			} while(true);
-			
+			int lastIterationWithinOfLoopWithDistanceMeasuresCalculation = iteration-1;
 			// only entry in this stage if connected component = 1
 			indicateAlgorithmIntermediateStage1(); // apply k-core
 			if(isApplyKCoreFilterTrigger()) {
@@ -95,7 +95,7 @@ public class MainProcess {
 			}
 			
 			indicateAlgorithmIntermediateStage2(); // build finalHeadNodes to calculate paths to final stage
-			buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts();
+			buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts(lastIterationWithinOfLoopWithDistanceMeasuresCalculation);
 			filterStreamGraphWithNodesAndEdgesBelongToShortestPathsOfFinalHeadNodes();
 			iteration++;
 			createCurrentSystemGraphData();
@@ -195,7 +195,7 @@ public class MainProcess {
             
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
-			buildClxFileFromConceptMap();
+			buildCxlFileFromConceptMap();
 			
 			end();
 		}
@@ -620,6 +620,7 @@ public class MainProcess {
 		int num = 0;
 		if(currentSystemGraphData.getConnectedComponentsCount() > 1)
 			num = WholeSystem.getStreamGraphData().calculateRelationshipLevelBetweenOriginalConcepts();
+		WholeSystem.getStreamGraphData().setCurrentLevelRelationshipBetweenOriginalConcepts(num);
 		int maximumLevel = WholeSystem.getQuantityPathsBetweenOriginalConcetps();
 		String sameReport = "level: " + num + "/" + maximumLevel + " ("+ (int)(((double)(maximumLevel-num)/maximumLevel)*100)+"% complete).";
 		Log.consoleln(sameReport);
@@ -723,28 +724,42 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);
 	}	
 	public static boolean breakIteration() throws Exception {
-		boolean isBreak = false;
+		Log.console("- Verifying exit conditions: ");
+		String sameReport = "maximum iteration ("+iteration+" = "+Config.maxIteration+") \n  or " 
+		                   +"[ minimum iteration ("+iteration+" >= "+Config.minIterationToVerifyUniqueConnectedComponent+") and "
+		                   +"connected component ("+currentSystemGraphData.getConnectedComponentsCount()+" = 1) ] or "
+		                   +"[ minimum iteration ("+iteration+" >= "+Config.minIterationToVerifyRelationshipBetweenOriginalConcepts+") and "
+		                   +"relationship level between original concepts ("+WholeSystem.getStreamGraphData().getCurrentLevelRelationshipBetweenOriginalConcepts()+" = 0) ]";
+		Log.consoleln(sameReport);
+		Log.outFileCompleteReport("Verification of exit conditions of loop\n"+sameReport);
+		Log.outFileShortReport("Verification of exit conditions of loop\n"+sameReport);		
 		// verify the iteration limit				
-		if(iteration == Config.maxIteration-1) {
-			isBreak = true;
-			Log.consoleln("- Ending loop, maximum iteration quantity "+(Config.maxIteration)+" reached.");
-			String sameReport = "Loop ended, maximum iteration quantity "+(Config.maxIteration)+" reached.";
-			Log.outFileCompleteReport(sameReport);
-			Log.outFileShortReport(sameReport);
+		if(iteration == Config.maxIteration) {
+			Log.consoleln("- Ending loop, maximum iteration quantity reached.");
+			String sameReport2 = "Loop ended, maximum iteration quantity reached.";
+			Log.outFileCompleteReport(sameReport2);
+			Log.outFileShortReport(sameReport2);
+			return true;
 		}
-		// at least x iterations are necessary
-		else if(iteration < Config.minIteration-1) {
-			isBreak = false;
+		// at least n iterations and connected component == 1
+		if(iteration >= Config.minIterationToVerifyUniqueConnectedComponent 
+				&& currentSystemGraphData.getConnectedComponentsCount() == 1) {
+			Log.consoleln("- Ending loop, connected component = 1 reached.");
+			String sameReport2 = "Loop ended, connected component = 1 reached.";
+			Log.outFileCompleteReport(sameReport2);
+			Log.outFileShortReport(sameReport2);
+			return true;
 		}
-		// checks if there is only one connected component 
-		else if(currentSystemGraphData.getConnectedComponentsCount() == 1) {
-			isBreak = true;
-			Log.consoleln("- Ending loop, 1 connected component reached and at least "+(Config.minIteration)+" iterations.");
-			String sameReport = "Loop ended, 1 connected component reached and at least "+(Config.minIteration)+" iterations.";
-			Log.outFileCompleteReport(sameReport);
-			Log.outFileShortReport(sameReport);
+		// at least n iterations and relationship level between original concepts == 0
+		if(iteration >= Config.minIterationToVerifyRelationshipBetweenOriginalConcepts 
+				&& WholeSystem.getStreamGraphData().getCurrentLevelRelationshipBetweenOriginalConcepts() == 0) {
+			Log.consoleln("- Ending loop, relationship level between original concepts = 0 reached.");
+			String sameReport2 = "Loop ended, relationship level between original concepts = 0 reached.";
+			Log.outFileCompleteReport(sameReport2);
+			Log.outFileShortReport(sameReport2);
+			return true;
 		}
-		return isBreak;
+		return false;
 	}
 	public static void prepareDataToNewIteration() throws Exception {
 		// preparation to a new iteration
@@ -781,11 +796,14 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);
 	}
 	
-	public static void buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts() throws Exception {
+	public static void buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts(int lastIterationWithinOfLoopWithDistanceMeasuresCalculation) throws Exception {
 		Log.console("- Building head nodes from original concepts and selected concepts");
-		currentSystemGraphData.buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts();
-		Log.consoleln(" - "+WholeSystem.getFinalHeadNodes().getCount() + " nodes.");
-		String sameReport = "Built " + WholeSystem.getFinalHeadNodes().getCount() + "head nodes from original concepts and selected concepts";
+		int n = currentSystemGraphData.buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts(lastIterationWithinOfLoopWithDistanceMeasuresCalculation);
+		Log.consoleln(" - "+WholeSystem.getFinalHeadNodes().getCount() + " nodes ("+
+						n+" discarded because betweenness equals zero calculated in iteration "+lastIterationWithinOfLoopWithDistanceMeasuresCalculation+").");
+		String sameReport = "Built " + WholeSystem.getFinalHeadNodes().getCount() + 
+				        "head nodes from original concepts and selected concepts (" +
+				        n+" discarded because betweenness equals zero calculated in iteration "+lastIterationWithinOfLoopWithDistanceMeasuresCalculation+").";
 		Log.outFileCompleteReport(sameReport + "\n\n" + WholeSystem.getFinalHeadNodes().toString());
 		Log.outFileShortReport(sameReport);
 	}
@@ -952,13 +970,16 @@ public class MainProcess {
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
-	public static void buildClxFileFromConceptMap() throws Exception {
-		Log.console("- Building CLX final Concept Map");
-		WholeSystem.getConceptMap().buildClxFileFromConceptMap(Config.nameClxConceptMapFile);
+	public static void buildCxlFileFromConceptMap() throws Exception {
+		Log.console("- Building CXL final Concept Map");
+		String clxFileContent = WholeSystem.getConceptMap().buildCxlFileFromConceptMap(Config.nameCxlConceptMapFile);
 		Log.consoleln(" (generated file: " + Config.nameTxtConceptMapFile + ").");
-		String sameReport = "CLX concept map generated: " + Config.nameClxConceptMapFile;
+		String sameReport = "CXL concept map generated: " + Config.nameCxlConceptMapFile;
+        Log.outFileCompleteReport(WholeSystem.getConceptMap().toStringComplete());
         Log.outFileCompleteReport(sameReport);
+        Log.outFileCompleteReport(clxFileContent);
 		Log.outFileShortReport(sameReport);
+		
 	}
 	
 

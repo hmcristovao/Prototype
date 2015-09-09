@@ -152,7 +152,7 @@ public class ConceptMap {
 			// at first, verify whether it is not alone concept 
 			if(proposition.getLink() != null)
 			{
-				if(proposition.getSourceConcept().equals(proposition.getTargetConcept())) {
+				if(proposition.getSourceConcept().getLabel().equals(proposition.getTargetConcept().getLabel())) {
 					excludedPropositions.add(proposition);
 					n++;
 				}
@@ -191,14 +191,14 @@ public class ConceptMap {
 		for(Proposition proposition : this.propositions) {
  			// create 1º node gephiNode
 			Node nodeSource = gephiGraphData.getGraphModel().factory().newNode(proposition.getSourceConcept().getLabel());
-			nodeSource.getNodeData().getAttributes().setValue(labelAttributeColumn.getIndex(), proposition.getSourceConcept());	
+			nodeSource.getNodeData().getAttributes().setValue(labelAttributeColumn.getIndex(), proposition.getSourceConcept().getLabel());	
 			gephiGraphData.getGephiGraph().addNode(nodeSource);
 			
 			// whether it not special case (alone concept)
 			if(proposition.getTargetConcept() != null) {	
 				// create 2º node gephiNode
 				Node nodeTarget = gephiGraphData.getGraphModel().factory().newNode(proposition.getTargetConcept().getLabel());
-				nodeTarget.getNodeData().getAttributes().setValue(labelAttributeColumn.getIndex(), proposition.getTargetConcept());
+				nodeTarget.getNodeData().getAttributes().setValue(labelAttributeColumn.getIndex(), proposition.getTargetConcept().getLabel());
 				gephiGraphData.getGephiGraph().addNode(nodeTarget);
 
 				// create the edge (put different id to each edge because it is not possible same id in the record of getxf) 
@@ -220,24 +220,26 @@ public class ConceptMap {
 	// create a TXT file from concept map
 	// use tab ('\t') to separate concepts and links
 	public void buildTxtFileFromConceptMap(String fileTxt) throws Exception {
-		BufferedWriter outFile = new BufferedWriter(new FileWriter(fileTxt)); 
+		StringBuffer str = new StringBuffer();
 		for(Proposition proposition : this.propositions) {
- 			outFile.write(proposition.getSourceConcept().getLabel());
- 			outFile.write('\t');
+ 			str.append(proposition.getSourceConcept().getLabel());
+ 			str.append('\t');
  			// verify whether special case (alone concept)
  			if(proposition.getLink() != null) {
- 				outFile.write(proposition.getLink());
- 				outFile.write('\t');
- 				outFile.write(proposition.getTargetConcept().getLabel());
+ 				str.append(proposition.getLink());
+ 				str.append('\t');
+ 				str.append(proposition.getTargetConcept().getLabel());
  			}
- 			outFile.write('\r');
-			outFile.write('\n');
+ 			str.append('\r');
+			str.append('\n');
 		}
+		BufferedWriter outFile = new BufferedWriter(new FileWriter(fileTxt)); 
+		outFile.write(str.toString());
 		outFile.close();
 	}
 		
 	// create attributes of CXL file from Propositions in ConceptMap (after processing of all heuristics)
-	// return last value of j (join)
+	// return quantity of joins
 	private int fillAttributesOfFileCXL() {
 		int numConcept       = 1;  
 		int numJoin          = 1;     
@@ -256,13 +258,13 @@ public class ConceptMap {
 			for(int j=0; j < i; j++) {
 				Proposition prop_j = this.propositions.get(j);
 				// search in the source concepts
-				if(prop_i.getSourceConcept().equals(prop_j.getSourceConcept())) {
+				if(prop_i.getSourceConcept().getLabel().equals(prop_j.getSourceConcept().getLabel())) {
 					idFoundConcept = prop_j.getIdSourceConcept();
 					break;
 				}
 				// search in the target concepts
-				if(prop_i.getSourceConcept().equals(prop_j.getTargetConcept())) {
-					idFoundConcept = prop_j.getIdSourceConcept();
+				if(prop_i.getSourceConcept().getLabel().equals(prop_j.getTargetConcept().getLabel())) {
+					idFoundConcept = prop_j.getIdTargetConcept();
 					break;
 				}
 			}
@@ -280,13 +282,13 @@ public class ConceptMap {
 			for(int j=0; j < i; j++) {
 				Proposition prop_j = this.propositions.get(j);
 				// search in the source concepts
-				if(prop_i.getTargetConcept().equals(prop_j.getSourceConcept())) {
+				if(prop_i.getTargetConcept().getLabel().equals(prop_j.getSourceConcept().getLabel())) {
 					idFoundConcept = prop_j.getIdSourceConcept();
 					break;
 				}
 				// search in the target concepts
-				if(prop_i.getTargetConcept().equals(prop_j.getTargetConcept())) {
-					idFoundConcept = prop_j.getIdSourceConcept();
+				if(prop_i.getTargetConcept().getLabel().equals(prop_j.getTargetConcept().getLabel())) {
+					idFoundConcept = prop_j.getIdTargetConcept();
 					break;
 				}
 			}
@@ -299,12 +301,12 @@ public class ConceptMap {
 			this.concepts.put(idFoundConcept, prop_i.getTargetConcept());		
 		
 			// figure out the join and link (source)
-			idFoundJoin = null;
 			idFoundLink = null;
+			idFoundJoin = null;
 			for(int j=0; j < i; j++) {
 				Proposition prop_j = this.propositions.get(j);
 				// search for source concept and link equals
-				if(prop_i.getSourceConcept().equals(prop_j.getSourceConcept()) &&
+				if(prop_i.getSourceConcept().getLabel().equals(prop_j.getSourceConcept().getLabel()) &&
 				   prop_i.getLink().equals(prop_j.getLink())) {
 					idFoundJoin = prop_j.getIdSourceJoin();
 					idFoundLink = prop_j.getIdLinkingPhrase();
@@ -321,6 +323,7 @@ public class ConceptMap {
 			// if did not find, then will figure out the join and link (target):
 			else {
 				idFoundJoin = "j"+numJoin;
+				prop_i.setIdSourceJoin(idFoundJoin);
 				numJoin++;
 				
 				idFoundJoin = null;
@@ -328,7 +331,7 @@ public class ConceptMap {
 				for(int j=0; j < i; j++) {
 					Proposition prop_j = this.propositions.get(j);
 					// search for target concept and link equals
-					if(prop_i.getTargetConcept().equals(prop_j.getTargetConcept()) &&
+					if(prop_i.getTargetConcept().getLabel().equals(prop_j.getTargetConcept().getLabel()) &&
 							prop_i.getLink().equals(prop_j.getLink())) {
 						idFoundJoin = prop_j.getIdTargetJoin();
 						idFoundLink = prop_j.getIdLinkingPhrase();
@@ -347,121 +350,146 @@ public class ConceptMap {
 			}
 			this.links.put(idFoundLink, prop_i.getLink());
 		}
-		return numJoin;
+		return numJoin-1;
 	}
 
 	// create a CLX file from concept map
-	public void buildClxFileFromConceptMap(String fileClx) throws Exception {
+	// return content of CLX file
+	public String buildCxlFileFromConceptMap(String fileClx) throws Exception {
 		// at firt, fill attributes of Proposition class to create CLX file
 		int countJ = this.fillAttributesOfFileCXL();
-		
-		BufferedWriter outFile = new BufferedWriter(new FileWriter(fileClx)); 
 
-		outFile.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
-		outFile.write("<cmap xmlns:dcterms=\"http://purl.org/dc/terms/\"\r\n");
-		outFile.write("xmlns=\"http://cmap.ihmc.us/xml/cmap/\"\r\n");
-		outFile.write("xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\r\n");
-		outFile.write("xmlns:vcard=\"http://www.w3.org/2001/vcard-rdf/3.0#\">\r\n");
+		// buffer to store the content that will be stored in CLX file
+		StringBuffer str = new StringBuffer();
+	
+		str.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
+		str.append("<cmap xmlns:dcterms=\"http://purl.org/dc/terms/\"\r\n");
+		str.append("xmlns=\"http://cmap.ihmc.us/xml/cmap/\"\r\n");
+		str.append("xmlns:dc=\"http://purl.org/dc/elements/1.1/\"\r\n");
+		str.append("xmlns:vcard=\"http://www.w3.org/2001/vcard-rdf/3.0#\">\r\n");
 		
-		outFile.write("<map>\r\n");
+		str.append("<map>\r\n");
 		
 		// section: 
-		outFile.write("<concept-list>\r\n");
+		str.append("<concept-list>\r\n");
 		for(int i=1; i <= this.concepts.size(); i++) {
 			SimpleConcept simpleConcept = this.concepts.get("c"+i); // get id's: c1, c2, c3, ...
-			outFile.write("\t<concept id=\"");
-			outFile.write(simpleConcept.getIdConcept());
-			outFile.write("\" label=\"");
-			outFile.write(simpleConcept.getLabel());
-			outFile.write("\"");
+			str.append("\t<concept id=\"");
+			str.append(simpleConcept.getIdConcept());
+			str.append("\" label=\"");
+			str.append(simpleConcept.getLabel());
+			str.append("\"");
 			if(simpleConcept.getNodeData().getAbstractAttribute() != null) {
-				outFile.write(" short-comment=\"");
-				outFile.write(simpleConcept.getNodeData().getAbstractAttribute());
-				outFile.write(" (font: DBPEDIA)");
-				outFile.write("\" long-comment=\"\"");
+				str.append(" short-comment=\"");
+				str.append(simpleConcept.getNodeData().getAbstractAttribute().replaceAll("\\\"", "'").replace("\\",""));
+				str.append(" (font: DBPEDIA)");
+				str.append("\" long-comment=\"\"");
 			}
 			else if(simpleConcept.getNodeData().getCommentAttribute() != null) {
-				outFile.write(" short-comment=\"");
-				outFile.write(simpleConcept.getNodeData().getCommentAttribute());
-				outFile.write(" (font: DBPEDIA)");
-				outFile.write("\" long-comment=\"\"");
+				str.append(" short-comment=\"");
+				str.append(simpleConcept.getNodeData().getCommentAttribute().replaceAll("\\\"", "'").replace("\\",""));
+				str.append(" (font: DBPEDIA)");
+				str.append("\" long-comment=\"\"");
 			}
-			outFile.write("/>\r\n");
+			str.append("/>\r\n");
 		}
-		outFile.write("</concept-list>\r\n");
+		str.append("</concept-list>\r\n");
 		
 		// section: <linking-phrase-list>
-		outFile.write("<linking-phrase-list>\r\n");
-		for(int i=1; i <= this.concepts.size(); i++) {
+		str.append("<linking-phrase-list>\r\n");
+		for(int i=1; i <= this.links.size(); i++) {
 			String idLink = "l"+i;   // get id's: l1, l2, l3, ...
 			String labelLink = this.links.get(idLink); 
-			outFile.write("\t<linking-phrase id=\"");
-			outFile.write(idLink);
-			outFile.write("\" label=\"");
-			outFile.write(labelLink);
-			outFile.write("\"/>\r\n");
+			str.append("\t<linking-phrase id=\"");
+			str.append(idLink);
+			str.append("\" label=\"");
+			str.append(labelLink);
+			str.append("\"/>\r\n");
 		}
-		outFile.write("</linking-phrase-list>\r\n");
+		str.append("</linking-phrase-list>\r\n");
 		
 		// section: <connection-list>
-		outFile.write("<connection-list>\r\n");
+		str.append("<connection-list>\r\n");
 		for(Proposition proposition : this.propositions) {
 			// source join
-			outFile.write("\t<connection id=\"");
-			outFile.write(proposition.getIdSourceJoin());
-			outFile.write("\" from-id=\"");
-			outFile.write(proposition.getIdSourceConcept());
-			outFile.write("\" to-id=\"");
-			outFile.write(proposition.getIdLinkingPhrase());
-			outFile.write("\"/>\r\n");
+			str.append("\t<connection id=\"");
+			str.append(proposition.getIdSourceJoin());
+			str.append("\" from-id=\"");
+			str.append(proposition.getIdSourceConcept());
+			str.append("\" to-id=\"");
+			str.append(proposition.getIdLinkingPhrase());
+			str.append("\"/>\r\n");
 			// target join
-			outFile.write("\t<connection id=\"");
-			outFile.write(proposition.getIdTargetJoin());
-			outFile.write("\" from-id=\"");
-			outFile.write(proposition.getIdLinkingPhrase());
-			outFile.write("\" to-id=\"");
-			outFile.write(proposition.getIdTargetConcept());
-			outFile.write("\"/>\r\n");
+			str.append("\t<connection id=\"");
+			str.append(proposition.getIdTargetJoin());
+			str.append("\" from-id=\"");
+			str.append(proposition.getIdLinkingPhrase());
+			str.append("\" to-id=\"");
+			str.append(proposition.getIdTargetConcept());
+			str.append("\"/>\r\n");
 		}
-		outFile.write("</connection-list>\r\n");
+		str.append("</connection-list>\r\n");
 
 		// section: <concept-appearance-list>
-		outFile.write("<concept-appearance-list>\r\n");
+		str.append("<concept-appearance-list>\r\n");
 		for(int i=1; i <= this.concepts.size(); i++) {
 			SimpleConcept simpleConcept = this.concepts.get("c"+i); // get id's: c1, c2, c3, ...
-			outFile.write("\t<concept-appearance id=\"");
-			outFile.write(simpleConcept.getIdConcept());
-			outFile.write("\" ");
+			str.append("\t<concept-appearance id=\"");
+			str.append(simpleConcept.getIdConcept());
+			str.append("\" ");
 			if(simpleConcept.getNodeData().getStatus() == ConceptStatus.originalConcept) {
-				outFile.write("background-color=\"");
-				outFile.write(Config.backGroundcolorOriginalConcept);
-				outFile.write("\" ");
+				str.append("background-color=\"");
+				str.append(Config.backGroundcolorOriginalConcept);
+				str.append("\" ");
 			}
 			if(simpleConcept.getNodeData().getAbstractAttribute() != null || simpleConcept.getNodeData().getCommentAttribute() != null) {
-				outFile.write("border-thickness=\"");
-				outFile.write(Config.borderThicknessConceptWithHint);
-				outFile.write("\" ");
+				str.append("border-thickness=\"");
+				str.append(Config.borderThicknessConceptWithHint);
+				str.append("\" ");
 			}
-			outFile.write("\"/>\r\n");
+			str.append("/>\r\n");
 		}
-		outFile.write("</concept-appearance-list>\r\n");
+		str.append("</concept-appearance-list>\r\n");
 
 		
 		// section: <connection-appearance-list>
-		outFile.write("<connection-appearance-list>\r\n");
+		str.append("<connection-appearance-list>\r\n");
 		for(int i=1; i <= countJ; i++) {
-			outFile.write("\t<connection-appearance id=\"");
-			outFile.write("j"+i);
-			outFile.write("\" from-pos=\"center\" to-pos=\"center\" type=\"straight\" arrowhead=\"yes\"/>\r\n");
+			str.append("\t<connection-appearance id=\"");
+			str.append("j"+i);
+			str.append("\" from-pos=\"center\" to-pos=\"center\" type=\"straight\" arrowhead=\"yes\"/>\r\n");
 		}
-		outFile.write("</connection-appearance-list>\r\n");
+		str.append("</connection-appearance-list>\r\n");
 		
-		outFile.write("</map>\r\n");
-		outFile.write("</cmap>\r\n");		
+		str.append("</map>\r\n");
+		str.append("</cmap>\r\n");		
+	
+		// save in file
+		String cxlFileContent = str.toString();
+		BufferedWriter outFile = new BufferedWriter(new FileWriter(fileClx)); 
+		outFile.write(cxlFileContent);
 		outFile.close();
+		
+		return cxlFileContent;
 	}
 
-	
+
+	public String toStringComplete() {
+		StringBuffer out = new StringBuffer();
+		out.append("Total propositions: ");
+		out.append(this.propositions.size());
+		out.append("\n");
+		int i =1;
+		for(Proposition p : this.propositions) {
+			out.append("\nProposition ");
+			out.append(i);
+			out.append(":\n");
+			out.append(p.toStringComplete());
+			out.append("\n");
+			i++;
+		}
+		return out.toString();
+	}
 	
 	public String toString() {
 		StringBuffer out = new StringBuffer();

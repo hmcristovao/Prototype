@@ -67,6 +67,9 @@ public class StreamGraphData {
 	public int getCurrentLevelRelationshipBetweenOriginalConcepts() {
 		return this.currentLevelRelationshipBetweenOriginalConcepts;
 	}
+	public void setCurrentLevelRelationshipBetweenOriginalConcepts(int level) {
+		this.currentLevelRelationshipBetweenOriginalConcepts = level;
+	}
 	public boolean isChangedStreamGraph() {
 		return this.isChangedStreamGraph;
 	}

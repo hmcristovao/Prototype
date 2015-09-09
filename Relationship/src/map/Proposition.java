@@ -109,12 +109,25 @@ public class Proposition {
 		this.idTargetJoin = str;
 	}
 
-	
-
 	public String toString() {
 		if(this.link == null)
 			return this.sourceConcept.getLabel();
 		else
 			return this.sourceConcept.getLabel() + " -> " + this.link + " -> " + this.targetConcept.getLabel();
 	}
+
+	public String toStringComplete() {
+		if(this.link == null)
+			return "Source: "+this.sourceConcept.getLabel();
+		else
+			return   "idSourceConcept: "+this.sourceConcept.getIdConcept()+
+				   "\nSourceConcept:   "+this.sourceConcept.getLabel()+
+				   "\nidSourceJoin:    "+this.idSourceJoin+
+				   "\nidLink:          "+this.idLinkingPhrase+
+				   "\nLink:            "+this.link+
+				   "\nidTargetJoin:    "+this.idTargetJoin+
+				   "\nidTargetConcept: "+this.targetConcept.getIdConcept()+
+				   "\nTargetConcept:   "+this.targetConcept.getLabel();
+				   	}
+	
 }
