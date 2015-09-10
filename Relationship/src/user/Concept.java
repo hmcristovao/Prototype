@@ -24,8 +24,8 @@ public class Concept {
 		this.iteration                  = iteration;
 		this.conceptCategory            = (Concept.verifyIfCategory(this.blankName)==true) ? ConceptCategory.yes : ConceptCategory.no;
 		this.quantityRdfs               = quantityRdfs;
-		this.registerConnectedComponent = new int[Constants.maxIteration];
-		for(int i=0; i<Constants.maxIteration; i++)
+		this.registerConnectedComponent = new int[WholeSystem.configTable.getInt("maxIteration")];
+		for(int i=0; i<WholeSystem.configTable.getInt("maxIteration"); i++)
 			this.registerConnectedComponent[i] = Constants.withoutConnectedComponent;
 		this.registerConnectedComponent[iteration] = connectedComponent;
 	}

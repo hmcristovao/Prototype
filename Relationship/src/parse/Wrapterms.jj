@@ -29,7 +29,7 @@ SKIP: { "\n" : DEFAULT | <~[]> }
 TOKEN : {
 < T_numberFileUser: 							"numberFileUser" > |
 < T_nameUserTermsFile: 							"nameUserTermsFile" > |
-< T_minIterationToVerifyUniqueConnectedComponent: "minIterationToVerifyUniqueConnectedComponen" > |
+< T_minIterationToVerifyUniqueConnectedComponent: "minIterationToVerifyUniqueConnectedComponent" > |
 < T_minIterationToVerifyRelationshipBetweenOriginalConcepts: "minIterationToVerifyRelationshipBetweenOriginalConcepts" > |
 < T_maxIteration: 								"maxIteration" > |
 < T_additionNewConceptWithoutCategory:			"additionNewConceptWithoutCategory" > |
@@ -56,54 +56,55 @@ TOKEN : {
 < T_backGroundcolorOriginalConcept: 			"backGroundcolorOriginalConcept" > |
 < T_borderThicknessConceptWithHint: 			"borderThicknessConceptWithHint" > |
 < T_nameGexfGraphFile: 							"nameGexfGraphFile" > |
-< T_nameQueryDefaultFile: 						"ameQueryDefaultFile" > |
+< T_nameQueryDefaultFile: 						"nameQueryDefaultFile" > |
 < T_nameVocabularyFile: 						"nameVocabularyFile" > |
 < T_nameUselessConceptsFile: 					"nameUselessConceptsFile" > |
 < T_nameTxtConceptMapFile: 						"nameTxtConceptMapFile" > |
 < T_nameCxlConceptMapFile: 						"nameCxlConceptMapFile" > |
-< T_nameCompleteReportFile: 					"nameCompletReportFile" > |
+< T_nameCompleteReportFile: 					"nameCompleteReportFile" > |
 < T_nameShortReportFile: 						"nameShortReportFile" > |
 < T_nameConsoleReportFile: 						"nameConsoleReportFile" > |
 < T_nameConsoleErrorFile: 						"nameConsoleErrorFile" > |
 < T_dirRdfsPersistenceFiles: 					"dirRdfsPersistenceFiles" > |
 < T_dbpediaServer: 								"dbpediaServer" > |
-< T_maxNodes: 									"maxNodes" > |
-< T_minEdges: 									"minEdges" > |
 < T_gephiVisualization: 						"gephiVisualization" > |
-< T_graphStreamVisualization: 					"boolean graphStreamVisualization" > |
+< T_graphStreamVisualization: 					"graphStreamVisualization" > |
 < T_isFixBugInGephiToolKit: 					"isFixBugInGephiToolKit" > |
 < T_originalConceptWithGephiToolKitBug: 		"originalConceptWithGephiToolKitBug" > 
 }
 
 TOKEN : {
-      < EQUALS:         (" ")+ "=" (" ")+ > |
-      < NEW_LINE:       ( "\n" | "\r" )+ > 
+      < EQUALS:             (" "|"\t")* "=" (" "|"\t")* > |
+      < NEW_LINE:           ( "\n" | "\r" )+ > |
+      < TAB:                ( "\t" )+ > |
+      < BLANK:              " " >
  }
 
 
 TOKEN : {
-      < ARROW:          "->" > |
-      < CHARACTER:      ["a"-"z","A"-"Z","0"-"9","_",":","#",".","\'" ,  "/","\\" ] > |
-      < TERM:           < CHARACTER > 
-                        (
-                          ( < CHARACTER > | " " | < CHARACTER > "-" )*
-                            < CHARACTER >
-                        )?
+      < ARROW:              "->" > |
+      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9" ] > |
+      < #SPECIAL_CHARACTER: [ "-","_",":","#",".","\'","\\","/" ] > |
+      < TERM:               < COMMON_CHARACTER > 
+                            (
+                              ( < COMMON_CHARACTER > | < SPECIAL_CHARACTER > | < BLANK > )*
+                              < COMMON_CHARACTER >
+                            )?
       > |
-      < SEPARATORS:    ( "\t" | "," | ";" | " " )+ > 
+      < SEPARATORS:         ( "," | ";" )+ > 
  }
 /*
 Grammar (read of user terms):
 parseUserTerms        ->  ( elementUserTerm() )*  < EOF > 
-element               ->  < TERM > ( < SEPARATORS > | <  NEW_LINE > )*
+element               ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  NEW_LINE > )*
 
 Grammar (read of link vocabulary):
 parseSystemVocabulary ->  ( line() )*  < EOF >
-line                  ->  < TERM > ( < SEPARATORS > )* < ARROW > ( < SEPARATORS > )* < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
+line                  ->  < TERM > ( < BLANK > | < TAB > )* < ARROW > ( < BLANK > | < TAB > )* < TERM > ( < BLANK > | < TAB > | <  NEW_LINE >  )*
 
 Grammar (read of useless concepts):
 parseUserTerms        ->  ( elementUselessConcept() )*  < EOF > 
-elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
+elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  NEW_LINE >  )*
 
 */
 
@@ -120,7 +121,7 @@ void elementUserTerm(SetQuerySparql originalSetQuerySparql) : {Token token; Conc
 		// copy the concept to static attribute in root class:
 		WholeSystem.getConceptsRegister().add(concept);			
     }
-    ( < SEPARATORS > | <  NEW_LINE > )*
+    ( < SEPARATORS > | < BLANK > | < TAB >  | <  NEW_LINE > )*
 }
 
 // list of sentences, each one per line 
@@ -130,11 +131,11 @@ void parseSystemVocabulary(VocabularyTable vocabularyTable) : {}
 }
 void line(VocabularyTable vocabularyTable) : {Token tokenLeft; Token tokenRight;}  
 {
-	tokenLeft = < TERM > ( < SEPARATORS > )* < ARROW > ( < SEPARATORS > )* tokenRight = < TERM > 
+	tokenLeft = < TERM > ( < BLANK > | < TAB > )* < ARROW > ( < BLANK > | < TAB > )* tokenRight = < TERM > 
     {
 		vocabularyTable.put(tokenLeft,tokenRight);
     }
-    ( < SEPARATORS > | <  NEW_LINE > )*
+    ( < BLANK > | < TAB > | <  NEW_LINE > )*
 }
 
 // list of concepts, separate for comma or new line
@@ -149,13 +150,19 @@ void elementUselessConcept(UselessConceptsTable uselessConceptsTable) : {Token t
 		// copy the useless concept to static attribute in root class:
 		WholeSystem.getUselessConceptsTable().insert(token.image.trim());			
     }
-    ( < SEPARATORS > | <  NEW_LINE > )*
+    ( < SEPARATORS > | < BLANK > | < TAB > | <  NEW_LINE > )*
 }
 
 // config file
 void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token tokenValue; String numberFileUser;} 
 {
-(  (
+(
+  < NEW_LINE >
+  |
+  < TAB > 
+  |   < BLANK > 
+  | 
+  (
     (    tokenVar=< T_numberFileUser >  |
 	tokenVar=< T_minIterationToVerifyUniqueConnectedComponent > |
 	tokenVar=< T_minIterationToVerifyRelationshipBetweenOriginalConcepts > |
@@ -186,29 +193,27 @@ void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token token
 	tokenVar=< T_nameQueryDefaultFile >  |
 	tokenVar=< T_nameVocabularyFile >  |
 	tokenVar=< T_nameUselessConceptsFile >  |
-	tokenVar=< T_nameTxtConceptMapFile >  |
-	tokenVar=< T_nameCxlConceptMapFile >  |
 	tokenVar=< T_nameConsoleErrorFile >  |
 	tokenVar=< T_dirRdfsPersistenceFiles >  |
 	tokenVar=< T_dbpediaServer >  |
-	tokenVar=< T_maxNodes >  |
-	tokenVar=< T_minEdges >  |
 	tokenVar=< T_gephiVisualization >  |
 	tokenVar=< T_graphStreamVisualization >  |
 	tokenVar=< T_isFixBugInGephiToolKit >  |
 	tokenVar=< T_originalConceptWithGephiToolKitBug >  
     )
-    < EQUALS > tokenValue = < TERM > < NEW_LINE >
+    < EQUALS > tokenValue = < TERM > 
     { configTable.insert(tokenVar.image, tokenValue.image.trim()); }
   )
   |
-  (    (	tokenVar=< T_nameUserTermsFile >  |
-	tokenVar=< T_nameGexfGraphFile >  |
+  (    (	tokenVar=< T_nameUserTermsFile >       |
+	tokenVar=< T_nameGexfGraphFile >       |
 	tokenVar=< T_nameCompleteReportFile >  |
-	tokenVar=< T_nameShortReportFile >  |
-	tokenVar=< T_nameConsoleReportFile >  
+	tokenVar=< T_nameShortReportFile >     |
+	tokenVar=< T_nameConsoleReportFile >   | 
+	tokenVar=< T_nameTxtConceptMapFile >   |
+	tokenVar=< T_nameCxlConceptMapFile >   
     )
-    < EQUALS > tokenValue = < TERM > < NEW_LINE >
+    < EQUALS > tokenValue = < TERM >
     {
 	  numberFileUser = WholeSystem.configTable.getString("numberFileUser");	
       configTable.insert(tokenVar.image, tokenValue.image.trim().replace("##",numberFileUser));

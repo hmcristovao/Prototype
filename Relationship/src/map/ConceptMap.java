@@ -451,12 +451,12 @@ public class ConceptMap {
 			str.append("\" ");
 			if(simpleConcept.getNodeData().getStatus() == ConceptStatus.originalConcept) {
 				str.append("background-color=\"");
-				str.append(Constants.backGroundcolorOriginalConcept);
+				str.append(WholeSystem.configTable.getString("backGroundcolorOriginalConcept").replace(".", ","));
 				str.append("\" ");
 			}
 			if(simpleConcept.getNodeData().getAbstractAttribute() != null || simpleConcept.getNodeData().getCommentAttribute() != null) {
 				str.append("border-thickness=\"");
-				str.append(Constants.borderThicknessConceptWithHint);
+				str.append(WholeSystem.configTable.getString("borderThicknessConceptWithHint"));
 				str.append("\" ");
 			}
 			str.append("/>\r\n");

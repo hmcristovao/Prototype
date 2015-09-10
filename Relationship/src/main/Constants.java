@@ -25,6 +25,9 @@ public interface Constants {
 		// indicate value of concepts that do not belong to connected component (for example: original concepts)
 		int withoutConnectedComponent = -1;
 		
+		int maxNodes = 50000;
+		int minEdges = 50000;
+		
 		String doubleLine = "\n=============================================================================================\n";
 		String singleLine = "\n---------------------------------------------------------------------------------------------\n";
 		String starsLine  = "\n*********************************************************************************************\n";

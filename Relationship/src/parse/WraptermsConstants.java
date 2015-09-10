@@ -91,29 +91,31 @@ public interface WraptermsConstants {
   /** RegularExpression Id. */
   int T_dbpediaServer = 43;
   /** RegularExpression Id. */
-  int T_maxNodes = 44;
+  int T_gephiVisualization = 44;
   /** RegularExpression Id. */
-  int T_minEdges = 45;
+  int T_graphStreamVisualization = 45;
   /** RegularExpression Id. */
-  int T_gephiVisualization = 46;
+  int T_isFixBugInGephiToolKit = 46;
   /** RegularExpression Id. */
-  int T_graphStreamVisualization = 47;
+  int T_originalConceptWithGephiToolKitBug = 47;
   /** RegularExpression Id. */
-  int T_isFixBugInGephiToolKit = 48;
+  int EQUALS = 48;
   /** RegularExpression Id. */
-  int T_originalConceptWithGephiToolKitBug = 49;
+  int NEW_LINE = 49;
   /** RegularExpression Id. */
-  int EQUALS = 50;
+  int TAB = 50;
   /** RegularExpression Id. */
-  int NEW_LINE = 51;
+  int BLANK = 51;
   /** RegularExpression Id. */
   int ARROW = 52;
   /** RegularExpression Id. */
-  int CHARACTER = 53;
+  int COMMON_CHARACTER = 53;
   /** RegularExpression Id. */
-  int TERM = 54;
+  int SPECIAL_CHARACTER = 54;
   /** RegularExpression Id. */
-  int SEPARATORS = 55;
+  int TERM = 55;
+  /** RegularExpression Id. */
+  int SEPARATORS = 56;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -128,7 +130,7 @@ public interface WraptermsConstants {
     "<token of kind 3>",
     "\"numberFileUser\"",
     "\"nameUserTermsFile\"",
-    "\"minIterationToVerifyUniqueConnectedComponen\"",
+    "\"minIterationToVerifyUniqueConnectedComponent\"",
     "\"minIterationToVerifyRelationshipBetweenOriginalConcepts\"",
     "\"maxIteration\"",
     "\"additionNewConceptWithoutCategory\"",
@@ -155,27 +157,28 @@ public interface WraptermsConstants {
     "\"backGroundcolorOriginalConcept\"",
     "\"borderThicknessConceptWithHint\"",
     "\"nameGexfGraphFile\"",
-    "\"ameQueryDefaultFile\"",
+    "\"nameQueryDefaultFile\"",
     "\"nameVocabularyFile\"",
     "\"nameUselessConceptsFile\"",
     "\"nameTxtConceptMapFile\"",
     "\"nameCxlConceptMapFile\"",
-    "\"nameCompletReportFile\"",
+    "\"nameCompleteReportFile\"",
     "\"nameShortReportFile\"",
     "\"nameConsoleReportFile\"",
     "\"nameConsoleErrorFile\"",
     "\"dirRdfsPersistenceFiles\"",
     "\"dbpediaServer\"",
-    "\"maxNodes\"",
-    "\"minEdges\"",
     "\"gephiVisualization\"",
-    "\"boolean graphStreamVisualization\"",
+    "\"graphStreamVisualization\"",
     "\"isFixBugInGephiToolKit\"",
     "\"originalConceptWithGephiToolKitBug\"",
     "<EQUALS>",
     "<NEW_LINE>",
+    "<TAB>",
+    "\" \"",
     "\"->\"",
-    "<CHARACTER>",
+    "<COMMON_CHARACTER>",
+    "<SPECIAL_CHARACTER>",
     "<TERM>",
     "<SEPARATORS>",
   };

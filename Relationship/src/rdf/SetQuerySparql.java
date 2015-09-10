@@ -116,7 +116,7 @@ public class SetQuerySparql {
 	}
 
 	private StringBuffer readFileQueryDefault() throws IOException {
-		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(Constants.nameQueryDefaultFile));
+		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(WholeSystem.configTable.getString("nameQueryDefaultFile")));
 		StringBuffer queryDefault = new StringBuffer();
 		String linhaAux = null;
 	    while (true) {
@@ -186,7 +186,7 @@ public class SetQuerySparql {
 			numRdfsInInternet.incCount(count);
 			// and save it in file
 			String fileName = RdfsFilesTable.formatToFileName(querySparql.getConcept().getBlankName());
-			ObjectOutputStream buffer = new ObjectOutputStream(new FileOutputStream(Constants.dirRdfsPersistenceFiles+"\\"+fileName));
+			ObjectOutputStream buffer = new ObjectOutputStream(new FileOutputStream(WholeSystem.configTable.getString("dirRdfsPersistenceFiles")+"\\"+fileName));
 			buffer.writeObject(querySparql.getListRDF()) ; 
 			buffer.flush(); 
 			buffer.close();
@@ -197,7 +197,7 @@ public class SetQuerySparql {
 	private int readPersistenceRDFsOneQuery(QuerySparql querySparql) throws Exception {
 		String strConcept = querySparql.getConcept().getBlankName();
 		String fileName   = RdfsFilesTable.formatToFileName(strConcept);
-		ObjectInputStream buffer = new ObjectInputStream(new FileInputStream(Constants.dirRdfsPersistenceFiles+"\\"+fileName));
+		ObjectInputStream buffer = new ObjectInputStream(new FileInputStream(WholeSystem.configTable.getString("dirRdfsPersistenceFiles")+"\\"+fileName));
 		querySparql.setListRDF((ListRDF)buffer.readObject());
 		buffer.close();
 		return querySparql.getListRDF().size();
@@ -206,7 +206,7 @@ public class SetQuerySparql {
 	private int readInternetDataBaseOneQuery(QuerySparql querySparql) {
 		String queryStr = querySparql.getQueryString().getQueryStrString();
 		Query query = QueryFactory.create(queryStr);
-		QueryEngineHTTP queryEngineHTTP = (QueryEngineHTTP)QueryExecutionFactory.sparqlService(Constants.selectedServiceSnorqlEndPoint,  query);
+		QueryEngineHTTP queryEngineHTTP = (QueryEngineHTTP)QueryExecutionFactory.sparqlService(WholeSystem.configTable.getString("dbpediaServer"), query);
 		queryEngineHTTP.setModelContentType(WebContent.contentTypeJSONLD);
 		Model model = queryEngineHTTP.execConstruct();
 

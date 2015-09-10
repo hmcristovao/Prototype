@@ -17,15 +17,15 @@ public class Wrapterms implements WraptermsConstants {
 /*
 Grammar (read of user terms):
 parseUserTerms        ->  ( elementUserTerm() )*  < EOF > 
-element               ->  < TERM > ( < SEPARATORS > | <  NEW_LINE > )*
+element               ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  NEW_LINE > )*
 
 Grammar (read of link vocabulary):
 parseSystemVocabulary ->  ( line() )*  < EOF >
-line                  ->  < TERM > ( < SEPARATORS > )* < ARROW > ( < SEPARATORS > )* < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
+line                  ->  < TERM > ( < BLANK > | < TAB > )* < ARROW > ( < BLANK > | < TAB > )* < TERM > ( < BLANK > | < TAB > | <  NEW_LINE >  )*
 
 Grammar (read of useless concepts):
 parseUserTerms        ->  ( elementUselessConcept() )*  < EOF > 
-elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
+elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  NEW_LINE >  )*
 
 */
 
@@ -57,6 +57,8 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case NEW_LINE:
+      case TAB:
+      case BLANK:
       case SEPARATORS:
         ;
         break;
@@ -67,6 +69,12 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEPARATORS:
         jj_consume_token(SEPARATORS);
+        break;
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
         break;
       case NEW_LINE:
         jj_consume_token(NEW_LINE);
@@ -102,27 +110,51 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     label_4:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case SEPARATORS:
+      case TAB:
+      case BLANK:
         ;
         break;
       default:
         jj_la1[4] = jj_gen;
         break label_4;
       }
-      jj_consume_token(SEPARATORS);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      default:
+        jj_la1[5] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
     }
     jj_consume_token(ARROW);
     label_5:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case SEPARATORS:
+      case TAB:
+      case BLANK:
         ;
         break;
       default:
-        jj_la1[5] = jj_gen;
+        jj_la1[6] = jj_gen;
         break label_5;
       }
-      jj_consume_token(SEPARATORS);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
     }
     tokenRight = jj_consume_token(TERM);
                 vocabularyTable.put(tokenLeft,tokenRight);
@@ -130,22 +162,26 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case NEW_LINE:
-      case SEPARATORS:
+      case TAB:
+      case BLANK:
         ;
         break;
       default:
-        jj_la1[6] = jj_gen;
+        jj_la1[8] = jj_gen;
         break label_6;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case SEPARATORS:
-        jj_consume_token(SEPARATORS);
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
         break;
       case NEW_LINE:
         jj_consume_token(NEW_LINE);
         break;
       default:
-        jj_la1[7] = jj_gen;
+        jj_la1[9] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -161,7 +197,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
         ;
         break;
       default:
-        jj_la1[8] = jj_gen;
+        jj_la1[10] = jj_gen;
         break label_7;
       }
       elementUselessConcept(uselessConceptsTable);
@@ -178,22 +214,30 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case NEW_LINE:
+      case TAB:
+      case BLANK:
       case SEPARATORS:
         ;
         break;
       default:
-        jj_la1[9] = jj_gen;
+        jj_la1[11] = jj_gen;
         break label_8;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case SEPARATORS:
         jj_consume_token(SEPARATORS);
         break;
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
       case NEW_LINE:
         jj_consume_token(NEW_LINE);
         break;
       default:
-        jj_la1[10] = jj_gen;
+        jj_la1[12] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -246,19 +290,29 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
       case T_nameConsoleErrorFile:
       case T_dirRdfsPersistenceFiles:
       case T_dbpediaServer:
-      case T_maxNodes:
-      case T_minEdges:
       case T_gephiVisualization:
       case T_graphStreamVisualization:
       case T_isFixBugInGephiToolKit:
       case T_originalConceptWithGephiToolKitBug:
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
         ;
         break;
       default:
-        jj_la1[11] = jj_gen;
+        jj_la1[13] = jj_gen;
         break label_9;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+        jj_consume_token(NEW_LINE);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
       case T_numberFileUser:
       case T_minIterationToVerifyUniqueConnectedComponent:
       case T_minIterationToVerifyRelationshipBetweenOriginalConcepts:
@@ -289,13 +343,9 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
       case T_nameQueryDefaultFile:
       case T_nameVocabularyFile:
       case T_nameUselessConceptsFile:
-      case T_nameTxtConceptMapFile:
-      case T_nameCxlConceptMapFile:
       case T_nameConsoleErrorFile:
       case T_dirRdfsPersistenceFiles:
       case T_dbpediaServer:
-      case T_maxNodes:
-      case T_minEdges:
       case T_gephiVisualization:
       case T_graphStreamVisualization:
       case T_isFixBugInGephiToolKit:
@@ -391,12 +441,6 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
         case T_nameUselessConceptsFile:
           tokenVar = jj_consume_token(T_nameUselessConceptsFile);
           break;
-        case T_nameTxtConceptMapFile:
-          tokenVar = jj_consume_token(T_nameTxtConceptMapFile);
-          break;
-        case T_nameCxlConceptMapFile:
-          tokenVar = jj_consume_token(T_nameCxlConceptMapFile);
-          break;
         case T_nameConsoleErrorFile:
           tokenVar = jj_consume_token(T_nameConsoleErrorFile);
           break;
@@ -405,12 +449,6 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
           break;
         case T_dbpediaServer:
           tokenVar = jj_consume_token(T_dbpediaServer);
-          break;
-        case T_maxNodes:
-          tokenVar = jj_consume_token(T_maxNodes);
-          break;
-        case T_minEdges:
-          tokenVar = jj_consume_token(T_minEdges);
           break;
         case T_gephiVisualization:
           tokenVar = jj_consume_token(T_gephiVisualization);
@@ -425,17 +463,18 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
           tokenVar = jj_consume_token(T_originalConceptWithGephiToolKitBug);
           break;
         default:
-          jj_la1[12] = jj_gen;
+          jj_la1[14] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         jj_consume_token(EQUALS);
         tokenValue = jj_consume_token(TERM);
-        jj_consume_token(NEW_LINE);
       configTable.insert(tokenVar.image, tokenValue.image.trim());
         break;
       case T_nameUserTermsFile:
       case T_nameGexfGraphFile:
+      case T_nameTxtConceptMapFile:
+      case T_nameCxlConceptMapFile:
       case T_nameCompleteReportFile:
       case T_nameShortReportFile:
       case T_nameConsoleReportFile:
@@ -455,19 +494,24 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
         case T_nameConsoleReportFile:
           tokenVar = jj_consume_token(T_nameConsoleReportFile);
           break;
+        case T_nameTxtConceptMapFile:
+          tokenVar = jj_consume_token(T_nameTxtConceptMapFile);
+          break;
+        case T_nameCxlConceptMapFile:
+          tokenVar = jj_consume_token(T_nameCxlConceptMapFile);
+          break;
         default:
-          jj_la1[13] = jj_gen;
+          jj_la1[15] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         jj_consume_token(EQUALS);
         tokenValue = jj_consume_token(TERM);
-        jj_consume_token(NEW_LINE);
           numberFileUser = WholeSystem.configTable.getString("numberFileUser");
       configTable.insert(tokenVar.image, tokenValue.image.trim().replace("##",numberFileUser));
         break;
       default:
-        jj_la1[14] = jj_gen;
+        jj_la1[16] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -483,7 +527,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[15];
+  final private int[] jj_la1 = new int[17];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -491,10 +535,10 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfffffff0,0xffffffd0,0x20,0xfffffff0,};
+      jj_la1_0 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfffffff0,0xffffffd0,0x20,0xfffffff0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x400000,0x880000,0x880000,0x400000,0x800000,0x800000,0x880000,0x880000,0x400000,0x880000,0x880000,0x3ffff,0x3fe3e,0x1c1,0x3ffff,};
+      jj_la1_1 = new int[] {0x800000,0x10e0000,0x10e0000,0x800000,0xc0000,0xc0000,0xc0000,0xc0000,0xe0000,0xe0000,0x800000,0x10e0000,0x10e0000,0xeffff,0xfe0e,0x1f1,0xeffff,};
    }
 
   /** Constructor with InputStream. */
@@ -508,7 +552,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -522,7 +566,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -532,7 +576,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -542,7 +586,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -551,7 +595,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -560,7 +604,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 15; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -611,12 +655,12 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[56];
+    boolean[] la1tokens = new boolean[57];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 15; i++) {
+    for (int i = 0; i < 17; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -628,7 +672,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
         }
       }
     }
-    for (int i = 0; i < 56; i++) {
+    for (int i = 0; i < 57; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

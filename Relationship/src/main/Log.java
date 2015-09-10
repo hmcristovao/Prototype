@@ -11,10 +11,10 @@ public class Log {
 	public static PrintStream printStreamError;
 
 	public static void initFiles() throws Exception {
-		fileCompleteReport = new BufferedWriter(new FileWriter(Constants.nameFileCompletReport));
-		fileShortReport    = new BufferedWriter(new FileWriter(Constants.nameFileShortReport));
-		fileConsoleReport  = new BufferedWriter(new FileWriter(Constants.nameFileConsoleReport));
-		printStreamError   = new PrintStream(Constants.nameFileConsoleError);
+		fileCompleteReport = new BufferedWriter(new FileWriter(WholeSystem.configTable.getString("nameCompleteReportFile")));
+		fileShortReport    = new BufferedWriter(new FileWriter(WholeSystem.configTable.getString("nameShortReportFile")));
+		fileConsoleReport  = new BufferedWriter(new FileWriter(WholeSystem.configTable.getString("nameConsoleReportFile")));
+		printStreamError   = new PrintStream(WholeSystem.configTable.getString("nameConsoleErrorFile"));
 		System.setErr(printStreamError);
 	}
 	public static void close() throws Exception {

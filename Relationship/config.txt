@@ -8,7 +8,7 @@ numberFileUser = 00
 nameUserTermsFile = userterms\\terms##.txt
 
 // minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
-minIterationToVerifyUniqueConnectedComponent = 6
+minIterationToVerifyUniqueConnectedComponent = 4
 
 // minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
 minIterationToVerifyRelationshipBetweenOriginalConcepts = 10
@@ -22,7 +22,7 @@ additionNewConceptWithoutCategory = true
 // K-core used in all system (good value: 2)
 kCoreFilter = 2
 
-// since iteration number x to apply K-core filter trigger (good value: 5)
+// apply K-core filter trigger from iteration number (good value: 5)
 iterationTriggerApplyKCoreFilterAlgorithm = 5
 
 // quantity of nodes to shoot K-core n algorithm
@@ -31,7 +31,7 @@ quantityNodesToApplyKcoreFilter = 700
 // N-degree filter used in all system (good value: 2)
 nDegreeFilter = 2
 
-// since iteration number x to apply n-degree filter trigger (good value: 2)
+// apply n-degree filter trigger from iteration number (good value: 2)
 iterationTriggerApplyNDegreeFilterAlgorithm = 1
 
 // quantity of nodes to shoot n-degree filter algorithm (good value: 10000)
@@ -79,20 +79,20 @@ isKeepNeighborsOfOriginalConcepts = false
 // quantity of nodes each rank to show in short report (good value: 1)
 quantityNodesShortReport = 1
 
-// color of original concepts (good value: 200,200,200,255)
-backGroundcolorOriginalConcept = 200,200,200,255
+// color of original concepts (good value: 200.200.200.255)
+backGroundcolorOriginalConcept = 200.200.200.255
 
 // thickness of concepts with hint (good value: 2)
 borderThicknessConceptWithHint = 2
 
 // Directories and names of files
-nameGexfGraphFile       = graph\\graph##
+nameGexfGraphFile       = graph\\graph##.gexf
 nameQueryDefaultFile    = query_model\\query.txt
 nameVocabularyFile      = vocabulary\\linkvocabulary.txt
 nameUselessConceptsFile = vocabulary\\uselessconcepts.txt
-nameTxtConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
-nameCxlConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".cxl";
-nameCompleteReportFile   = C:\\Users\\Henrique\\Documents\\log\\complete_report_##.txt
+nameTxtConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap##.txt
+nameCxlConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap##.cxl
+nameCompleteReportFile  = C:\\Users\\Henrique\\Documents\\log\\complete_report_##.txt
 nameShortReportFile     = C:\\Users\\Henrique\\Documents\\log\\short_report_##.txt
 nameConsoleReportFile   = C:\\Users\\Henrique\\Documents\\log\\console_report_##.txt
 nameConsoleErrorFile    = C:\\Users\\Henrique\\Documents\\log\\consoleErr.txt
@@ -101,15 +101,11 @@ dirRdfsPersistenceFiles = persistenceRdfs
 // DBPEDIA server (good value: http://dbpedia.org/sparql) (alternative good value: http://lod.openlinksw.com/sparql/)
 dbpediaServer = http://dbpedia.org/sparql
 
-// maximum size of graph (good value: 50000)
-maxNodes = 50000
-minEdges = 50000
-
 // to see simultaneously the build of graph in Gephi (good value: false)	
 gephiVisualization = false
 
 // to see simultaneously the build of graph in Graph Stream Visualization (good value: false)	
-boolean graphStreamVisualization = 	false
+graphStreamVisualization = 	false
 
 // to fix a bug in Gephi Tool Kit - calculate wrong the quantity of connected component
 // turn the flag to true and put the especific original concept that is getting alone

@@ -42,8 +42,8 @@ public class WholeSystem {
 	public static void initGoalMaxConceptsQuantity() {
 		int originalConceptsQuantity = WholeSystem.getQuantityOriginalConcepts();
 		WholeSystem.goalConceptsQuantity = (int)( ( Math.log(1.0/(double)originalConceptsQuantity)/Math.log(2.0) )
-				                           * 2.0 + Constants.conceptsQuantityCalulationFactor) + originalConceptsQuantity;
-		WholeSystem.maxConceptsQuantity = WholeSystem.goalConceptsQuantity + Constants.conceptsMinMaxRange;
+				                           * 2.0 + WholeSystem.configTable.getDouble("conceptsQuantityCalulationFactor")) + originalConceptsQuantity;
+		WholeSystem.maxConceptsQuantity = WholeSystem.goalConceptsQuantity + WholeSystem.configTable.getInt("conceptsMinMaxRange");
 	}
 	public static void initQuantityPathsBetweenOriginalConcetps() {
 		int maximumPaths=0;

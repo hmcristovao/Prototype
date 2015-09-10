@@ -309,7 +309,7 @@ public class SystemGraphData {
 			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayEigenvector();
 			this.ranks.getMeasuresRankTable(i).setEigenvector(sortedNodesTableArray);
 			
-			int filterQuantity = (int)(WholeSystem.getQuantityOriginalConcepts() * Constants.proporcionBetweenness);
+			int filterQuantity = (int)(WholeSystem.getQuantityOriginalConcepts() * WholeSystem.configTable.getDouble("proporcionBetweenness"));
 			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayBetweennessCloseness(filterQuantity);
 			this.ranks.getMeasuresRankTable(i).setBetweennessCloseness(sortedNodesTableArray);	
 		}
@@ -318,7 +318,7 @@ public class SystemGraphData {
 	// select the firt largest maxBetweennessCloseness nodes of each connected component
 	public int selectLargestNodesBetweennessCloseness(int iteration) throws Exception {
 		// quantity total of nodes to change the status (all connected components)
-		int countTotalSelectNodes = (int)(WholeSystem.getQuantityOriginalConcepts() * Constants.proporcionBetweennessCloseness);
+		int countTotalSelectNodes = (int)(WholeSystem.getQuantityOriginalConcepts() * WholeSystem.configTable.getDouble("proporcionBetweennessCloseness"));
 		int countConnectedComponentSelectNodes;
 		NodeData currentNodeData;
 		int count = 0;
@@ -327,12 +327,12 @@ public class SystemGraphData {
 			countConnectedComponentSelectNodes = 
 			(int)( ( (double)countTotalSelectNodes / (double)WholeSystem.getQuantityOriginalConcepts() ) * 
 					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().size() + 
-			        Constants.precisionBetweennessCloseness
+			        WholeSystem.configTable.getDouble("precisionBetweennessCloseness")
 			      );
 			// mark the level of the firt nodes to new status, except original nodes
 			for(int j=0, k=0; k < countConnectedComponentSelectNodes &&
 					          j < this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getCount() &&
-					          k < (Constants.maxBetweennessCloseness / this.connectedComponentsCount + 0.5); 
+					          k < (WholeSystem.configTable.getDouble("maxBetweennessCloseness") / this.connectedComponentsCount + 0.5); 
 				j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j);
 				// changes status only of nodes still not selected or not original concept
@@ -355,7 +355,7 @@ public class SystemGraphData {
 	// select the firt largest maxEigenvector nodes of each connected component
 	public int selectLargestNodesEigenvector(int iteration) throws Exception {
 		// quantity total of nodes to change the status (all connected components)
-		int countTotalSelectNodes = (int)(WholeSystem.getQuantityOriginalConcepts() * Constants.proporcionEigenvector);
+		int countTotalSelectNodes = (int)(WholeSystem.getQuantityOriginalConcepts() * WholeSystem.configTable.getDouble("proporcionEigenvector"));
 		int countConnectedComponentSelectNodes;
 		NodeData currentNodeData;
 		int count = 0;
@@ -364,12 +364,12 @@ public class SystemGraphData {
 			countConnectedComponentSelectNodes = 
 			(int)( ( (double)countTotalSelectNodes / (double)WholeSystem.getQuantityOriginalConcepts()) * 
 					this.ranks.getMeasuresRankTable(i).getOriginalGroupConcepts().size() + 
-			        Constants.precisionEigenvector
+			        WholeSystem.configTable.getDouble("precisionEigenvector")
 			      );
 			// mark the level of the firt nodes to new status, except original nodes
 			for(int j=0, k=0; k < countConnectedComponentSelectNodes && 
 					          j < this.ranks.getMeasuresRankTable(i).getEigenvector().getCount() &&
-					          k < ( Constants.maxEigenvector / this.connectedComponentsCount + 0.5);  
+					          k < ( WholeSystem.configTable.getDouble("maxEigenvector") / this.connectedComponentsCount + 0.5);  
 				j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j);
 				// changes status only of nodes still not selected or not original concept
@@ -410,14 +410,15 @@ public class SystemGraphData {
 	public int buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts(int lastIterationWithinOfLoopWithDistanceMeasuresCalculation) throws Exception {
 		// build finalHeadNodes: contains the head nodes to build the paths to final stage
 		int maximumHeadNodes = WholeSystem.getQuantityOriginalConcepts();
-		ConceptsGroup selectedConcepts;
-		if(Constants.isSelected)
+		ConceptsGroup selectedConcepts = null;
+		if(WholeSystem.configTable.getBoolean("isSelected"))
 			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
-		if(Constants.isBetweennessCloseness)
+		if(WholeSystem.configTable.getBoolean("isBetweennessCloseness"))
 			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedBetweennessClosenessConcepts();
-		else if(Constants.isEigenvector)
+		else if(WholeSystem.configTable.getBoolean("isEigenvector"))
 			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedEigenvectorConcepts();
-		
+		else
+			System.err.println("\none of the config variables must be true: isSelected, isBetweennessCloseness, isEigenvector");
 		maximumHeadNodes += selectedConcepts.size();
 		WholeSystem.setFinalHeadNodes(new NodesTableArray(maximumHeadNodes));
 		// insert original concepts in finalHeadNodes
