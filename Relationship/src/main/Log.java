@@ -11,10 +11,10 @@ public class Log {
 	public static PrintStream printStreamError;
 
 	public static void initFiles() throws Exception {
-		fileCompleteReport = new BufferedWriter(new FileWriter(Config.nameFileCompletReport));
-		fileShortReport    = new BufferedWriter(new FileWriter(Config.nameFileShortReport));
-		fileConsoleReport  = new BufferedWriter(new FileWriter(Config.nameFileConsoleReport));
-		printStreamError   = new PrintStream(Config.nameFileConsoleError);
+		fileCompleteReport = new BufferedWriter(new FileWriter(Constants.nameFileCompletReport));
+		fileShortReport    = new BufferedWriter(new FileWriter(Constants.nameFileShortReport));
+		fileConsoleReport  = new BufferedWriter(new FileWriter(Constants.nameFileConsoleReport));
+		printStreamError   = new PrintStream(Constants.nameFileConsoleError);
 		System.setErr(printStreamError);
 	}
 	public static void close() throws Exception {
@@ -24,12 +24,12 @@ public class Log {
 		if(printStreamError != null)   printStreamError.close();
 	}
 	public static void outFileCompleteReport(String msgSingle) throws Exception {
-		fileCompleteReport.write(Config.doubleLine);
+		fileCompleteReport.write(Constants.doubleLine);
 		fileCompleteReport.write(msgSingle);
 		fileCompleteReport.write("\n");
 	}
 	public static void outFileShortReport(String msgSingle) throws Exception {
-		fileShortReport.write(Config.doubleLine);
+		fileShortReport.write(Constants.doubleLine);
 		fileShortReport.write(msgSingle);
 		fileShortReport.write("\n");
 	}
@@ -45,11 +45,11 @@ public class Log {
 		catch(Exception e) {;}		
 	}
 	public static void console(String msg, String value) {
-		Log.print(Config.doubleLine);
+		Log.print(Constants.doubleLine);
 		Log.println(msg);
 		Log.println("<=>");
 		Log.println(value);
-		Log.print(Config.singleLine);
+		Log.print(Constants.singleLine);
 	}
 	public static void console(boolean bool) {
 		if(bool)
@@ -58,11 +58,11 @@ public class Log {
 			Log.console("Boolean value: false");
 	}
 	public static void console(String msg, long value) {
-		Log.print(Config.doubleLine);
+		Log.print(Constants.doubleLine);
 		Log.println(msg);
 		Log.println("<=>");
 		Log.println(String.valueOf(value));
-		Log.print(Config.singleLine);
+		Log.print(Constants.singleLine);
 }
 	public static void console(String msg) {
 		Log.print(msg);

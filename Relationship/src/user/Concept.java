@@ -24,14 +24,14 @@ public class Concept {
 		this.iteration                  = iteration;
 		this.conceptCategory            = (Concept.verifyIfCategory(this.blankName)==true) ? ConceptCategory.yes : ConceptCategory.no;
 		this.quantityRdfs               = quantityRdfs;
-		this.registerConnectedComponent = new int[Config.maxIteration];
-		for(int i=0; i<Config.maxIteration; i++)
-			this.registerConnectedComponent[i] = Config.withoutConnectedComponent;
+		this.registerConnectedComponent = new int[Constants.maxIteration];
+		for(int i=0; i<Constants.maxIteration; i++)
+			this.registerConnectedComponent[i] = Constants.withoutConnectedComponent;
 		this.registerConnectedComponent[iteration] = connectedComponent;
 	}
 	public Concept(Token token) {
 		// it is before the first iteration
-		this(Config.originalConceptAddress+Concept.blankToUnderline(token.image), token.image, ConceptStatus.originalConcept, 0, ConceptCategory.no, 0, Config.withoutConnectedComponent);  
+		this(Constants.originalConceptAddress+Concept.blankToUnderline(token.image), token.image, ConceptStatus.originalConcept, 0, ConceptCategory.no, 0, Constants.withoutConnectedComponent);  
 	}
 		
 	public String getFullName() {

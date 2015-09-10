@@ -9,6 +9,7 @@ import map.*;
 import java.util.LinkedList;
 
 public class WholeSystem {
+	public static  ConfigTable configTable = new ConfigTable();
 	private static UselessConceptsTable uselessConceptsTable = new UselessConceptsTable();
 	private static RdfsFilesTable rdfsFilesTable = new RdfsFilesTable();
 	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in Time.  Only one to store all iterations.
@@ -41,8 +42,8 @@ public class WholeSystem {
 	public static void initGoalMaxConceptsQuantity() {
 		int originalConceptsQuantity = WholeSystem.getQuantityOriginalConcepts();
 		WholeSystem.goalConceptsQuantity = (int)( ( Math.log(1.0/(double)originalConceptsQuantity)/Math.log(2.0) )
-				                           * 2.0 + Config.conceptsQuantityCalulationFactor) + originalConceptsQuantity;
-		WholeSystem.maxConceptsQuantity = WholeSystem.goalConceptsQuantity + Config.conceptsMinMaxRange;
+				                           * 2.0 + Constants.conceptsQuantityCalulationFactor) + originalConceptsQuantity;
+		WholeSystem.maxConceptsQuantity = WholeSystem.goalConceptsQuantity + Constants.conceptsMinMaxRange;
 	}
 	public static void initQuantityPathsBetweenOriginalConcetps() {
 		int maximumPaths=0;

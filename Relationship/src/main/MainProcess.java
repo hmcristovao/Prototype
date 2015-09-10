@@ -1,4 +1,4 @@
-// v5.7 - fixed problem with CLX file. Insert new break of loop. Working!
+// v5.71 - building external config file...
 
 package main;
 
@@ -56,7 +56,7 @@ public class MainProcess {
 				if(iteration >= 1) 
 					copyAllObjectsLastIteration();
 				if(isApplyNDegreeFilterTrigger())
- 				   applyNDegreeFilterTrigger(Config.nDegreeFilter, false);
+ 				   applyNDegreeFilterTrigger(Constants.nDegreeFilter, false);
 				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
 				classifyConnectedComponent();
@@ -76,7 +76,7 @@ public class MainProcess {
 				selectLargestNodesByBetweennessCloseness();
 				selectLargestNodesByEigenvector();
 				reportSelectedNodesToNewIteration();
-				if(Config.additionNewConceptWithoutCategory)
+				if(Constants.additionNewConceptWithoutCategory)
 					duplicateConceptsWithoutCategory(iteration);				
 				prepareDataToNewIteration();
 				iteration++;
@@ -126,14 +126,14 @@ public class MainProcess {
 				
 				// if node is link with original concepts then get the next
 				// (try to fix a bug in Gephi Tool Kit - calculate with wrong the value of connected component)
-				if(Config.isFixBugInGephiToolKit) {
-					if(isCurrentNodeHasLinkWithAnEspecificOriginalConcept(Config.originalConceptWithGephiToolKitBug)) {
+				if(Constants.isFixBugInGephiToolKit) {
+					if(isCurrentNodeHasLinkWithAnEspecificOriginalConcept(Constants.originalConceptWithGephiToolKitBug)) {
 						nodeDataPos++;
 						continue;
 					}
 				}
 				
-				if(Config.isKeepNeighborsOfOriginalConcepts) {
+				if(Constants.isKeepNeighborsOfOriginalConcepts) {
 					if(isCurrentNodeHasLinkWithOriginalConcepts()) {
 						nodeDataPos++;
 						continue;
@@ -232,9 +232,19 @@ public class MainProcess {
 		Log.initFiles();
 		Log.consoleln("- Starting.");
 	}
+	public static void parseConfiguration(Wrapterms parser) throws Exception {
+		Log.console("- Parsing configuration");
+		parser = new Wrapterms(new FileInputStream(Constants.nameConfigFile));
+		parser.parseConfigurations(WholeSystem.configTable);
+		Log.consoleln(" - " + WholeSystem.configTable.size() + " configurations parsed (file: "+Constants.nameConfigFile+").");
+		String sameReport = "Quantity of configuration parsed: " + WholeSystem.configTable.size() + 
+				            " (file: "+Constants.nameConfigFile+")"; 
+		Log.outFileCompleteReport(sameReport + "\n\n"+ WholeSystem.configTable.toString());
+		Log.outFileShortReport(sameReport);
+	}
 	public static void parseTerms(Wrapterms parser) throws Exception {
 		Log.console("- Parsing user terms");
-		parser = new Wrapterms(new FileInputStream(Config.nameUserTermsFile));
+		parser = new Wrapterms(new FileInputStream(WholeSystem.configTable.getString("nameUserTermsFile")));
 		WholeSystem.insertListSetQuerySparql(new SetQuerySparql());
 		parser.parseUserTerms(WholeSystem.getListSetQuerySparql().getFirst());
 		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
@@ -243,35 +253,35 @@ public class MainProcess {
 		WholeSystem.initQuantityPathsBetweenOriginalConcetps();
 		Log.consoleln(" - " + WholeSystem.getQuantityOriginalConcepts() + " terms parsed.");
 		String sameReport = "Quantity of terms parsed: " + WholeSystem.getQuantityOriginalConcepts() + 
-				            " (file: "+Config.nameUserTermsFile+")\n"; 
+				            " (file: "+WholeSystem.configTable.getString("nameUserTermsFile")+")\n"; 
 		Log.outFileCompleteReport(sameReport + WholeSystem.getOriginalConcepts().toStringLong());
 		Log.outFileShortReport(sameReport + WholeSystem.getOriginalConcepts().toString());
 	}
 	public static void parseUselessConcepts(Wrapterms parser) throws Exception {
 		Log.console("- Parsing useless concepts");
-		parser = new Wrapterms(new FileInputStream(Config.nameUselessConceptsFile));
+		parser = new Wrapterms(new FileInputStream(WholeSystem.configTable.getString("nameUselessConceptsFile")));
 		parser.parseUselessConcepts(WholeSystem.getUselessConceptsTable());
 		Log.consoleln(" - " + WholeSystem.getUselessConceptsTable().size() + " concepts parsed.");
 		String sameReport = "Quantity of useless concepts parsed: " + WholeSystem.getUselessConceptsTable().size() +   
-                " (file: "+Config.nameUselessConceptsFile+")\n" +
+                " (file: "+WholeSystem.configTable.getString("nameUselessConceptsFile")+")\n" +
 				"\nUseless concepts parsed:\n" + WholeSystem.getUselessConceptsTable().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
 	public static void parseVocabulary(Wrapterms parser) throws Exception {
 		Log.console("- Parsing vocabulary");
-		parser = new Wrapterms(new FileInputStream(Config.nameVocabularyFile));
+		parser = new Wrapterms(new FileInputStream(WholeSystem.configTable.getString("nameVocabularyFile")));
 		parser.parseSystemVocabulary(WholeSystem.getVocabularyTable());
 		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " sentences parsed.");
 		String sameReport = "Quantity of vocabulary sentences parsed: " + WholeSystem.getVocabularyTable().size() +   
-                " (file: "+Config.nameVocabularyFile+")\n" +
+                " (file: "+WholeSystem.configTable.getString("nameVocabularyFile")+")\n" +
 				"\nVocabulary table parsed:\n" + WholeSystem.getVocabularyTable().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
 	public static void readRdfsFileNameToRdfsFileTable() throws Exception {
 		Log.console("- Reading RDFs files names to put in table");
-		WholeSystem.getRdfsFileTable().init(Config.dirRdfsPersistenceFiles);  
+		WholeSystem.getRdfsFileTable().init(WholeSystem.configTable.getString("dirRdfsPersistenceFiles"));  
  		Log.consoleln(" - " + WholeSystem.getRdfsFileTable().size() + " RDFs files identified.");
 		String sameReport = "RDFs files identified: "+WholeSystem.getRdfsFileTable().size()+".";
 		Log.outFileCompleteReport(sameReport+"\n"+WholeSystem.getRdfsFileTable());
@@ -280,13 +290,13 @@ public class MainProcess {
 	
 	public static void indicateIterationNumber() throws Exception {
 		Log.consoleln("\n*** Iteration "+iteration+" ***");
-		String sameReport = Config.starsLine+"Iteration "+iteration+Config.starsLine;
+		String sameReport = Constants.starsLine+"Iteration "+iteration+Constants.starsLine;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
 	public static void indicateAlgorithmIntermediateStage1() throws Exception {
 		Log.consoleln("\n*** Intermediate stage 1 (apply k-core) ***");
-		String sameReport = Config.starsLine+"Intermediate stage 1 (apply k-core)"+Config.starsLine;
+		String sameReport = Constants.starsLine+"Intermediate stage 1 (apply k-core)"+Constants.starsLine;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
@@ -298,7 +308,7 @@ public class MainProcess {
 		        WholeSystem.getGoalConceptsQuantity()+ " good, "+
                 WholeSystem.getMaxConceptsQuantity()+" maximum.";
 		Log.consoleln("\n*** Intermediate stage 2 (build head nodes list to calculate paths in the final stage) ***\n- " + sameReport);
-		String sameReport2 = Config.starsLine+"Intermediate stage 2 (build head nodes list to calculate paths in the final stage)"+Config.starsLine;
+		String sameReport2 = Constants.starsLine+"Intermediate stage 2 (build head nodes list to calculate paths in the final stage)"+Constants.starsLine;
 		Log.outFileCompleteReport(sameReport2+sameReport);
 		Log.outFileShortReport(sameReport2+sameReport);
 	}
@@ -310,14 +320,14 @@ public class MainProcess {
 		        WholeSystem.getGoalConceptsQuantity()+ " good, "+
                 WholeSystem.getMaxConceptsQuantity()+" maximum.";
 		Log.consoleln("\n*** Intermediate stage 3 (remove nodes steadying unique connected component ***\n- "+ sameReport);
-		String sameReport2 = Config.starsLine+"Intermediate stage 3 (remove nodes steadying unique connected component)"+Config.starsLine;
+		String sameReport2 = Constants.starsLine+"Intermediate stage 3 (remove nodes steadying unique connected component)"+Constants.starsLine;
 		Log.outFileCompleteReport(sameReport2+sameReport);
 		Log.outFileShortReport(sameReport2+sameReport);
 	}
 	
 	public static void indicateAlgorithmFinalStage() throws Exception {
 		Log.consoleln("\n*** Final stage (building concept map) ***");
-		String sameReport = Config.starsLine+"Final stage (building concept map)"+Config.starsLine;
+		String sameReport = Constants.starsLine+"Final stage (building concept map)"+Constants.starsLine;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
@@ -382,13 +392,13 @@ public class MainProcess {
 		currentSystemGraphData = WholeSystem.getListSystemGraphData().get(iteration);
 	}
 	public static void connectStreamVisualization() throws Exception {
-		if(Config.graphStreamVisualization) {
+		if(Constants.graphStreamVisualization) {
 			Log.consoleln("- Connecting Stream Visualization.");
 			WholeSystem.getStreamGraphData().getStreamGraph().display(true);
 		}
-		if(Config.gephiVisualization) {
+		if(Constants.gephiVisualization) {
 			Log.consoleln("- Connecting with Gephi.");
-			JSONSender sender = new JSONSender("localhost", 8080, Config.nameGephiWorkspace);
+			JSONSender sender = new JSONSender("localhost", 8080, Constants.nameGephiWorkspace);
 			WholeSystem.getStreamGraphData().getStreamGraph().addSink(sender);
 		}
 	}
@@ -420,13 +430,13 @@ public class MainProcess {
 	}
 	public static boolean isApplyNDegreeFilterTrigger() throws Exception {
 		Log.console("- Verifying whether apply N-degree filter: ");
-		String sameReport = "iteration ("+iteration+" > "+Config.iterationTriggerApplyNDegreeFilterAlgorithm+"), " 
-		                   +"nodes count ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+" > "+Config.quantityNodesToApplyNdegreeFilter+"), "
+		String sameReport = "iteration ("+iteration+" > "+Constants.iterationTriggerApplyNDegreeFilterAlgorithm+"), " 
+		                   +"nodes count ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+" > "+Constants.quantityNodesToApplyNdegreeFilter+"), "
 		                   +"connected component ("
 		                   + (iteration==0 ? "?" : WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount())
 		                   +" = 1)"; 
-		if(iteration >= Config.iterationTriggerApplyNDegreeFilterAlgorithm 
-		   && WholeSystem.getStreamGraphData().getRealTotalNodes() > Config.quantityNodesToApplyNdegreeFilter
+		if(iteration >= Constants.iterationTriggerApplyNDegreeFilterAlgorithm 
+		   && WholeSystem.getStreamGraphData().getRealTotalNodes() > Constants.quantityNodesToApplyNdegreeFilter
 		   && WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount() == 1) { 
 			Log.consoleln(sameReport+" - OK!");
 	        Log.outFileCompleteReport("Apply N-degree filter "+sameReport);
@@ -442,8 +452,8 @@ public class MainProcess {
 	}
 	public static boolean isApplyKCoreFilterTrigger() throws Exception {
 		Log.console("- Verifying whether apply K-core filter: ");
-		String sameReport = "quantity of nodes ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+" > "+Config.quantityNodesToApplyKcoreFilter+")"; 
-		if(WholeSystem.getStreamGraphData().getRealTotalNodes() > Config.quantityNodesToApplyKcoreFilter) { 
+		String sameReport = "quantity of nodes ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+" > "+Constants.quantityNodesToApplyKcoreFilter+")"; 
+		if(WholeSystem.getStreamGraphData().getRealTotalNodes() > Constants.quantityNodesToApplyKcoreFilter) { 
 			Log.consoleln(sameReport+" - OK!");
 	        Log.outFileCompleteReport("Apply K-core filter "+sameReport);
 			Log.outFileShortReport("Apply K-core filter "+sameReport);		
@@ -570,7 +580,7 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);
 	}
 	public static void clearStreamGraphSink() throws Exception {
-		if(Config.gephiVisualization)  
+		if(Constants.gephiVisualization)  
 			WholeSystem.getStreamGraphData().getStreamGraph().clearSinks();
 	}
 	public static void calculateDistanceMeasuresWholeNetwork() throws Exception {
@@ -662,13 +672,13 @@ public class MainProcess {
 	public static void buildGexfGraphFile(Time time) throws Exception {
 		String nameFileGexf = null;
 		if(time == Time.t1_whileIteration) 
-			nameFileGexf = Config.nameGexfGraphFile + "_t1_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
+			nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile") + "_t1_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf";
 		else if(time == Time.t2_afterIterationAndKcore)
-	   		nameFileGexf = Config.nameGexfGraphFile + "_t2_after_iterations_and_kcore.gexf";
+	   		nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile") + "_t2_after_iterations_and_kcore.gexf";
 		else if(time == Time.t3_afterHeadNodesPaths)
-	   		nameFileGexf = Config.nameGexfGraphFile + "_t3_after_head_nodes_path.gexf";
+	   		nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile") + "_t3_after_head_nodes_path.gexf";
 		else if(time == Time.t4_afterSteadyUniqueConnected)
-			nameFileGexf = Config.nameGexfGraphFile + "_t4_after_steady_unique_connected.gexf";	
+			nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile") + "_t4_after_steady_unique_connected.gexf";	
 		Log.console("- Building GEXF Graph File");
 		currentSystemGraphData.getGephiGraphData().buildGexfGraphFile(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
@@ -725,16 +735,16 @@ public class MainProcess {
 	}	
 	public static boolean breakIteration() throws Exception {
 		Log.console("- Verifying exit conditions: ");
-		String sameReport = "maximum iteration ("+iteration+" = "+Config.maxIteration+") \n  or " 
-		                   +"[ minimum iteration ("+iteration+" >= "+Config.minIterationToVerifyUniqueConnectedComponent+") and "
-		                   +"connected component ("+currentSystemGraphData.getConnectedComponentsCount()+" = 1) ] or "
-		                   +"[ minimum iteration ("+iteration+" >= "+Config.minIterationToVerifyRelationshipBetweenOriginalConcepts+") and "
+		String sameReport = "maximum iteration ("+iteration+" = "+Constants.maxIteration+") \n  or " 
+		                   +"[ minimum iteration ("+iteration+" >= "+Constants.minIterationToVerifyUniqueConnectedComponent+") and "
+		                   +"connected component ("+currentSystemGraphData.getConnectedComponentsCount()+" = 1) ]\n  or "
+		                   +"[ minimum iteration ("+iteration+" >= "+Constants.minIterationToVerifyRelationshipBetweenOriginalConcepts+") and "
 		                   +"relationship level between original concepts ("+WholeSystem.getStreamGraphData().getCurrentLevelRelationshipBetweenOriginalConcepts()+" = 0) ]";
 		Log.consoleln(sameReport);
 		Log.outFileCompleteReport("Verification of exit conditions of loop\n"+sameReport);
 		Log.outFileShortReport("Verification of exit conditions of loop\n"+sameReport);		
 		// verify the iteration limit				
-		if(iteration == Config.maxIteration) {
+		if(iteration == Constants.maxIteration) {
 			Log.consoleln("- Ending loop, maximum iteration quantity reached.");
 			String sameReport2 = "Loop ended, maximum iteration quantity reached.";
 			Log.outFileCompleteReport(sameReport2);
@@ -742,7 +752,7 @@ public class MainProcess {
 			return true;
 		}
 		// at least n iterations and connected component == 1
-		if(iteration >= Config.minIterationToVerifyUniqueConnectedComponent 
+		if(iteration >= Constants.minIterationToVerifyUniqueConnectedComponent 
 				&& currentSystemGraphData.getConnectedComponentsCount() == 1) {
 			Log.consoleln("- Ending loop, connected component = 1 reached.");
 			String sameReport2 = "Loop ended, connected component = 1 reached.";
@@ -751,7 +761,7 @@ public class MainProcess {
 			return true;
 		}
 		// at least n iterations and relationship level between original concepts == 0
-		if(iteration >= Config.minIterationToVerifyRelationshipBetweenOriginalConcepts 
+		if(iteration >= Constants.minIterationToVerifyRelationshipBetweenOriginalConcepts 
 				&& WholeSystem.getStreamGraphData().getCurrentLevelRelationshipBetweenOriginalConcepts() == 0) {
 			Log.consoleln("- Ending loop, relationship level between original concepts = 0 reached.");
 			String sameReport2 = "Loop ended, relationship level between original concepts = 0 reached.";
@@ -954,7 +964,7 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);		
 	}
 	public static void buildGexfGraphFileFromConceptMap() throws Exception {
-		String nameFileGexf = Config.nameGexfGraphFile + "_t5_concept_map.gexf";
+		String nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile") + "_t5_concept_map.gexf";
 		Log.console("- Building GEXF Graph File from final concept map");
 		WholeSystem.getConceptMap().buildGexfGraphFileFromConceptMap(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
@@ -964,17 +974,17 @@ public class MainProcess {
 	}
 	public static void buildTxtFileFromConceptMap() throws Exception {
 		Log.console("- Building TXT final Concept Map");
-		WholeSystem.getConceptMap().buildTxtFileFromConceptMap(Config.nameTxtConceptMapFile);
-		Log.consoleln(" (generated file: " + Config.nameTxtConceptMapFile + ").");
-		String sameReport = "TXT concept map generated: " + Config.nameTxtConceptMapFile;
+		WholeSystem.getConceptMap().buildTxtFileFromConceptMap(WholeSystem.configTable.getString("nameTxtConceptMapFile"));
+		Log.consoleln(" (generated file: " + WholeSystem.configTable.getString("nameTxtConceptMapFile") + ").");
+		String sameReport = "TXT concept map generated: " + WholeSystem.configTable.getString("nameTxtConceptMapFile");
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
 	public static void buildCxlFileFromConceptMap() throws Exception {
 		Log.console("- Building CXL final Concept Map");
-		String clxFileContent = WholeSystem.getConceptMap().buildCxlFileFromConceptMap(Config.nameCxlConceptMapFile);
-		Log.consoleln(" (generated file: " + Config.nameTxtConceptMapFile + ").");
-		String sameReport = "CXL concept map generated: " + Config.nameCxlConceptMapFile;
+		String clxFileContent = WholeSystem.getConceptMap().buildCxlFileFromConceptMap(WholeSystem.configTable.getString("nameCxlConceptMapFile"));
+		Log.consoleln(" (generated file: " + WholeSystem.configTable.getString("nameCxlConceptMapFile") + ").");
+		String sameReport = "CXL concept map generated: " + WholeSystem.configTable.getString("nameCxlConceptMapFile");
         Log.outFileCompleteReport(WholeSystem.getConceptMap().toStringComplete());
         Log.outFileCompleteReport(sameReport);
         Log.outFileCompleteReport(clxFileContent);
@@ -1038,7 +1048,7 @@ public class MainProcess {
 	
 	public static void end() throws Exception {
 		Log.consoleln("- Closing.");
-		if(Config.graphStreamVisualization) 
+		if(Constants.graphStreamVisualization) 
 			WholeSystem.getStreamGraphData().getStreamGraph().clear();
 		String sameReport = "Closed.\nOk!";
         Log.outFileCompleteReport(sameReport);

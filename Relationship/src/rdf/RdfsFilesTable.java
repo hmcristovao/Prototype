@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import main.Config;
+import main.Constants;
 import main.WholeSystem;
 import parse.Token;
 

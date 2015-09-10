@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import main.Config;
+import main.Constants;
 import main.Count;
 import main.Log;
 import main.WholeSystem;
@@ -48,11 +48,11 @@ public class StreamGraphData {
 
 	public StreamGraphData() {
 		this.streamGraph = new SingleGraph(
-				Config.nameGraph,
+				Constants.nameGraph,
 				true,                   // non-fatal error throws an exception = verify duplicated nodes
 				false,                  // auto-create
-				Config.maxNodes,
-				Config.minEdges
+				Constants.maxNodes,
+				Constants.minEdges
 				);
 		this.astar = new AStar(this.streamGraph);
 		this.isChangedStreamGraph = true;
@@ -212,7 +212,7 @@ public class StreamGraphData {
 			node.addAttribute("fullname",           subjectRDF.getFullName());
 			node.addAttribute("shortunderlinename", subjectRDF.getShortUnderlineName());
 			node.addAttribute("shortblankname",     subjectRDF.getShortBlankName());  // repeated with node id, but it is important...
-			if(Config.nodeLabelStreamGephi)
+			if(Constants.nodeLabelStreamGephi)
 				node.addAttribute("label", subjectRDF.getShortBlankName());
 			// if original concept then put label
 			if(WholeSystem.getConceptsRegister().isOriginalConcept(subjectRDF.getShortBlankName())) { 
@@ -227,13 +227,13 @@ public class StreamGraphData {
 
 		// case 12
 		// if predicate is known, transform it in attributes into node
-		if(predicateRDF.getFullName().equals(Config.addressBasic + "homepage"))
+		if(predicateRDF.getFullName().equals(Constants.addressBasic + "homepage"))
 			node.addAttribute("homepage", objectRDF.getShortBlankName());
-		else if(predicateRDF.getFullName().equals(Config.addressBasic + "comment"))
+		else if(predicateRDF.getFullName().equals(Constants.addressBasic + "comment"))
 			node.addAttribute("comment", objectRDF.getShortBlankName());
-		else if(predicateRDF.getFullName().equals(Config.addressBasic + "abstract"))
+		else if(predicateRDF.getFullName().equals(Constants.addressBasic + "abstract"))
 			node.addAttribute("abstract", objectRDF.getShortBlankName());
-		else if(predicateRDF.getFullName().equals(Config.addressBasic + "image"))
+		else if(predicateRDF.getFullName().equals(Constants.addressBasic + "image"))
 			node.addAttribute("image", objectRDF.getShortBlankName());
         
 		// continue to common predicate (unknown)
@@ -246,7 +246,7 @@ public class StreamGraphData {
 				node.addAttribute("fullname",           objectRDF.getFullName());
 				node.addAttribute("shortunderlinename", objectRDF.getShortUnderlineName());
 				node.addAttribute("shortblankname",     objectRDF.getShortBlankName());
-				if(Config.nodeLabelStreamGephi)
+				if(Constants.nodeLabelStreamGephi)
 					node.addAttribute("label", objectRDF.getShortBlankName());
 				// if original concept then put label
 				if(WholeSystem.getConceptsRegister().isOriginalConcept(objectRDF.getShortBlankName())) { 
@@ -262,7 +262,7 @@ public class StreamGraphData {
 			// work with predicate RDF
 			try {
 				// case 01
-				edge = this.streamGraph.addEdge(predicateRDF.getShortBlankName(), subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),Config.directedStreamGraph);
+				edge = this.streamGraph.addEdge(predicateRDF.getShortBlankName(), subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),Constants.directedStreamGraph);
 				edge.addAttribute("fullname",           predicateRDF.getFullName());
 				edge.addAttribute("shortunderlinename", predicateRDF.getShortUnderlineName());
 				edge.addAttribute("shortblankname",     predicateRDF.getShortBlankName());
@@ -271,7 +271,7 @@ public class StreamGraphData {
 				// if existent predicate (I don't know why!!! because the "catch" should get...) do nothing
 				WholeSystem.getEdgesTable().put(predicateRDF.getShortBlankName());
 				quantityNodesEdges.incNumEdges();
-				if(Config.edgeLabelStreamGephi)
+				if(Constants.edgeLabelStreamGephi)
 					edge.addAttribute("label", predicateRDF.getShortBlankName());
 			}
 			// case 4(scratch): same predicate (different subject and object)
@@ -282,9 +282,9 @@ public class StreamGraphData {
 				try {
 					// insert a count element in the id edge and try again
                     String newNameEdge = WholeSystem.getEdgesTable().getNewName(predicateRDF.getShortBlankName());  // add "#n" in the edge name
-					edge = this.streamGraph.addEdge(newNameEdge, subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),Config.directedStreamGraph);
+					edge = this.streamGraph.addEdge(newNameEdge, subjectRDF.getShortBlankName(), objectRDF.getShortBlankName(),Constants.directedStreamGraph);
 					quantityNodesEdges.incNumEdges();
-					if(Config.edgeLabelStreamGephi)
+					if(Constants.edgeLabelStreamGephi)
 						// add modifier to differentiate each link into the graph
 						edge.addAttribute("label", newNameEdge);
 				}
@@ -487,7 +487,7 @@ public class StreamGraphData {
 		for( Edge edge : edges ) {
 			Node nodeSource = edge.getSourceNode();
 			Node nodeTarget = edge.getTargetNode();
-			this.streamGraph.addEdge(edge.getId(), nodeSource, nodeTarget, Config.directedStreamGraph);
+			this.streamGraph.addEdge(edge.getId(), nodeSource, nodeTarget, Constants.directedStreamGraph);
 		}
 		this.setChangedStreamGraph(true);
 	}
@@ -675,7 +675,7 @@ public class StreamGraphData {
 	
 	public String toString() {
 		return  this.toStringGraph() +
-				Config.singleLine +
+				Constants.singleLine +
 				this.toStringShort();
 	}
 }

@@ -3,7 +3,7 @@ package graph;
 
 import user.Concept;
 import user.Concept.ConceptStatus;
-import main.Config;
+import main.Constants;
 
 public class NodeData {
 	// parse data

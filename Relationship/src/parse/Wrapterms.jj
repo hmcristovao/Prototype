@@ -1,4 +1,4 @@
-/*  Wrapterms.jj  -  It wraps terms to SPARQL query */ 
+/*  Wrapterms.jj  -  Process some parsers in system */ 
 options {
   DEBUG_PARSER = false;
   DEBUG_TOKEN_MANAGER = false;
@@ -21,29 +21,89 @@ public class Wrapterms {
    }
 }
 PARSER_END(Wrapterms)
+
+SKIP : { "//" : comentario_final }
+<comentario_final>
+SKIP: { "\n" : DEFAULT | <~[]> }
+
+TOKEN : {
+< T_numberFileUser: 							"numberFileUser" > |
+< T_nameUserTermsFile: 							"nameUserTermsFile" > |
+< T_minIterationToVerifyUniqueConnectedComponent: "minIterationToVerifyUniqueConnectedComponen" > |
+< T_minIterationToVerifyRelationshipBetweenOriginalConcepts: "minIterationToVerifyRelationshipBetweenOriginalConcepts" > |
+< T_maxIteration: 								"maxIteration" > |
+< T_additionNewConceptWithoutCategory:			"additionNewConceptWithoutCategory" > |
+< T_kCoreFilter: 								"kCoreFilter" > |
+< T_iterationTriggerApplyKCoreFilterAlgorithm: 	"iterationTriggerApplyKCoreFilterAlgorithm" > |
+< T_quantityNodesToApplyKcoreFilter: 			"quantityNodesToApplyKcoreFilter" > |
+< T_nDegreeFilter: 								"nDegreeFilter" > |
+< T_iterationTriggerApplyNDegreeFilterAlgorithm:"iterationTriggerApplyNDegreeFilterAlgorithm" > |
+< T_quantityNodesToApplyNdegreeFilter: 			"quantityNodesToApplyNdegreeFilter" > |
+< T_conceptsQuantityCalulationFactor: 			"conceptsQuantityCalulationFactor" > |
+< T_conceptsMinMaxRange: 						"conceptsMinMaxRange" > |
+< T_proporcionBetweenness: 						"proporcionBetweenness" > |
+< T_proporcionBetweennessCloseness: 			"proporcionBetweennessCloseness" > |
+< T_precisionBetweennessCloseness: 				"precisionBetweennessCloseness" > |
+< T_maxBetweennessCloseness: 					"maxBetweennessCloseness" > |
+< T_proporcionEigenvector: 						"proporcionEigenvector" > |
+< T_precisionEigenvector: 						"precisionEigenvector" > |
+< T_maxEigenvector: 							"maxEigenvector" > |
+< T_isBetweennessCloseness: 					"isBetweennessCloseness" > |
+< T_isEigenvector: 								"isEigenvector" > |
+< T_isSelected: 								"isSelected" > |
+< T_isKeepNeighborsOfOriginalConcepts: 			"isKeepNeighborsOfOriginalConcepts" > |
+< T_quantityNodesShortReport: 					"quantityNodesShortReport" > |
+< T_backGroundcolorOriginalConcept: 			"backGroundcolorOriginalConcept" > |
+< T_borderThicknessConceptWithHint: 			"borderThicknessConceptWithHint" > |
+< T_nameGexfGraphFile: 							"nameGexfGraphFile" > |
+< T_nameQueryDefaultFile: 						"ameQueryDefaultFile" > |
+< T_nameVocabularyFile: 						"nameVocabularyFile" > |
+< T_nameUselessConceptsFile: 					"nameUselessConceptsFile" > |
+< T_nameTxtConceptMapFile: 						"nameTxtConceptMapFile" > |
+< T_nameCxlConceptMapFile: 						"nameCxlConceptMapFile" > |
+< T_nameCompleteReportFile: 					"nameCompletReportFile" > |
+< T_nameShortReportFile: 						"nameShortReportFile" > |
+< T_nameConsoleReportFile: 						"nameConsoleReportFile" > |
+< T_nameConsoleErrorFile: 						"nameConsoleErrorFile" > |
+< T_dirRdfsPersistenceFiles: 					"dirRdfsPersistenceFiles" > |
+< T_dbpediaServer: 								"dbpediaServer" > |
+< T_maxNodes: 									"maxNodes" > |
+< T_minEdges: 									"minEdges" > |
+< T_gephiVisualization: 						"gephiVisualization" > |
+< T_graphStreamVisualization: 					"boolean graphStreamVisualization" > |
+< T_isFixBugInGephiToolKit: 					"isFixBugInGephiToolKit" > |
+< T_originalConceptWithGephiToolKitBug: 		"originalConceptWithGephiToolKitBug" > 
+}
+
+TOKEN : {
+      < EQUALS:         (" ")+ "=" (" ")+ > |
+      < NEW_LINE:       ( "\n" | "\r" )+ > 
+ }
+
+
 TOKEN : {
       < ARROW:          "->" > |
-      < CHARACTER:      ["a"-"z","A"-"Z","0"-"9","_",":","#",".","\'"] > |
+      < CHARACTER:      ["a"-"z","A"-"Z","0"-"9","_",":","#",".","\'" ,  "/","\\" ] > |
       < TERM:           < CHARACTER > 
                         (
                           ( < CHARACTER > | " " | < CHARACTER > "-" )*
                             < CHARACTER >
                         )?
       > |
-      < SEPARATORS:  ( "\n" | "\r" | "\t" | "," | ";" | " " )+ > 
+      < SEPARATORS:    ( "\t" | "," | ";" | " " )+ > 
  }
 /*
 Grammar (read of user terms):
 parseUserTerms        ->  ( elementUserTerm() )*  < EOF > 
-element               ->  < TERM > ( < SEPARATORS > )*
+element               ->  < TERM > ( < SEPARATORS > | <  NEW_LINE > )*
 
 Grammar (read of link vocabulary):
 parseSystemVocabulary ->  ( line() )*  < EOF >
-line                  ->  < TERM > < ARROW > < TERM > ( < SEPARATORS > )*
+line                  ->  < TERM > ( < SEPARATORS > )* < ARROW > ( < SEPARATORS > )* < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
 
 Grammar (read of useless concepts):
 parseUserTerms        ->  ( elementUselessConcept() )*  < EOF > 
-elementUselessConcept ->  < TERM > ( < SEPARATORS > )*
+elementUselessConcept ->  < TERM > ( < SEPARATORS > | <  NEW_LINE >  )*
 
 */
 
@@ -60,7 +120,7 @@ void elementUserTerm(SetQuerySparql originalSetQuerySparql) : {Token token; Conc
 		// copy the concept to static attribute in root class:
 		WholeSystem.getConceptsRegister().add(concept);			
     }
-    ( < SEPARATORS > )*
+    ( < SEPARATORS > | <  NEW_LINE > )*
 }
 
 // list of sentences, each one per line 
@@ -70,11 +130,11 @@ void parseSystemVocabulary(VocabularyTable vocabularyTable) : {}
 }
 void line(VocabularyTable vocabularyTable) : {Token tokenLeft; Token tokenRight;}  
 {
-	tokenLeft = < TERM > (< SEPARATORS >)* < ARROW > (< SEPARATORS >)* tokenRight = < TERM > 
+	tokenLeft = < TERM > ( < SEPARATORS > )* < ARROW > ( < SEPARATORS > )* tokenRight = < TERM > 
     {
 		vocabularyTable.put(tokenLeft,tokenRight);
     }
-    ( < SEPARATORS > )*
+    ( < SEPARATORS > | <  NEW_LINE > )*
 }
 
 // list of concepts, separate for comma or new line
@@ -89,7 +149,73 @@ void elementUselessConcept(UselessConceptsTable uselessConceptsTable) : {Token t
 		// copy the useless concept to static attribute in root class:
 		WholeSystem.getUselessConceptsTable().insert(token.image.trim());			
     }
-    ( < SEPARATORS > )*
+    ( < SEPARATORS > | <  NEW_LINE > )*
 }
+
+// config file
+void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token tokenValue; String numberFileUser;} 
+{
+(  (
+    (    tokenVar=< T_numberFileUser >  |
+	tokenVar=< T_minIterationToVerifyUniqueConnectedComponent > |
+	tokenVar=< T_minIterationToVerifyRelationshipBetweenOriginalConcepts > |
+	tokenVar=< T_maxIteration > |
+	tokenVar=< T_additionNewConceptWithoutCategory > |
+	tokenVar=< T_kCoreFilter > |
+	tokenVar=< T_iterationTriggerApplyKCoreFilterAlgorithm > |
+	tokenVar=< T_quantityNodesToApplyKcoreFilter >  |
+	tokenVar=< T_nDegreeFilter >  |
+	tokenVar=< T_iterationTriggerApplyNDegreeFilterAlgorithm >  |
+	tokenVar=< T_quantityNodesToApplyNdegreeFilter >  |
+	tokenVar=< T_conceptsQuantityCalulationFactor >  |
+	tokenVar=< T_conceptsMinMaxRange >  |
+	tokenVar=< T_proporcionBetweenness >  |
+	tokenVar=< T_proporcionBetweennessCloseness >  |
+	tokenVar=< T_precisionBetweennessCloseness >  |
+	tokenVar=< T_maxBetweennessCloseness >  |
+	tokenVar=< T_proporcionEigenvector >  |
+	tokenVar=< T_precisionEigenvector >  |
+	tokenVar=< T_maxEigenvector >  |
+	tokenVar=< T_isBetweennessCloseness >  |
+	tokenVar=< T_isEigenvector >  |
+	tokenVar=< T_isSelected >  |
+	tokenVar=< T_isKeepNeighborsOfOriginalConcepts >  |
+	tokenVar=< T_quantityNodesShortReport >  |
+	tokenVar=< T_backGroundcolorOriginalConcept >  |
+	tokenVar=< T_borderThicknessConceptWithHint >  |
+	tokenVar=< T_nameQueryDefaultFile >  |
+	tokenVar=< T_nameVocabularyFile >  |
+	tokenVar=< T_nameUselessConceptsFile >  |
+	tokenVar=< T_nameTxtConceptMapFile >  |
+	tokenVar=< T_nameCxlConceptMapFile >  |
+	tokenVar=< T_nameConsoleErrorFile >  |
+	tokenVar=< T_dirRdfsPersistenceFiles >  |
+	tokenVar=< T_dbpediaServer >  |
+	tokenVar=< T_maxNodes >  |
+	tokenVar=< T_minEdges >  |
+	tokenVar=< T_gephiVisualization >  |
+	tokenVar=< T_graphStreamVisualization >  |
+	tokenVar=< T_isFixBugInGephiToolKit >  |
+	tokenVar=< T_originalConceptWithGephiToolKitBug >  
+    )
+    < EQUALS > tokenValue = < TERM > < NEW_LINE >
+    { configTable.insert(tokenVar.image, tokenValue.image.trim()); }
+  )
+  |
+  (    (	tokenVar=< T_nameUserTermsFile >  |
+	tokenVar=< T_nameGexfGraphFile >  |
+	tokenVar=< T_nameCompleteReportFile >  |
+	tokenVar=< T_nameShortReportFile >  |
+	tokenVar=< T_nameConsoleReportFile >  
+    )
+    < EQUALS > tokenValue = < TERM > < NEW_LINE >
+    {
+	  numberFileUser = WholeSystem.configTable.getString("numberFileUser");	
+      configTable.insert(tokenVar.image, tokenValue.image.trim().replace("##",numberFileUser));
+    }    
+  )
+)*
+}
+
 
 

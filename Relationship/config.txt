@@ -1,0 +1,120 @@
+
+//================================================================================
+// BASIC CONFIG
+//================================================================================
+	
+// Current user terms file number (ex: 00, 01, ...) and directory\name
+numberFileUser = 00
+nameUserTermsFile = userterms\\terms##.txt
+
+// minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
+minIterationToVerifyUniqueConnectedComponent = 6
+
+// minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
+minIterationToVerifyRelationshipBetweenOriginalConcepts = 10
+
+// maximum quantity of iterations to get out of loop (good value: 50)  
+maxIteration = 50  
+
+// make the duplication of concept: from with "Category:" to without one (good value: true)
+additionNewConceptWithoutCategory = true
+	
+// K-core used in all system (good value: 2)
+kCoreFilter = 2
+
+// since iteration number x to apply K-core filter trigger (good value: 5)
+iterationTriggerApplyKCoreFilterAlgorithm = 5
+
+// quantity of nodes to shoot K-core n algorithm
+quantityNodesToApplyKcoreFilter = 700
+	
+// N-degree filter used in all system (good value: 2)
+nDegreeFilter = 2
+
+// since iteration number x to apply n-degree filter trigger (good value: 2)
+iterationTriggerApplyNDegreeFilterAlgorithm = 1
+
+// quantity of nodes to shoot n-degree filter algorithm (good value: 10000)
+quantityNodesToApplyNdegreeFilter = 5000
+
+// fator added in logarithmic function to calculate goal of concepts quantity in final concept to map (good value: 18)
+conceptsQuantityCalulationFactor = 18
+
+// top limit to range of concepts quantity (good value: 5)
+conceptsMinMaxRange = 5
+	
+
+//================================================================================
+// ADVANCED CONFIG
+//================================================================================
+	
+// proporcion above total original concept (used in the build betweenness+closeness sorted table) (good value: 10) 
+proporcionBetweenness = 10
+
+// BETWEENNESS + CLOSENESS
+// quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of original nodes) (good value: 2.0)
+proporcionBetweennessCloseness = 2.0
+// precision added up to rounding the calculate of quantity of each connected component (good value: 0.5)
+precisionBetweennessCloseness = 0.5
+// maximum limit to quantity of new concepts distributed in all connected component, +0.5 in each component (excluding the addition of nodes by "Category:") (good value: 15)
+maxBetweennessCloseness = 15
+
+// EIGENVECTOR
+// quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of original nodes) (good value: 2.0)
+proporcionEigenvector = 2.0
+// precision added up to rounding the calculate of quantity of each connected component (good value: 0.5)
+precisionEigenvector = 0.5 
+// maximum limit to quantity of new concepts distributed in all connected component, +0.5 in each component (excluding the addition of nodes by "Category:") (good value: 15)
+maxEigenvector = 15 
+
+// choice of nodes to be head. They are used to build the shortest paths (obs. the original concepts are always chosen) (good value: isBetweennessCloseness = true)
+isBetweennessCloseness = true
+isEigenvector = false
+isSelected = false
+	
+// keep all nodes with link to original concepts (in stage after selection of head nodes) (good value: false)
+// (normally this flag improves much more the final quantity of concepts in concept map) 
+isKeepNeighborsOfOriginalConcepts = false
+	
+// quantity of nodes each rank to show in short report (good value: 1)
+quantityNodesShortReport = 1
+
+// color of original concepts (good value: 200,200,200,255)
+backGroundcolorOriginalConcept = 200,200,200,255
+
+// thickness of concepts with hint (good value: 2)
+borderThicknessConceptWithHint = 2
+
+// Directories and names of files
+nameGexfGraphFile       = graph\\graph##
+nameQueryDefaultFile    = query_model\\query.txt
+nameVocabularyFile      = vocabulary\\linkvocabulary.txt
+nameUselessConceptsFile = vocabulary\\uselessconcepts.txt
+nameTxtConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".txt";
+nameCxlConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap"+Config.testNumber+".cxl";
+nameCompleteReportFile   = C:\\Users\\Henrique\\Documents\\log\\complete_report_##.txt
+nameShortReportFile     = C:\\Users\\Henrique\\Documents\\log\\short_report_##.txt
+nameConsoleReportFile   = C:\\Users\\Henrique\\Documents\\log\\console_report_##.txt
+nameConsoleErrorFile    = C:\\Users\\Henrique\\Documents\\log\\consoleErr.txt
+dirRdfsPersistenceFiles = persistenceRdfs
+    	
+// DBPEDIA server (good value: http://dbpedia.org/sparql) (alternative good value: http://lod.openlinksw.com/sparql/)
+dbpediaServer = http://dbpedia.org/sparql
+
+// maximum size of graph (good value: 50000)
+maxNodes = 50000
+minEdges = 50000
+
+// to see simultaneously the build of graph in Gephi (good value: false)	
+gephiVisualization = false
+
+// to see simultaneously the build of graph in Graph Stream Visualization (good value: false)	
+boolean graphStreamVisualization = 	false
+
+// to fix a bug in Gephi Tool Kit - calculate wrong the quantity of connected component
+// turn the flag to true and put the especific original concept that is getting alone
+isFixBugInGephiToolKit = false
+originalConceptWithGephiToolKitBug = Tim Berners-Lee
+	
+
+	

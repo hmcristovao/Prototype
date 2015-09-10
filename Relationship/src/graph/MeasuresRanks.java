@@ -1,6 +1,6 @@
 package graph;
 
-import main.Config;
+import main.Constants;
 import user.Concept;
 import user.ConceptsGroup;
 
@@ -81,38 +81,38 @@ public class MeasuresRanks {
 	}
 
 	public String toStringShort(int connectedComponentNumber, int quantityNodes) {
-		return  Config.doubleLine+"Table array (betweenness sorted) - Connected component number: "
-				+ connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
+		return  Constants.doubleLine+"Table array (betweenness sorted) - Connected component number: "
+				+ connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Constants.singleLine  
 				+ this.getBetweenness().toStringShort(quantityNodes) 
-		        + "\n"+Config.doubleLine+"Table array (closeness sorted) - Connected component number: "
-		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
+		        + "\n"+Constants.doubleLine+"Table array (closeness sorted) - Connected component number: "
+		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Constants.singleLine  
 		        + this.getCloseness().toStringShort(quantityNodes) 
-		        + "\n"+Config.doubleLine+"Table array (eccentricity sorted) - Connected component number: "
-		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
+		        + "\n"+Constants.doubleLine+"Table array (eccentricity sorted) - Connected component number: "
+		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Constants.singleLine  
 		        + this.getEccentricity().toStringShort(quantityNodes) 
-		        + "\n"+Config.doubleLine+"Table array (eingenvector sorted) - Connected component number: "
-		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
+		        + "\n"+Constants.doubleLine+"Table array (eingenvector sorted) - Connected component number: "
+		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Constants.singleLine  
 		        + this.getEigenvector().toStringShort(quantityNodes)		
-				+ "\n"+Config.doubleLine+"Table array (betweenness+closeness sorted) - Connected component number: "
-		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Config.singleLine  
+				+ "\n"+Constants.doubleLine+"Table array (betweenness+closeness sorted) - Connected component number: "
+		        + connectedComponentNumber + " (only the first "+quantityNodes+" nodes)"+Constants.singleLine  
 		        + this.getBetweennessCloseness().toStringShort(quantityNodes);		
 	}
 
 	public String toString(int connectedComponentNumber) {
-		return  Config.doubleLine+"Table array (betweenness sorted) - Connected component number: "
-				+ connectedComponentNumber + Config.singleLine  
+		return  Constants.doubleLine+"Table array (betweenness sorted) - Connected component number: "
+				+ connectedComponentNumber + Constants.singleLine  
 				+ this.getBetweenness().toString() 
-		        + "\n"+Config.doubleLine+"Table array (closeness sorted) - Connected component number: "
-		        + connectedComponentNumber + Config.singleLine  
+		        + "\n"+Constants.doubleLine+"Table array (closeness sorted) - Connected component number: "
+		        + connectedComponentNumber + Constants.singleLine  
 		        + this.getCloseness().toString() 
-		        + "\n"+Config.doubleLine+"Table array (eccentricity sorted) - Connected component number: "
-		        + connectedComponentNumber + Config.singleLine  
+		        + "\n"+Constants.doubleLine+"Table array (eccentricity sorted) - Connected component number: "
+		        + connectedComponentNumber + Constants.singleLine  
 		        + this.getEccentricity().toString() 
-		        + "\n"+Config.doubleLine+"Table array (eingenvector sorted) - Connected component number: "
-		        + connectedComponentNumber + Config.singleLine  
+		        + "\n"+Constants.doubleLine+"Table array (eingenvector sorted) - Connected component number: "
+		        + connectedComponentNumber + Constants.singleLine  
 		        + this.getEigenvector().toString()		
-				+ "\n"+Config.doubleLine+"Table array (betweenness+closeness sorted) - Connected component number: "
-		        + connectedComponentNumber + Config.singleLine  
+				+ "\n"+Constants.doubleLine+"Table array (betweenness+closeness sorted) - Connected component number: "
+		        + connectedComponentNumber + Constants.singleLine  
 		        + this.getBetweennessCloseness().toString();		
 	}
 }

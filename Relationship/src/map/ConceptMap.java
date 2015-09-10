@@ -27,7 +27,7 @@ import org.openide.util.Lookup;
 import user.Concept;
 import user.Concept.ConceptStatus;
 import user.ConceptsGroup;
-import main.Config;
+import main.Constants;
 import main.Log;
 import main.WholeSystem;
 
@@ -252,6 +252,14 @@ public class ConceptMap {
 		for(int i=0; i < this.propositions.size(); i++) {
 			Proposition prop_i = this.propositions.get(i);
 			
+			// special case: concept alone
+			if(prop_i.getTargetConcept() == null) {
+				idFoundConcept = "c"+numConcept;
+				numConcept++;
+				prop_i.setIdSourceConcept(idFoundConcept);
+				this.concepts.put(idFoundConcept, prop_i.getSourceConcept());
+				continue;
+			}
 			
 			// figure out the source concept
 			idFoundConcept = null;
@@ -411,6 +419,10 @@ public class ConceptMap {
 		// section: <connection-list>
 		str.append("<connection-list>\r\n");
 		for(Proposition proposition : this.propositions) {
+			// special case: concept alone
+			if(proposition.getTargetConcept() == null) {
+				continue;
+			}
 			// source join
 			str.append("\t<connection id=\"");
 			str.append(proposition.getIdSourceJoin());
@@ -439,12 +451,12 @@ public class ConceptMap {
 			str.append("\" ");
 			if(simpleConcept.getNodeData().getStatus() == ConceptStatus.originalConcept) {
 				str.append("background-color=\"");
-				str.append(Config.backGroundcolorOriginalConcept);
+				str.append(Constants.backGroundcolorOriginalConcept);
 				str.append("\" ");
 			}
 			if(simpleConcept.getNodeData().getAbstractAttribute() != null || simpleConcept.getNodeData().getCommentAttribute() != null) {
 				str.append("border-thickness=\"");
-				str.append(Config.borderThicknessConceptWithHint);
+				str.append(Constants.borderThicknessConceptWithHint);
 				str.append("\" ");
 			}
 			str.append("/>\r\n");

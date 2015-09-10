@@ -1,6 +1,6 @@
 package graph;
 
-import main.Config;
+import main.Constants;
 
 public class Ranks {
 	private MeasuresRanks measuresRanksTable[];  // 0 position correspond to total network
@@ -36,7 +36,7 @@ public class Ranks {
 	public String toStringShort(int quantityNodes) {
 		StringBuffer str = new StringBuffer();
 		for(int i=0; i<this.count; i++) {
-			str.append(Config.doubleLine);
+			str.append(Constants.doubleLine);
 			str.append("Connected component number: "+i);
 			str.append("\n");
 			str.append(this.measuresRanksTable[i].toStringShort(i, quantityNodes));
@@ -48,7 +48,7 @@ public class Ranks {
 	public String toString() {
 		StringBuffer str = new StringBuffer();
 		for(int i=0; i<this.count; i++) {
-			str.append(Config.singleLine);
+			str.append(Constants.singleLine);
 			str.append("Connected component number: "+i);
 			str.append("\n");
 			str.append(this.measuresRanksTable[i].toString(i));

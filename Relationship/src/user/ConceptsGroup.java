@@ -7,7 +7,7 @@ import java.util.HashMap;
 
 import user.Concept.ConceptCategory;
 import user.Concept.ConceptStatus;
-import main.Config;
+import main.Constants;
 import main.Log;
 import main.WholeSystem;
 

@@ -12,7 +12,7 @@ import java.util.LinkedList;
 
 import org.apache.jena.riot.WebContent;
 
-import main.Config;
+import main.Constants;
 import main.Count;
 import main.Log;
 import main.WholeSystem;
@@ -116,7 +116,7 @@ public class SetQuerySparql {
 	}
 
 	private StringBuffer readFileQueryDefault() throws IOException {
-		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(Config.nameQueryDefaultFile));
+		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(Constants.nameQueryDefaultFile));
 		StringBuffer queryDefault = new StringBuffer();
 		String linhaAux = null;
 	    while (true) {
@@ -133,8 +133,8 @@ public class SetQuerySparql {
 	private StringBuffer replaceQueryDefault(StringBuffer queryDefault, String concept) {
 		StringBuffer newQueryDefault = new StringBuffer(queryDefault);
 		int start = 0;
-		while( (start = newQueryDefault.indexOf(Config.markQueryReplacement, start)) != -1)
-		   newQueryDefault.replace(start, start+Config.markQueryReplacement.length(), concept);
+		while( (start = newQueryDefault.indexOf(Constants.markQueryReplacement, start)) != -1)
+		   newQueryDefault.replace(start, start+Constants.markQueryReplacement.length(), concept);
 		return newQueryDefault;
 	}
 	
@@ -186,7 +186,7 @@ public class SetQuerySparql {
 			numRdfsInInternet.incCount(count);
 			// and save it in file
 			String fileName = RdfsFilesTable.formatToFileName(querySparql.getConcept().getBlankName());
-			ObjectOutputStream buffer = new ObjectOutputStream(new FileOutputStream(Config.dirRdfsPersistenceFiles+"\\"+fileName));
+			ObjectOutputStream buffer = new ObjectOutputStream(new FileOutputStream(Constants.dirRdfsPersistenceFiles+"\\"+fileName));
 			buffer.writeObject(querySparql.getListRDF()) ; 
 			buffer.flush(); 
 			buffer.close();
@@ -197,7 +197,7 @@ public class SetQuerySparql {
 	private int readPersistenceRDFsOneQuery(QuerySparql querySparql) throws Exception {
 		String strConcept = querySparql.getConcept().getBlankName();
 		String fileName   = RdfsFilesTable.formatToFileName(strConcept);
-		ObjectInputStream buffer = new ObjectInputStream(new FileInputStream(Config.dirRdfsPersistenceFiles+"\\"+fileName));
+		ObjectInputStream buffer = new ObjectInputStream(new FileInputStream(Constants.dirRdfsPersistenceFiles+"\\"+fileName));
 		querySparql.setListRDF((ListRDF)buffer.readObject());
 		buffer.close();
 		return querySparql.getListRDF().size();
@@ -206,7 +206,7 @@ public class SetQuerySparql {
 	private int readInternetDataBaseOneQuery(QuerySparql querySparql) {
 		String queryStr = querySparql.getQueryString().getQueryStrString();
 		Query query = QueryFactory.create(queryStr);
-		QueryEngineHTTP queryEngineHTTP = (QueryEngineHTTP)QueryExecutionFactory.sparqlService(Config.selectedServiceSnorqlEndPoint,  query);
+		QueryEngineHTTP queryEngineHTTP = (QueryEngineHTTP)QueryExecutionFactory.sparqlService(Constants.selectedServiceSnorqlEndPoint,  query);
 		queryEngineHTTP.setModelContentType(WebContent.contentTypeJSONLD);
 		Model model = queryEngineHTTP.execConstruct();
 
