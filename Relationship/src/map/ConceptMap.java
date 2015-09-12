@@ -2,32 +2,22 @@ package map;
 
 import graph.GephiGraphData;
 import graph.NodeData;
-import graph.NodesTableArray;
-import graph.QuantityNodesEdges;
 import graph.SystemGraphData;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.gephi.data.attributes.api.AttributeColumn;
 import org.gephi.graph.api.Edge;
 import org.gephi.graph.api.Node;
-import org.gephi.io.exporter.api.ExportController;
-import org.gephi.io.exporter.spi.GraphExporter;
-import org.gephi.statistics.plugin.EigenvectorCentrality;
-import org.gephi.statistics.plugin.GraphDistance;
-import org.openide.util.Lookup;
 
 import user.Concept;
 import user.Concept.ConceptStatus;
 import user.ConceptsGroup;
-import main.Constants;
 import main.Log;
 import main.WholeSystem;
 
@@ -238,16 +228,196 @@ public class ConceptMap {
 		outFile.close();
 	}
 		
+	// fill diferents ids of the links, according to the grouping linked with the same concepts
+	// return quantity of groups (quantity of differents links)
+	private int fillLinksIdInPropositionTable() {
+		
+		// structure to store the the groups with their propositions
+		Map<String,List<Proposition>> linkTable = new HashMap<String,List<Proposition>>();
+
+		// create all possible groups: concept+link and link+concept
+		for(Proposition prop : this.propositions) {
+			linkTable.put(prop.getSourceConcept().getLabel()+prop.getLink(), new ArrayList<Proposition>());
+			linkTable.put(prop.getLink()+prop.getTargetConcept().getLabel(), new ArrayList<Proposition>());
+		}
+		// fill each group with their proposition
+		List<Proposition> group;
+		for(Proposition prop : this.propositions) {
+			group = linkTable.get(prop.getSourceConcept().getLabel()+prop.getLink());
+			group.add(prop);
+			group = linkTable.get(prop.getLink()+prop.getTargetConcept().getLabel());
+			group.add(prop);
+		}
+				// copy groups to an ArrayList
+		List<ArrayList<Proposition>> groupsList = new ArrayList<ArrayList<Proposition>>();
+		for(String key : linkTable.keySet()) {
+			groupsList.add((ArrayList<Proposition>)linkTable.get(key));
+		}
+		// verify the equals to each group
+		int numLinkingPhrase = 1;
+		for(int i=0; i < groupsList.size()-1; i++) {
+			List<ArrayList<Proposition>> equalsAuxList = new ArrayList<ArrayList<Proposition>>();
+			equalsAuxList.add(groupsList.get(i));
+			for(int j=i+1; j < groupsList.size(); j++) {
+				// verify whether group 'i' is equal group 'j'
+				if(ConceptMap.isEqualsGroup(groupsList.get(i),groupsList.get(j))) {
+					equalsAuxList.add(groupsList.get(j));
+				}
+			}
+			// determine new id link to the equals groups (only when there are more than one)
+			if(equalsAuxList.size() > 1) {
+				for(int k=0; k < equalsAuxList.size(); k++) {
+					for(int l=0; l < equalsAuxList.get(k).size(); l++) {
+						equalsAuxList.get(k).get(l).setIdLinkingPhrase("l"+numLinkingPhrase);
+					}
+				}
+				this.links.put("l"+numLinkingPhrase, equalsAuxList.get(0).get(0).getLink());
+				numLinkingPhrase++;
+			}
+		}
+		
+		// verify if still there are groups without id link in all elements
+		// if yes then put l# in id link
+        // (could be better - links more grouped - whether the verify begin for larger groups)
+		for(int i=0; i < groupsList.size(); i++) {
+			// verify if all propositions do not have id link 
+			boolean isExistIdLink = false;
+			for(int j=0; j < groupsList.get(i).size(); j++) {
+				if(groupsList.get(i).get(j).getIdLinkingPhrase() != null) {
+					isExistIdLink = true;
+				}
+			}
+			if(!isExistIdLink) {
+				for(int j=0; j < groupsList.get(i).size(); j++) {
+					groupsList.get(i).get(j).setIdLinkingPhrase("l"+numLinkingPhrase);
+				}
+				this.links.put("l"+numLinkingPhrase, groupsList.get(i).get(0).getLink());				
+				numLinkingPhrase++;
+			}
+		}
+		return numLinkingPhrase;
+	}
+	
+	// verify whether two groups are equals
+	// all prefix (sourceConcept+link) or same sufix (link+targetConcept) of one are equals of other.
+	public static boolean isEqualsGroup(List<Proposition> group1, List<Proposition> group2) {
+
+		// if second group is already used (has idLink), go out.
+		if(group2.get(0).getIdLinkingPhrase() != null)
+			return false;
+		
+		// if size groups are differents then all elements must be equals
+		if(group1.size() != group2.size()) {
+
+			boolean isEquals = true;
+			// at first verify whether all prefix are equals
+			for(int i=0; i < group1.size(); i++) {
+				String prefix_i = group1.get(i).getSourceConcept().getLabel() + group1.get(i).getLink();
+				for(int j=0; j < group2.size(); j++) {
+					String prefix_j = group2.get(j).getSourceConcept().getLabel() + group2.get(j).getLink();
+					if(!prefix_i.equals(prefix_j)) {
+						isEquals = false;
+						break;
+					}
+				}
+			}
+			if(isEquals)
+				return true;
+			else
+				isEquals = true;
+			// second: verify whether all sufix are equals
+			for(int i=0; i < group1.size(); i++) {
+				String sufix_i = group1.get(i).getLink() + group1.get(i).getTargetConcept().getLabel();
+				for(int j=0; j < group2.size(); j++) {
+					String sufix_j = group2.get(j).getLink() + group2.get(j).getTargetConcept().getLabel();
+					if(!sufix_i.equals(sufix_j)) {
+						isEquals = false;
+						break;
+					}
+				}
+			}
+			return isEquals;
+		}
+		
+		// if size groups are equals then the equality is more loose
+		else
+		{
+			int size = group1.size();  // anyone two groups
+			// at first verify whether all prefix are equals
+			// ...firt group with second group
+			int equalsCount = 0;
+			for(int i=0; i < group1.size(); i++) {
+				String prefix_i = group1.get(i).getSourceConcept().getLabel() + group1.get(i).getLink();
+				for(int j=0; j < group2.size(); j++) {
+					String prefix_j = group2.get(j).getSourceConcept().getLabel() + group2.get(j).getLink();
+					if(prefix_i.equals(prefix_j)) {
+						equalsCount++;
+						break;
+					}
+				}
+			}
+			if(equalsCount == size) {
+				// ...second group with first group
+				equalsCount = 0;
+				for(int i=0; i < group2.size(); i++) {
+					String prefix_i = group2.get(i).getSourceConcept().getLabel() + group2.get(i).getLink();
+					for(int j=0; j < group1.size(); j++) {
+						String prefix_j = group1.get(j).getSourceConcept().getLabel() + group1.get(j).getLink();
+						if(prefix_i.equals(prefix_j)) {
+							equalsCount++;
+							break;
+						}
+					}
+				}
+				if(equalsCount == size)
+					return true;
+			}
+
+			// second: verify whether all sufix are equals
+			// ...firt group with second group
+			equalsCount = 0;
+			for(int i=0; i < group1.size(); i++) {
+				String prefix_i = group1.get(i).getLink() + group1.get(i).getTargetConcept().getLabel();
+				for(int j=0; j < group2.size(); j++) {
+					String prefix_j = group2.get(j).getLink() + group2.get(j).getTargetConcept().getLabel();
+					if(prefix_i.equals(prefix_j)) {
+						equalsCount++;
+						break;
+					}
+				}
+			}
+			if(equalsCount == size) {
+				// ...second group with first group
+				equalsCount = 0;
+				for(int i=0; i < group2.size(); i++) {
+					String prefix_i = group2.get(i).getLink() + group2.get(i).getTargetConcept().getLabel();
+					for(int j=0; j < group1.size(); j++) {
+						String prefix_j = group1.get(j).getLink() + group1.get(j).getTargetConcept().getLabel();
+						if(prefix_i.equals(prefix_j)) {
+							equalsCount++;
+							break;
+						}
+					}
+				}
+				if(equalsCount == size)
+					return true;
+			}
+			return false;
+		}
+	}
+	
+	
 	// create attributes of CXL file from Propositions in ConceptMap (after processing of all heuristics)
 	// return quantity of joins
-	private int fillAttributesOfFileCXL() {
+	private int fillAttributesInPropositionTable() {
+		
+		this.fillLinksIdInPropositionTable();
+		
 		int numConcept       = 1;  
-		int numJoin          = 1;     
-		int numLinkingPhrase = 1;  
+		int numJoin          = 1;       
 
 		String idFoundConcept;  
 		String idFoundJoin;
-		String idFoundLink;
 
 		for(int i=0; i < this.propositions.size(); i++) {
 			Proposition prop_i = this.propositions.get(i);
@@ -285,6 +455,7 @@ public class ConceptMap {
 			this.concepts.put(idFoundConcept, prop_i.getSourceConcept());
 		
 			
+			
 			// figure out the target concept
 			idFoundConcept = null;
 			for(int j=0; j < i; j++) {
@@ -308,23 +479,22 @@ public class ConceptMap {
 			prop_i.setIdTargetConcept(idFoundConcept);
 			this.concepts.put(idFoundConcept, prop_i.getTargetConcept());		
 		
-			// figure out the join and link (source)
-			idFoundLink = null;
+			
+			
+			// figure out the join
 			idFoundJoin = null;
 			for(int j=0; j < i; j++) {
 				Proposition prop_j = this.propositions.get(j);
 				// search for source concept and link equals
 				if(prop_i.getSourceConcept().getLabel().equals(prop_j.getSourceConcept().getLabel()) &&
-				   prop_i.getLink().equals(prop_j.getLink())) {
+				   prop_i.getIdLinkingPhrase().equals(prop_j.getIdLinkingPhrase())) {
 					idFoundJoin = prop_j.getIdSourceJoin();
-					idFoundLink = prop_j.getIdLinkingPhrase();
 					break;
 				}
 			}
 			// if found:
 			if(idFoundJoin != null) {
 				prop_i.setIdSourceJoin(idFoundJoin);
-				prop_i.setIdLinkingPhrase(idFoundLink);
 				prop_i.setIdTargetJoin(numJoin);
 				numJoin++;
 			}
@@ -335,14 +505,12 @@ public class ConceptMap {
 				numJoin++;
 				
 				idFoundJoin = null;
-				idFoundLink = null;
 				for(int j=0; j < i; j++) {
 					Proposition prop_j = this.propositions.get(j);
 					// search for target concept and link equals
 					if(prop_i.getTargetConcept().getLabel().equals(prop_j.getTargetConcept().getLabel()) &&
-							prop_i.getLink().equals(prop_j.getLink())) {
+							prop_i.getIdLinkingPhrase().equals(prop_j.getIdLinkingPhrase())) {
 						idFoundJoin = prop_j.getIdTargetJoin();
-						idFoundLink = prop_j.getIdLinkingPhrase();
 						break;
 					}
 				}
@@ -350,13 +518,9 @@ public class ConceptMap {
 				if(idFoundJoin == null) {
 					idFoundJoin = "j"+numJoin;
 					numJoin++;
-					idFoundLink = "l"+numLinkingPhrase;
-					numLinkingPhrase++;
 				}
 				prop_i.setIdTargetJoin(idFoundJoin);
-				prop_i.setIdLinkingPhrase(idFoundLink);
 			}
-			this.links.put(idFoundLink, prop_i.getLink());
 		}
 		return numJoin-1;
 	}
@@ -365,7 +529,7 @@ public class ConceptMap {
 	// return content of CLX file
 	public String buildCxlFileFromConceptMap(String fileClx) throws Exception {
 		// at firt, fill attributes of Proposition class to create CLX file
-		int countJ = this.fillAttributesOfFileCXL();
+		int countJ = this.fillAttributesInPropositionTable();
 
 		// buffer to store the content that will be stored in CLX file
 		StringBuffer str = new StringBuffer();
@@ -389,13 +553,15 @@ public class ConceptMap {
 			str.append("\"");
 			if(simpleConcept.getNodeData().getAbstractAttribute() != null) {
 				str.append(" short-comment=\"");
-				str.append(simpleConcept.getNodeData().getAbstractAttribute().replaceAll("\\\"", "'").replace("\\",""));
+				str.append(simpleConcept.getNodeData().getAbstractAttribute()
+						   .replaceAll("\\\"", "'").replace("\\","").replace("&", "and"));
 				str.append(" (font: DBPEDIA)");
 				str.append("\" long-comment=\"\"");
 			}
 			else if(simpleConcept.getNodeData().getCommentAttribute() != null) {
 				str.append(" short-comment=\"");
-				str.append(simpleConcept.getNodeData().getCommentAttribute().replaceAll("\\\"", "'").replace("\\",""));
+				str.append(simpleConcept.getNodeData().getCommentAttribute()
+						   .replaceAll("\\\"", "'").replace("\\","").replace("&", "and"));
 				str.append(" (font: DBPEDIA)");
 				str.append("\" long-comment=\"\"");
 			}

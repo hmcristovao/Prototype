@@ -4,30 +4,18 @@
 //================================================================================
 	
 // Current user terms file number (ex: 00, 01, ...) and directory\name
-numberFileUser = 00
+numberFileUser = 20
 nameUserTermsFile = userterms\\terms##.txt
 
 // minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
-minIterationToVerifyUniqueConnectedComponent = 4
+minIterationToVerifyUniqueConnectedComponent = 5
 
 // minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
-minIterationToVerifyRelationshipBetweenOriginalConcepts = 10
+minIterationToVerifyRelationshipBetweenOriginalConcepts = 8
 
 // maximum quantity of iterations to get out of loop (good value: 50)  
 maxIteration = 50  
 
-// make the duplication of concept: from with "Category:" to without one (good value: true)
-additionNewConceptWithoutCategory = true
-	
-// K-core used in all system (good value: 2)
-kCoreFilter = 2
-
-// apply K-core filter trigger from iteration number (good value: 5)
-iterationTriggerApplyKCoreFilterAlgorithm = 5
-
-// quantity of nodes to shoot K-core n algorithm
-quantityNodesToApplyKcoreFilter = 700
-	
 // N-degree filter used in all system (good value: 2)
 nDegreeFilter = 2
 
@@ -35,10 +23,19 @@ nDegreeFilter = 2
 iterationTriggerApplyNDegreeFilterAlgorithm = 1
 
 // quantity of nodes to shoot n-degree filter algorithm (good value: 10000)
-quantityNodesToApplyNdegreeFilter = 5000
+quantityNodesToApplyNdegreeFilter = 10000
 
+// make the duplication of concept: from with "Category:" to without one (good value: true)
+additionNewConceptWithoutCategory = false
+	
+// K-core used in all system (good value: 2)
+kCoreFilter = 2
+
+// quantity of nodes to shoot K-core n algorithm
+quantityNodesToApplyKcoreFilter = 700
+	
 // fator added in logarithmic function to calculate goal of concepts quantity in final concept to map (good value: 18)
-conceptsQuantityCalulationFactor = 18
+conceptsQuantityCalulationFactor = 10
 
 // top limit to range of concepts quantity (good value: 5)
 conceptsMinMaxRange = 5
@@ -86,12 +83,12 @@ backGroundcolorOriginalConcept = 200.200.200.255
 borderThicknessConceptWithHint = 2
 
 // Directories and names of files
-nameGexfGraphFile       = graph\\graph##.gexf
 nameQueryDefaultFile    = query_model\\query.txt
 nameVocabularyFile      = vocabulary\\linkvocabulary.txt
 nameUselessConceptsFile = vocabulary\\uselessconcepts.txt
 nameTxtConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap##.txt
 nameCxlConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap##.cxl
+nameGexfGraphFile       = C:\\Users\\Henrique\\Documents\\networks\\graph##.gexf
 nameCompleteReportFile  = C:\\Users\\Henrique\\Documents\\log\\complete_report_##.txt
 nameShortReportFile     = C:\\Users\\Henrique\\Documents\\log\\short_report_##.txt
 nameConsoleReportFile   = C:\\Users\\Henrique\\Documents\\log\\console_report_##.txt

@@ -257,7 +257,6 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_maxIteration:
       case T_additionNewConceptWithoutCategory:
       case T_kCoreFilter:
-      case T_iterationTriggerApplyKCoreFilterAlgorithm:
       case T_quantityNodesToApplyKcoreFilter:
       case T_nDegreeFilter:
       case T_iterationTriggerApplyNDegreeFilterAlgorithm:
@@ -319,7 +318,6 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_maxIteration:
       case T_additionNewConceptWithoutCategory:
       case T_kCoreFilter:
-      case T_iterationTriggerApplyKCoreFilterAlgorithm:
       case T_quantityNodesToApplyKcoreFilter:
       case T_nDegreeFilter:
       case T_iterationTriggerApplyNDegreeFilterAlgorithm:
@@ -368,9 +366,6 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
           break;
         case T_kCoreFilter:
           tokenVar = jj_consume_token(T_kCoreFilter);
-          break;
-        case T_iterationTriggerApplyKCoreFilterAlgorithm:
-          tokenVar = jj_consume_token(T_iterationTriggerApplyKCoreFilterAlgorithm);
           break;
         case T_quantityNodesToApplyKcoreFilter:
           tokenVar = jj_consume_token(T_quantityNodesToApplyKcoreFilter);
@@ -535,10 +530,10 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfffffff0,0xffffffd0,0x20,0xfffffff0,};
+      jj_la1_0 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfffffff0,0x7fffffd0,0x80000020,0xfffffff0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x800000,0x10e0000,0x10e0000,0x800000,0xc0000,0xc0000,0xc0000,0xc0000,0xe0000,0xe0000,0x800000,0x10e0000,0x10e0000,0xeffff,0xfe0e,0x1f1,0xeffff,};
+      jj_la1_1 = new int[] {0x400000,0x870000,0x870000,0x400000,0x60000,0x60000,0x60000,0x60000,0x70000,0x70000,0x400000,0x870000,0x870000,0x77fff,0x7f07,0xf8,0x77fff,};
    }
 
   /** Constructor with InputStream. */
@@ -655,7 +650,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[57];
+    boolean[] la1tokens = new boolean[56];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -672,7 +667,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
         }
       }
     }
-    for (int i = 0; i < 57; i++) {
+    for (int i = 0; i < 56; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

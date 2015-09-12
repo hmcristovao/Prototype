@@ -34,7 +34,6 @@ TOKEN : {
 < T_maxIteration: 								"maxIteration" > |
 < T_additionNewConceptWithoutCategory:			"additionNewConceptWithoutCategory" > |
 < T_kCoreFilter: 								"kCoreFilter" > |
-< T_iterationTriggerApplyKCoreFilterAlgorithm: 	"iterationTriggerApplyKCoreFilterAlgorithm" > |
 < T_quantityNodesToApplyKcoreFilter: 			"quantityNodesToApplyKcoreFilter" > |
 < T_nDegreeFilter: 								"nDegreeFilter" > |
 < T_iterationTriggerApplyNDegreeFilterAlgorithm:"iterationTriggerApplyNDegreeFilterAlgorithm" > |
@@ -169,7 +168,6 @@ void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token token
 	tokenVar=< T_maxIteration > |
 	tokenVar=< T_additionNewConceptWithoutCategory > |
 	tokenVar=< T_kCoreFilter > |
-	tokenVar=< T_iterationTriggerApplyKCoreFilterAlgorithm > |
 	tokenVar=< T_quantityNodesToApplyKcoreFilter >  |
 	tokenVar=< T_nDegreeFilter >  |
 	tokenVar=< T_iterationTriggerApplyNDegreeFilterAlgorithm >  |

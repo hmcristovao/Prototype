@@ -25,97 +25,95 @@ public interface WraptermsConstants {
   /** RegularExpression Id. */
   int T_kCoreFilter = 10;
   /** RegularExpression Id. */
-  int T_iterationTriggerApplyKCoreFilterAlgorithm = 11;
+  int T_quantityNodesToApplyKcoreFilter = 11;
   /** RegularExpression Id. */
-  int T_quantityNodesToApplyKcoreFilter = 12;
+  int T_nDegreeFilter = 12;
   /** RegularExpression Id. */
-  int T_nDegreeFilter = 13;
+  int T_iterationTriggerApplyNDegreeFilterAlgorithm = 13;
   /** RegularExpression Id. */
-  int T_iterationTriggerApplyNDegreeFilterAlgorithm = 14;
+  int T_quantityNodesToApplyNdegreeFilter = 14;
   /** RegularExpression Id. */
-  int T_quantityNodesToApplyNdegreeFilter = 15;
+  int T_conceptsQuantityCalulationFactor = 15;
   /** RegularExpression Id. */
-  int T_conceptsQuantityCalulationFactor = 16;
+  int T_conceptsMinMaxRange = 16;
   /** RegularExpression Id. */
-  int T_conceptsMinMaxRange = 17;
+  int T_proporcionBetweenness = 17;
   /** RegularExpression Id. */
-  int T_proporcionBetweenness = 18;
+  int T_proporcionBetweennessCloseness = 18;
   /** RegularExpression Id. */
-  int T_proporcionBetweennessCloseness = 19;
+  int T_precisionBetweennessCloseness = 19;
   /** RegularExpression Id. */
-  int T_precisionBetweennessCloseness = 20;
+  int T_maxBetweennessCloseness = 20;
   /** RegularExpression Id. */
-  int T_maxBetweennessCloseness = 21;
+  int T_proporcionEigenvector = 21;
   /** RegularExpression Id. */
-  int T_proporcionEigenvector = 22;
+  int T_precisionEigenvector = 22;
   /** RegularExpression Id. */
-  int T_precisionEigenvector = 23;
+  int T_maxEigenvector = 23;
   /** RegularExpression Id. */
-  int T_maxEigenvector = 24;
+  int T_isBetweennessCloseness = 24;
   /** RegularExpression Id. */
-  int T_isBetweennessCloseness = 25;
+  int T_isEigenvector = 25;
   /** RegularExpression Id. */
-  int T_isEigenvector = 26;
+  int T_isSelected = 26;
   /** RegularExpression Id. */
-  int T_isSelected = 27;
+  int T_isKeepNeighborsOfOriginalConcepts = 27;
   /** RegularExpression Id. */
-  int T_isKeepNeighborsOfOriginalConcepts = 28;
+  int T_quantityNodesShortReport = 28;
   /** RegularExpression Id. */
-  int T_quantityNodesShortReport = 29;
+  int T_backGroundcolorOriginalConcept = 29;
   /** RegularExpression Id. */
-  int T_backGroundcolorOriginalConcept = 30;
+  int T_borderThicknessConceptWithHint = 30;
   /** RegularExpression Id. */
-  int T_borderThicknessConceptWithHint = 31;
+  int T_nameGexfGraphFile = 31;
   /** RegularExpression Id. */
-  int T_nameGexfGraphFile = 32;
+  int T_nameQueryDefaultFile = 32;
   /** RegularExpression Id. */
-  int T_nameQueryDefaultFile = 33;
+  int T_nameVocabularyFile = 33;
   /** RegularExpression Id. */
-  int T_nameVocabularyFile = 34;
+  int T_nameUselessConceptsFile = 34;
   /** RegularExpression Id. */
-  int T_nameUselessConceptsFile = 35;
+  int T_nameTxtConceptMapFile = 35;
   /** RegularExpression Id. */
-  int T_nameTxtConceptMapFile = 36;
+  int T_nameCxlConceptMapFile = 36;
   /** RegularExpression Id. */
-  int T_nameCxlConceptMapFile = 37;
+  int T_nameCompleteReportFile = 37;
   /** RegularExpression Id. */
-  int T_nameCompleteReportFile = 38;
+  int T_nameShortReportFile = 38;
   /** RegularExpression Id. */
-  int T_nameShortReportFile = 39;
+  int T_nameConsoleReportFile = 39;
   /** RegularExpression Id. */
-  int T_nameConsoleReportFile = 40;
+  int T_nameConsoleErrorFile = 40;
   /** RegularExpression Id. */
-  int T_nameConsoleErrorFile = 41;
+  int T_dirRdfsPersistenceFiles = 41;
   /** RegularExpression Id. */
-  int T_dirRdfsPersistenceFiles = 42;
+  int T_dbpediaServer = 42;
   /** RegularExpression Id. */
-  int T_dbpediaServer = 43;
+  int T_gephiVisualization = 43;
   /** RegularExpression Id. */
-  int T_gephiVisualization = 44;
+  int T_graphStreamVisualization = 44;
   /** RegularExpression Id. */
-  int T_graphStreamVisualization = 45;
+  int T_isFixBugInGephiToolKit = 45;
   /** RegularExpression Id. */
-  int T_isFixBugInGephiToolKit = 46;
+  int T_originalConceptWithGephiToolKitBug = 46;
   /** RegularExpression Id. */
-  int T_originalConceptWithGephiToolKitBug = 47;
+  int EQUALS = 47;
   /** RegularExpression Id. */
-  int EQUALS = 48;
+  int NEW_LINE = 48;
   /** RegularExpression Id. */
-  int NEW_LINE = 49;
+  int TAB = 49;
   /** RegularExpression Id. */
-  int TAB = 50;
+  int BLANK = 50;
   /** RegularExpression Id. */
-  int BLANK = 51;
+  int ARROW = 51;
   /** RegularExpression Id. */
-  int ARROW = 52;
+  int COMMON_CHARACTER = 52;
   /** RegularExpression Id. */
-  int COMMON_CHARACTER = 53;
+  int SPECIAL_CHARACTER = 53;
   /** RegularExpression Id. */
-  int SPECIAL_CHARACTER = 54;
+  int TERM = 54;
   /** RegularExpression Id. */
-  int TERM = 55;
-  /** RegularExpression Id. */
-  int SEPARATORS = 56;
+  int SEPARATORS = 55;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -135,7 +133,6 @@ public interface WraptermsConstants {
     "\"maxIteration\"",
     "\"additionNewConceptWithoutCategory\"",
     "\"kCoreFilter\"",
-    "\"iterationTriggerApplyKCoreFilterAlgorithm\"",
     "\"quantityNodesToApplyKcoreFilter\"",
     "\"nDegreeFilter\"",
     "\"iterationTriggerApplyNDegreeFilterAlgorithm\"",

@@ -1,4 +1,4 @@
-// v5.8 - fixed problems with external config file. Working!
+// v5.9 - fixed problems with groups of links em CXL file. Working!
 
 package main;
 

@@ -116,6 +116,13 @@ public class Proposition {
 			return this.sourceConcept.getLabel() + " -> " + this.link + " -> " + this.targetConcept.getLabel();
 	}
 
+	public String toStringAux() {
+		if(this.link == null)
+			return this.sourceConcept.getLabel();
+		else
+			return this.sourceConcept.getLabel() + " -> " + this.link+"("+this.getIdLinkingPhrase()+") -> " + this.targetConcept.getLabel();
+	}
+
 	public String toStringComplete() {
 		if(this.link == null)
 			return "Source: "+this.sourceConcept.getLabel();
