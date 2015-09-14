@@ -1,2 +1,1 @@
-Monkey  - (detectou parenteses como erro na query)
-Human
+

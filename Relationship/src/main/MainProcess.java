@@ -1,4 +1,4 @@
-// v5.95 - fixed problems with id link, logarithmic function and others. Working!
+// v6.0 - Working!
 
 package main;
 

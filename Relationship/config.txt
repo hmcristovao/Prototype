@@ -4,7 +4,7 @@
 //================================================================================
 	
 // Current user terms file number (ex: 00, 01, 02, ..., ##)
-numberFileUser = 27
+numberFileUser = 12
 
 // Name of file with the concepts (it is recommended an amount of 2 to 12 concepts)
 nameUserTermsFile = userterms\\terms##.txt
@@ -13,7 +13,7 @@ nameUserTermsFile = userterms\\terms##.txt
 minIterationToVerifyUniqueConnectedComponent = 4
 
 // minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
-minIterationToVerifyRelationshipBetweenOriginalConcepts = 10
+minIterationToVerifyRelationshipBetweenOriginalConcepts = 8
 
 // maximum quantity of iterations to get out of loop (good value: 50)  
 maxIteration = 50  
@@ -37,7 +37,7 @@ kCoreFilter = 2
 quantityNodesToApplyKcoreFilter = 700
 	
 // fator added in logarithmic function to calculate goal of concepts quantity in final concept to map (good value: 3)
-// function: log2(1/2*countOriginal)+factor
+// function: log2(1/countOriginal)+4+factor
 conceptsQuantityCalculationFactor = 3
 
 // top limit to range of concepts quantity (good value: 5)
@@ -113,7 +113,7 @@ graphStreamVisualization = 	false
 // to fix a bug in Gephi Tool Kit - calculate wrong the quantity of connected component
 // turn the flag to true and put the especific original concept that is getting alone
 isFixBugInGephiToolKit = false
-originalConceptWithGephiToolKitBug = Semantic Web
+originalConceptWithGephiToolKitBug = Information science
 	
 
 	
