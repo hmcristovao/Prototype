@@ -127,14 +127,14 @@ public class Proposition {
 		if(this.link == null)
 			return "Source: "+this.sourceConcept.getLabel();
 		else
-			return   "idSourceConcept: "+this.sourceConcept.getIdConcept()+
-				   "\nSourceConcept:   "+this.sourceConcept.getLabel()+
-				   "\nidSourceJoin:    "+this.idSourceJoin+
-				   "\nidLink:          "+this.idLinkingPhrase+
-				   "\nLink:            "+this.link+
-				   "\nidTargetJoin:    "+this.idTargetJoin+
-				   "\nidTargetConcept: "+this.targetConcept.getIdConcept()+
-				   "\nTargetConcept:   "+this.targetConcept.getLabel();
+			return   "idSourceConcept: "+(this.sourceConcept.getIdConcept()==null?"(null)":this.sourceConcept.getIdConcept())+
+				   "\nSourceConcept:   "+(this.sourceConcept.getLabel()==null?"(null)":this.sourceConcept.getLabel())+
+				   "\nidSourceJoin:    "+(this.idSourceJoin==null?"(null)":this.idSourceJoin)+
+				   "\nidLink:          "+(this.idLinkingPhrase==null?"(null)":this.idLinkingPhrase)+
+				   "\nLink:            "+(this.link==null?"(null)":this.link)+
+				   "\nidTargetJoin:    "+(this.idTargetJoin==null?"(null)":this.idTargetJoin)+
+				   "\nidTargetConcept: "+(this.targetConcept.getIdConcept()==null?"(null)":this.targetConcept.getIdConcept())+
+				   "\nTargetConcept:   "+(this.targetConcept.getLabel()==null?"(null)":this.targetConcept.getLabel());
 				   	}
 	
 }

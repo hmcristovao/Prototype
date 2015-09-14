@@ -232,6 +232,10 @@ public class ConceptMap {
 	// return quantity of groups (quantity of differents links)
 	private int fillLinksIdInPropositionTable() {
 		
+		// ==================================================================================
+	    //  First stage of algorithm
+		// ==================================================================================
+		
 		// structure to store the the groups with their propositions
 		Map<String,List<Proposition>> linkTable = new HashMap<String,List<Proposition>>();
 
@@ -295,6 +299,100 @@ public class ConceptMap {
 				numLinkingPhrase++;
 			}
 		}
+
+		// ==================================================================================
+	    //  Last stage of algorithm (repechage of the propositions without id link)
+		// ==================================================================================
+
+		// verify if still there are propositions without id link
+		// if yes then create a new collection and begin again this algorithm...
+		List<Proposition> propositionsLastStage = new ArrayList<Proposition>();	
+		for(int i=0; i < groupsList.size(); i++) {
+			for(int j=0; j < groupsList.get(i).size(); j++) {
+				if(groupsList.get(i).get(j).getIdLinkingPhrase() == null) {
+					propositionsLastStage.add(groupsList.get(i).get(j));
+				}
+			}
+		}
+		// if there is any propostion still without id link, starts again the algorithm...
+		if(propositionsLastStage.size() > 0) {
+			
+			// structure to store the the groups with their propositions
+			Map<String,List<Proposition>> linkTable2 = new HashMap<String,List<Proposition>>();
+
+			// create all possible groups: concept+link and link+concept
+			for(Proposition prop : propositionsLastStage) {
+				linkTable2.put(prop.getSourceConcept().getLabel()+prop.getLink(), new ArrayList<Proposition>());
+				linkTable2.put(prop.getLink()+prop.getTargetConcept().getLabel(), new ArrayList<Proposition>());
+			}
+			// fill each group with their proposition
+			List<Proposition> group2;
+			for(Proposition prop : propositionsLastStage) {
+				group2 = linkTable2.get(prop.getSourceConcept().getLabel()+prop.getLink());
+				group2.add(prop);
+				group2 = linkTable2.get(prop.getLink()+prop.getTargetConcept().getLabel());
+				group2.add(prop);
+			}
+			// copy groups to an ArrayList
+			List<ArrayList<Proposition>> groupsList2 = new ArrayList<ArrayList<Proposition>>();
+			for(String key : linkTable2.keySet()) {
+				groupsList2.add((ArrayList<Proposition>)linkTable2.get(key));
+			}
+			// verify the equals to each group
+			for(int i=0; i < groupsList2.size()-1; i++) {
+				List<ArrayList<Proposition>> equalsAuxList2 = new ArrayList<ArrayList<Proposition>>();
+				equalsAuxList2.add(groupsList2.get(i));
+				for(int j=i+1; j < groupsList2.size(); j++) {
+					// verify whether group 'i' is equal group 'j'
+					if(ConceptMap.isEqualsGroup(groupsList2.get(i),groupsList2.get(j))) {
+						equalsAuxList2.add(groupsList2.get(j));
+					}
+				}
+				// determine new id link to the equals groups (only when there are more than one)
+				if(equalsAuxList2.size() > 1) {
+					for(int k=0; k < equalsAuxList2.size(); k++) {
+						for(int l=0; l < equalsAuxList2.get(k).size(); l++) {
+							equalsAuxList2.get(k).get(l).setIdLinkingPhrase("l"+numLinkingPhrase);
+						}
+					}
+					this.links.put("l"+numLinkingPhrase, equalsAuxList2.get(0).get(0).getLink());
+					numLinkingPhrase++;
+				}
+			}
+
+			// verify if still there are groups without id link in all elements
+			// if yes then put l# in id link
+			// (could be better - links more grouped - whether the verify begin for larger groups)
+			for(int i=0; i < groupsList2.size(); i++) {
+				// verify if all propositions do not have id link 
+				boolean isExistIdLink = false;
+				for(int j=0; j < groupsList2.get(i).size(); j++) {
+					if(groupsList2.get(i).get(j).getIdLinkingPhrase() != null) {
+						isExistIdLink = true;
+					}
+				}
+				if(!isExistIdLink) {
+					for(int j=0; j < groupsList2.get(i).size(); j++) {
+						groupsList2.get(i).get(j).setIdLinkingPhrase("l"+numLinkingPhrase);
+					}
+					this.links.put("l"+numLinkingPhrase, groupsList2.get(i).get(0).getLink());				
+					numLinkingPhrase++;
+				}
+			}
+
+			// verify if still there are propositions without id link
+			// if yes then put a new l# in its link
+			for(int i=0; i < groupsList2.size(); i++) {
+				for(int j=0; j < groupsList2.get(i).size(); j++) {
+					if(groupsList2.get(i).get(j).getIdLinkingPhrase() == null) {
+						groupsList2.get(i).get(j).setIdLinkingPhrase("l"+numLinkingPhrase);
+						this.links.put("l"+numLinkingPhrase, groupsList2.get(i).get(j).getLink());				
+						numLinkingPhrase++;
+					}
+				}
+			}
+		}
+		
 		return numLinkingPhrase;
 	}
 	
@@ -408,9 +506,8 @@ public class ConceptMap {
 	
 	
 	// create attributes of CXL file from Propositions in ConceptMap (after processing of all heuristics)
-	// return quantity of joins
 	private int fillAttributesInPropositionTable() {
-		
+				
 		this.fillLinksIdInPropositionTable();
 		
 		int numConcept       = 1;  

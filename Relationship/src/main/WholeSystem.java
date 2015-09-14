@@ -38,11 +38,13 @@ public class WholeSystem {
 		return WholeSystem.quantityPathsBetweenOriginalConcetps;
 	}
 	
-	// goalConcepts = log2(1 / #original_concepts) * 2 + factor) + #original_concepts
+	// goalConcepts = log2(1 / 2 * #original_concepts) + factor) + #original_concepts
 	public static void initGoalMaxConceptsQuantity() {
 		int originalConceptsQuantity = WholeSystem.getQuantityOriginalConcepts();
-		WholeSystem.goalConceptsQuantity = (int)( ( Math.log(1.0/(double)originalConceptsQuantity)/Math.log(2.0) )
-				                           * 2.0 + WholeSystem.configTable.getDouble("conceptsQuantityCalulationFactor")) + originalConceptsQuantity;
+		WholeSystem.goalConceptsQuantity = (int)(
+				                                 (Math.log(1.0/(double)originalConceptsQuantity) / Math.log(2)) + 4 
+				                                 + WholeSystem.configTable.getDouble("conceptsQuantityCalculationFactor") + originalConceptsQuantity
+				                                );
 		WholeSystem.maxConceptsQuantity = WholeSystem.goalConceptsQuantity + WholeSystem.configTable.getInt("conceptsMinMaxRange");
 	}
 	public static void initQuantityPathsBetweenOriginalConcetps() {

@@ -37,13 +37,47 @@ public class RdfsFilesTable  implements Serializable   {
 	}
 	
 	public static String formatToConcept(String fileName) {
-		return fileName.replace(';', ':').replace('_', ' ');
+		String str = fileName.replace(';', ':').replace('_', ' ');
+		StringBuffer newStr = new StringBuffer();
+		for(int i=0; i < str.length() - 4; i++) {
+			if(str.charAt(i) == '^') {
+			   i++;
+			   newStr.append(Character.toUpperCase((str.charAt(i))));
+			}
+			else
+			{
+				newStr.append(str.charAt(i));
+			}
+		}
+		return newStr.toString();
 	}
 	public static String formatToFileName(String concept) {
-		return concept.replace(':', ';').replace(' ', '_');
+		String str = concept.replace(':', ';').replace(' ', '_');
+		StringBuffer newStr = new StringBuffer();
+		for(int i=0; i < str.length(); i++) {
+			if(str.charAt(i) >= 'A' && str.charAt(i) <= 'Z' ) {
+			   newStr.append('^');
+			   newStr.append(Character.toLowerCase((str.charAt(i))));
+			}
+			else
+			{
+				newStr.append(str.charAt(i));
+			}
+		}
+		newStr.append(".dat");
+		return newStr.toString();
 	}
 	
 	public String toString() {
+		StringBuffer out = new StringBuffer();
+		Iterator<String> i = this.table.keySet().iterator(); 
+		while(i.hasNext()) {
+		   out.append((String)i.next()); 
+		   out.append(", ");
+		}
+		return out.toString();
+	}
+	public String toStringAux() {
 		StringBuffer out = new StringBuffer();
 		Iterator<String> i = this.table.keySet().iterator(); 
 		while(i.hasNext()) {

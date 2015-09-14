@@ -196,11 +196,13 @@ public class StreamGraphData {
 		
 		// verify whether one of nodes belong to RDF is useless
 		// in this case, discard RDF
-		if(WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(subjectRDF.getShortBlankName()) ||
-		   WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(objectRDF.getShortBlankName())) {
-			countUselessRDFs.incCount();
-			return;
-		}
+		if(WholeSystem.configTable.getBoolean("isEnableUselessTable")) {
+			if(WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(subjectRDF.getShortBlankName()) ||
+					WholeSystem.getUselessConceptsTable().containsKeyAndPlusOne(objectRDF.getShortBlankName())) {
+				countUselessRDFs.incCount();
+				return;
+			}
+		}	
 		
 		Node node = null;
 		Edge edge = null;

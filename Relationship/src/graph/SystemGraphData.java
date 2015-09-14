@@ -438,7 +438,6 @@ public class SystemGraphData {
 			}
 			else {
 				count++;
-				Log.consoleln("descartado: "+WholeSystem.getListSystemGraphData().get(lastIterationWithinOfLoopWithDistanceMeasuresCalculation).getNodeData(concept.getBlankName()).toString());
 			}
 		}
 		return count;

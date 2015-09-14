@@ -38,7 +38,7 @@ TOKEN : {
 < T_nDegreeFilter: 								"nDegreeFilter" > |
 < T_iterationTriggerApplyNDegreeFilterAlgorithm:"iterationTriggerApplyNDegreeFilterAlgorithm" > |
 < T_quantityNodesToApplyNdegreeFilter: 			"quantityNodesToApplyNdegreeFilter" > |
-< T_conceptsQuantityCalulationFactor: 			"conceptsQuantityCalulationFactor" > |
+< T_conceptsQuantityCalculationFactor: 			"conceptsQuantityCalculationFactor" > |
 < T_conceptsMinMaxRange: 						"conceptsMinMaxRange" > |
 < T_proporcionBetweenness: 						"proporcionBetweenness" > |
 < T_proporcionBetweennessCloseness: 			"proporcionBetweennessCloseness" > |
@@ -69,7 +69,8 @@ TOKEN : {
 < T_gephiVisualization: 						"gephiVisualization" > |
 < T_graphStreamVisualization: 					"graphStreamVisualization" > |
 < T_isFixBugInGephiToolKit: 					"isFixBugInGephiToolKit" > |
-< T_originalConceptWithGephiToolKitBug: 		"originalConceptWithGephiToolKitBug" > 
+< T_originalConceptWithGephiToolKitBug: 		"originalConceptWithGephiToolKitBug" > |
+< T_isEnableUselessTable:						"isEnableUselessTable" > 
 }
 
 TOKEN : {
@@ -172,7 +173,7 @@ void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token token
 	tokenVar=< T_nDegreeFilter >  |
 	tokenVar=< T_iterationTriggerApplyNDegreeFilterAlgorithm >  |
 	tokenVar=< T_quantityNodesToApplyNdegreeFilter >  |
-	tokenVar=< T_conceptsQuantityCalulationFactor >  |
+	tokenVar=< T_conceptsQuantityCalculationFactor >  |
 	tokenVar=< T_conceptsMinMaxRange >  |
 	tokenVar=< T_proporcionBetweenness >  |
 	tokenVar=< T_proporcionBetweennessCloseness >  |
@@ -197,7 +198,8 @@ void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token token
 	tokenVar=< T_gephiVisualization >  |
 	tokenVar=< T_graphStreamVisualization >  |
 	tokenVar=< T_isFixBugInGephiToolKit >  |
-	tokenVar=< T_originalConceptWithGephiToolKitBug >  
+	tokenVar=< T_originalConceptWithGephiToolKitBug > |
+	tokenVar=< T_isEnableUselessTable >  
     )
     < EQUALS > tokenValue = < TERM > 
     { configTable.insert(tokenVar.image, tokenValue.image.trim()); }

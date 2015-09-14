@@ -1,3 +1,4 @@
+// optional line of comment
 Category:Year of death unknown
 Category:Missing middle or first names
 Category:Year of birth uncertain
@@ -19,6 +20,6 @@ Category:Glossaries
 Category:Indexes of topics
 Category:Container
 Category:Main topic classifications
+Category:MacArthur Fellows
 Category:Articles containing video clips
 Connectome: How the Brain's Wiring Makes Us Who We Are
-MacArthur Fellows category

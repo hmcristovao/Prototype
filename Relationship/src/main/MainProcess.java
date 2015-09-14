@@ -1,4 +1,4 @@
-// v5.9 - fixed problems with groups of links em CXL file. Working!
+// v5.95 - fixed problems with id link, logarithmic function and others. Working!
 
 package main;
 
@@ -12,13 +12,17 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
+
+import map.Proposition;
 
 import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.stream.gephi.JSONSender;
 
 import parse.*;
+import rdf.QuerySparql;
 import rdf.SetQuerySparql;
 import user.*;
 
@@ -240,10 +244,11 @@ public class MainProcess {
 		parser.parseConfigurations(WholeSystem.configTable);
 	}
 	private static void showParseConfigurationInformation() throws Exception {
-		String sameReport = "  Quantity of configuration parsed: " + WholeSystem.configTable.size() + 
+		String sameReport = "Quantity of configuration parsed: " + WholeSystem.configTable.size() + 
 				            " (file: "+Constants.nameConfigFile+")"; 
+		Log.consoleln("- Parsing configuration file "+Constants.nameConfigFile+" - "+WholeSystem.configTable.size()+" itens.");
 		Log.outFileCompleteReport(sameReport + "\n\n"+ WholeSystem.configTable.toString());
-		Log.outFileShortReport(sameReport);
+		Log.outFileShortReport(sameReport + "\n\n"+ WholeSystem.configTable.toString());
 	}
 	private static void parseTerms(Wrapterms parser) throws Exception {
 		Log.console("- Parsing user terms");
@@ -261,15 +266,17 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport + WholeSystem.getOriginalConcepts().toString());
 	}
 	private static void parseUselessConcepts(Wrapterms parser) throws Exception {
-		Log.console("- Parsing useless concepts");
-		parser = new Wrapterms(new FileInputStream(WholeSystem.configTable.getString("nameUselessConceptsFile")));
-		parser.parseUselessConcepts(WholeSystem.getUselessConceptsTable());
-		Log.consoleln(" - " + WholeSystem.getUselessConceptsTable().size() + " concepts parsed.");
-		String sameReport = "Quantity of useless concepts parsed: " + WholeSystem.getUselessConceptsTable().size() +   
-                " (file: "+WholeSystem.configTable.getString("nameUselessConceptsFile")+")\n" +
-				"\nUseless concepts parsed:\n" + WholeSystem.getUselessConceptsTable().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);
+		if(WholeSystem.configTable.getBoolean("isEnableUselessTable")) {
+			Log.console("- Parsing useless concepts");
+			parser = new Wrapterms(new FileInputStream(WholeSystem.configTable.getString("nameUselessConceptsFile")));
+			parser.parseUselessConcepts(WholeSystem.getUselessConceptsTable());
+			Log.consoleln(" - " + WholeSystem.getUselessConceptsTable().size() + " concepts parsed.");
+			String sameReport = "Quantity of useless concepts parsed: " + WholeSystem.getUselessConceptsTable().size() +   
+					" (file: "+WholeSystem.configTable.getString("nameUselessConceptsFile")+")\n" +
+					"\nUseless concepts parsed:\n" + WholeSystem.getUselessConceptsTable().toString();
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);
+		}
 	}
 	private static void parseVocabulary(Wrapterms parser) throws Exception {
 		Log.console("- Parsing vocabulary");
@@ -951,10 +958,12 @@ public class MainProcess {
 	}
 
 	private static void showUselessConceptsStatistic() throws Exception {
-		Log.consoleln("- Recording in log statistic of useless concepts.");
-		String sameReport = "Statistic of useless concepts:\n" + WholeSystem.getUselessConceptsTable().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);
+		if(WholeSystem.configTable.getBoolean("isEnableUselessTable")) {
+			Log.consoleln("- Recording in log statistic of useless concepts.");
+			String sameReport = "Statistic of useless concepts:\n" + WholeSystem.getUselessConceptsTable().toString();
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);
+		}
 	}
 	
 	private static void buildRawConceptMapFromStreamGraph()  throws Exception {
@@ -972,7 +981,7 @@ public class MainProcess {
 		WholeSystem.getConceptMap().buildGexfGraphFileFromConceptMap(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
 		String sameReport = "GEXF graph file generated: " + nameFileGexf;
-        Log.outFileCompleteReport(sameReport);
+		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
 	private static void buildTxtFileFromConceptMap() throws Exception {
@@ -984,19 +993,30 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);
 	}
 	private static void buildCxlFileFromConceptMap() throws Exception {
-		Log.console("- Building CXL final Concept Map");
-		String clxFileContent = WholeSystem.getConceptMap().buildCxlFileFromConceptMap(WholeSystem.configTable.getString("nameCxlConceptMapFile"));
-		Log.consoleln(" (generated file: " + WholeSystem.configTable.getString("nameCxlConceptMapFile") + ").");
-		String sameReport = "CXL concept map generated: " + WholeSystem.configTable.getString("nameCxlConceptMapFile");
-        Log.outFileCompleteReport(WholeSystem.getConceptMap().toStringComplete());
-        Log.outFileCompleteReport(sameReport);
-        Log.outFileCompleteReport(clxFileContent);
-		Log.outFileShortReport(sameReport);
-		
+		// if there are some alone concept, do not create CXL file
+		List<String> aloneConcepts = new ArrayList<String>();
+		for(Proposition prop : WholeSystem.getConceptMap().getPropositions()) {
+			if(prop.getTargetConcept() == null)  {
+				aloneConcepts.add(prop.getSourceConcept().getLabel());
+			}
+		}
+		if(aloneConcepts.size() > 0) {
+			String sameReport = "- File CXL did not create because there are alone concepts: "+aloneConcepts.toString();
+			Log.consoleln(sameReport);
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileShortReport(sameReport);
+		}
+		else {
+			Log.console("- Building CXL final Concept Map");
+			String clxFileContent = WholeSystem.getConceptMap().buildCxlFileFromConceptMap(WholeSystem.configTable.getString("nameCxlConceptMapFile"));
+			Log.consoleln(" (generated file: " + WholeSystem.configTable.getString("nameCxlConceptMapFile") + ").");
+			String sameReport = "CXL concept map generated: " + WholeSystem.configTable.getString("nameCxlConceptMapFile");
+			Log.outFileCompleteReport(WholeSystem.getConceptMap().toStringComplete());
+			Log.outFileCompleteReport(sameReport);
+			Log.outFileCompleteReport(clxFileContent);
+			Log.outFileShortReport(sameReport);
+		}		
 	}
-	
-
-	
 	private static void upgradeConceptMap_heuristic_01_removeLinkNumber()  throws Exception {
 		Log.console("- Upgrading the concept map with first heuristic (remove link id number)");
 		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_01_removeLinkNumber();

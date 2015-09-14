@@ -31,6 +31,7 @@ public class Concept {
 	}
 	public Concept(Token token) {
 		// it is before the first iteration
+		
 		this(Constants.originalConceptAddress+Concept.blankToUnderline(token.image), token.image, ConceptStatus.originalConcept, 0, ConceptCategory.no, 0, Constants.withoutConnectedComponent);  
 	}
 		

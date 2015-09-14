@@ -33,7 +33,7 @@ public interface WraptermsConstants {
   /** RegularExpression Id. */
   int T_quantityNodesToApplyNdegreeFilter = 14;
   /** RegularExpression Id. */
-  int T_conceptsQuantityCalulationFactor = 15;
+  int T_conceptsQuantityCalculationFactor = 15;
   /** RegularExpression Id. */
   int T_conceptsMinMaxRange = 16;
   /** RegularExpression Id. */
@@ -97,23 +97,25 @@ public interface WraptermsConstants {
   /** RegularExpression Id. */
   int T_originalConceptWithGephiToolKitBug = 46;
   /** RegularExpression Id. */
-  int EQUALS = 47;
+  int T_isEnableUselessTable = 47;
   /** RegularExpression Id. */
-  int NEW_LINE = 48;
+  int EQUALS = 48;
   /** RegularExpression Id. */
-  int TAB = 49;
+  int NEW_LINE = 49;
   /** RegularExpression Id. */
-  int BLANK = 50;
+  int TAB = 50;
   /** RegularExpression Id. */
-  int ARROW = 51;
+  int BLANK = 51;
   /** RegularExpression Id. */
-  int COMMON_CHARACTER = 52;
+  int ARROW = 52;
   /** RegularExpression Id. */
-  int SPECIAL_CHARACTER = 53;
+  int COMMON_CHARACTER = 53;
   /** RegularExpression Id. */
-  int TERM = 54;
+  int SPECIAL_CHARACTER = 54;
   /** RegularExpression Id. */
-  int SEPARATORS = 55;
+  int TERM = 55;
+  /** RegularExpression Id. */
+  int SEPARATORS = 56;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -137,7 +139,7 @@ public interface WraptermsConstants {
     "\"nDegreeFilter\"",
     "\"iterationTriggerApplyNDegreeFilterAlgorithm\"",
     "\"quantityNodesToApplyNdegreeFilter\"",
-    "\"conceptsQuantityCalulationFactor\"",
+    "\"conceptsQuantityCalculationFactor\"",
     "\"conceptsMinMaxRange\"",
     "\"proporcionBetweenness\"",
     "\"proporcionBetweennessCloseness\"",
@@ -169,6 +171,7 @@ public interface WraptermsConstants {
     "\"graphStreamVisualization\"",
     "\"isFixBugInGephiToolKit\"",
     "\"originalConceptWithGephiToolKitBug\"",
+    "\"isEnableUselessTable\"",
     "<EQUALS>",
     "<NEW_LINE>",
     "<TAB>",

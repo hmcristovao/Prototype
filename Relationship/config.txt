@@ -3,15 +3,17 @@
 // BASIC CONFIG
 //================================================================================
 	
-// Current user terms file number (ex: 00, 01, ...) and directory\name
-numberFileUser = 20
+// Current user terms file number (ex: 00, 01, 02, ..., ##)
+numberFileUser = 27
+
+// Name of file with the concepts (it is recommended an amount of 2 to 12 concepts)
 nameUserTermsFile = userterms\\terms##.txt
 
 // minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
-minIterationToVerifyUniqueConnectedComponent = 5
+minIterationToVerifyUniqueConnectedComponent = 4
 
 // minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
-minIterationToVerifyRelationshipBetweenOriginalConcepts = 8
+minIterationToVerifyRelationshipBetweenOriginalConcepts = 10
 
 // maximum quantity of iterations to get out of loop (good value: 50)  
 maxIteration = 50  
@@ -20,13 +22,13 @@ maxIteration = 50
 nDegreeFilter = 2
 
 // apply n-degree filter trigger from iteration number (good value: 2)
-iterationTriggerApplyNDegreeFilterAlgorithm = 1
+iterationTriggerApplyNDegreeFilterAlgorithm = 2
 
 // quantity of nodes to shoot n-degree filter algorithm (good value: 10000)
 quantityNodesToApplyNdegreeFilter = 10000
 
-// make the duplication of concept: from with "Category:" to without one (good value: true)
-additionNewConceptWithoutCategory = false
+// make the duplication of concept: from with "category" to without one (change to modify quantity of concepts with "category")
+additionNewConceptWithoutCategory = true
 	
 // K-core used in all system (good value: 2)
 kCoreFilter = 2
@@ -34,8 +36,9 @@ kCoreFilter = 2
 // quantity of nodes to shoot K-core n algorithm
 quantityNodesToApplyKcoreFilter = 700
 	
-// fator added in logarithmic function to calculate goal of concepts quantity in final concept to map (good value: 18)
-conceptsQuantityCalulationFactor = 10
+// fator added in logarithmic function to calculate goal of concepts quantity in final concept to map (good value: 3)
+// function: log2(1/2*countOriginal)+factor
+conceptsQuantityCalculationFactor = 3
 
 // top limit to range of concepts quantity (good value: 5)
 conceptsMinMaxRange = 5
@@ -44,6 +47,9 @@ conceptsMinMaxRange = 5
 //================================================================================
 // ADVANCED CONFIG
 //================================================================================
+
+// use of the useless table to discart terms in rdfs collect fase
+isEnableUselessTable = true
 	
 // proporcion above total original concept (used in the build betweenness+closeness sorted table) (good value: 10) 
 proporcionBetweenness = 10
@@ -107,7 +113,7 @@ graphStreamVisualization = 	false
 // to fix a bug in Gephi Tool Kit - calculate wrong the quantity of connected component
 // turn the flag to true and put the especific original concept that is getting alone
 isFixBugInGephiToolKit = false
-originalConceptWithGephiToolKitBug = Tim Berners-Lee
+originalConceptWithGephiToolKitBug = Semantic Web
 	
 
 	

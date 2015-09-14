@@ -182,11 +182,13 @@ public class SetQuerySparql {
 		}
 		// else, read it of the Internet DataBase
 		else {
-			count = readInternetDataBaseOneQuery(querySparql);
+			count = readInternetDataBaseOneQuery(querySparql);			
 			numRdfsInInternet.incCount(count);
+			
 			// and save it in file
 			String fileName = RdfsFilesTable.formatToFileName(querySparql.getConcept().getBlankName());
-			ObjectOutputStream buffer = new ObjectOutputStream(new FileOutputStream(WholeSystem.configTable.getString("dirRdfsPersistenceFiles")+"\\"+fileName));
+			ObjectOutputStream buffer = new ObjectOutputStream(
+					new FileOutputStream(WholeSystem.configTable.getString("dirRdfsPersistenceFiles")+"\\"+fileName));
 			buffer.writeObject(querySparql.getListRDF()) ; 
 			buffer.flush(); 
 			buffer.close();

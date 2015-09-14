@@ -261,7 +261,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_nDegreeFilter:
       case T_iterationTriggerApplyNDegreeFilterAlgorithm:
       case T_quantityNodesToApplyNdegreeFilter:
-      case T_conceptsQuantityCalulationFactor:
+      case T_conceptsQuantityCalculationFactor:
       case T_conceptsMinMaxRange:
       case T_proporcionBetweenness:
       case T_proporcionBetweennessCloseness:
@@ -293,6 +293,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_graphStreamVisualization:
       case T_isFixBugInGephiToolKit:
       case T_originalConceptWithGephiToolKitBug:
+      case T_isEnableUselessTable:
       case NEW_LINE:
       case TAB:
       case BLANK:
@@ -322,7 +323,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_nDegreeFilter:
       case T_iterationTriggerApplyNDegreeFilterAlgorithm:
       case T_quantityNodesToApplyNdegreeFilter:
-      case T_conceptsQuantityCalulationFactor:
+      case T_conceptsQuantityCalculationFactor:
       case T_conceptsMinMaxRange:
       case T_proporcionBetweenness:
       case T_proporcionBetweennessCloseness:
@@ -348,6 +349,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_graphStreamVisualization:
       case T_isFixBugInGephiToolKit:
       case T_originalConceptWithGephiToolKitBug:
+      case T_isEnableUselessTable:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case T_numberFileUser:
           tokenVar = jj_consume_token(T_numberFileUser);
@@ -379,8 +381,8 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
         case T_quantityNodesToApplyNdegreeFilter:
           tokenVar = jj_consume_token(T_quantityNodesToApplyNdegreeFilter);
           break;
-        case T_conceptsQuantityCalulationFactor:
-          tokenVar = jj_consume_token(T_conceptsQuantityCalulationFactor);
+        case T_conceptsQuantityCalculationFactor:
+          tokenVar = jj_consume_token(T_conceptsQuantityCalculationFactor);
           break;
         case T_conceptsMinMaxRange:
           tokenVar = jj_consume_token(T_conceptsMinMaxRange);
@@ -456,6 +458,9 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
           break;
         case T_originalConceptWithGephiToolKitBug:
           tokenVar = jj_consume_token(T_originalConceptWithGephiToolKitBug);
+          break;
+        case T_isEnableUselessTable:
+          tokenVar = jj_consume_token(T_isEnableUselessTable);
           break;
         default:
           jj_la1[14] = jj_gen;
@@ -533,7 +538,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       jj_la1_0 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfffffff0,0x7fffffd0,0x80000020,0xfffffff0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x400000,0x870000,0x870000,0x400000,0x60000,0x60000,0x60000,0x60000,0x70000,0x70000,0x400000,0x870000,0x870000,0x77fff,0x7f07,0xf8,0x77fff,};
+      jj_la1_1 = new int[] {0x800000,0x10e0000,0x10e0000,0x800000,0xc0000,0xc0000,0xc0000,0xc0000,0xe0000,0xe0000,0x800000,0x10e0000,0x10e0000,0xeffff,0xff07,0xf8,0xeffff,};
    }
 
   /** Constructor with InputStream. */
@@ -650,7 +655,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[56];
+    boolean[] la1tokens = new boolean[57];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
@@ -667,7 +672,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
         }
       }
     }
-    for (int i = 0; i < 56; i++) {
+    for (int i = 0; i < 57; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;
