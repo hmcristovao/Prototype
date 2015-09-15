@@ -30,227 +30,16 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
 */
 
 // list of user terms, separate for comma or new line 
-  final public void parseUserTerms(SetQuerySparql originalSetQuerySparql) throws ParseException {
+  final public void parseConfigurations(ConfigTable configTable) throws ParseException {
+                                                     Token tokenVar; Token tokenValue; String testName;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TERM:
-        ;
-        break;
-      default:
-        jj_la1[0] = jj_gen;
-        break label_1;
-      }
-      elementUserTerm(originalSetQuerySparql);
-    }
-    jj_consume_token(0);
-  }
-
-  final public void elementUserTerm(SetQuerySparql originalSetQuerySparql) throws ParseException {
-                                                               Token token; Concept concept;
-    token = jj_consume_token(TERM);
-                concept = new Concept(token);
-                originalSetQuerySparql.insertQuerySparql(concept);
-                // copy the concept to static attribute in root class:
-                WholeSystem.getConceptsRegister().add(concept);
-    label_2:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case NEW_LINE:
-      case TAB:
-      case BLANK:
-      case SEPARATORS:
-        ;
-        break;
-      default:
-        jj_la1[1] = jj_gen;
-        break label_2;
-      }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case SEPARATORS:
-        jj_consume_token(SEPARATORS);
-        break;
-      case BLANK:
-        jj_consume_token(BLANK);
-        break;
-      case TAB:
-        jj_consume_token(TAB);
-        break;
-      case NEW_LINE:
-        jj_consume_token(NEW_LINE);
-        break;
-      default:
-        jj_la1[2] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    }
-  }
-
-// list of sentences, each one per line 
-  final public void parseSystemVocabulary(VocabularyTable vocabularyTable) throws ParseException {
-    label_3:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TERM:
-        ;
-        break;
-      default:
-        jj_la1[3] = jj_gen;
-        break label_3;
-      }
-      line(vocabularyTable);
-    }
-    jj_consume_token(0);
-  }
-
-  final public void line(VocabularyTable vocabularyTable) throws ParseException {
-                                              Token tokenLeft; Token tokenRight;
-    tokenLeft = jj_consume_token(TERM);
-    label_4:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TAB:
-      case BLANK:
-        ;
-        break;
-      default:
-        jj_la1[4] = jj_gen;
-        break label_4;
-      }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case BLANK:
-        jj_consume_token(BLANK);
-        break;
-      case TAB:
-        jj_consume_token(TAB);
-        break;
-      default:
-        jj_la1[5] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    }
-    jj_consume_token(ARROW);
-    label_5:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TAB:
-      case BLANK:
-        ;
-        break;
-      default:
-        jj_la1[6] = jj_gen;
-        break label_5;
-      }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case BLANK:
-        jj_consume_token(BLANK);
-        break;
-      case TAB:
-        jj_consume_token(TAB);
-        break;
-      default:
-        jj_la1[7] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    }
-    tokenRight = jj_consume_token(TERM);
-                vocabularyTable.put(tokenLeft,tokenRight);
-    label_6:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case NEW_LINE:
-      case TAB:
-      case BLANK:
-        ;
-        break;
-      default:
-        jj_la1[8] = jj_gen;
-        break label_6;
-      }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case BLANK:
-        jj_consume_token(BLANK);
-        break;
-      case TAB:
-        jj_consume_token(TAB);
-        break;
-      case NEW_LINE:
-        jj_consume_token(NEW_LINE);
-        break;
-      default:
-        jj_la1[9] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    }
-  }
-
-// list of concepts, separate for comma or new line
-  final public void parseUselessConcepts(UselessConceptsTable uselessConceptsTable) throws ParseException {
-    label_7:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case TERM:
-        ;
-        break;
-      default:
-        jj_la1[10] = jj_gen;
-        break label_7;
-      }
-      elementUselessConcept(uselessConceptsTable);
-    }
-    jj_consume_token(0);
-  }
-
-  final public void elementUselessConcept(UselessConceptsTable uselessConceptsTable) throws ParseException {
-                                                                         Token token;
-    token = jj_consume_token(TERM);
-                // copy the useless concept to static attribute in root class:
-                WholeSystem.getUselessConceptsTable().insert(token.image.trim());
-    label_8:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case NEW_LINE:
-      case TAB:
-      case BLANK:
-      case SEPARATORS:
-        ;
-        break;
-      default:
-        jj_la1[11] = jj_gen;
-        break label_8;
-      }
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case SEPARATORS:
-        jj_consume_token(SEPARATORS);
-        break;
-      case BLANK:
-        jj_consume_token(BLANK);
-        break;
-      case TAB:
-        jj_consume_token(TAB);
-        break;
-      case NEW_LINE:
-        jj_consume_token(NEW_LINE);
-        break;
-      default:
-        jj_la1[12] = jj_gen;
-        jj_consume_token(-1);
-        throw new ParseException();
-      }
-    }
-  }
-
-// config file
-  final public void parseConfigurations(ConfigTable configTable) throws ParseException {
-                                                     Token tokenVar; Token tokenValue; String numberFileUser;
-    label_9:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case T_numberFileUser:
+      case T_testName:
+      case T_baseDirectory:
+      case T_dirGraph:
+      case T_dirLog:
+      case T_dirConceptMap:
       case T_nameUserTermsFile:
       case T_minIterationToVerifyUniqueConnectedComponent:
       case T_minIterationToVerifyRelationshipBetweenOriginalConcepts:
@@ -300,8 +89,8 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
         ;
         break;
       default:
-        jj_la1[13] = jj_gen;
-        break label_9;
+        jj_la1[0] = jj_gen;
+        break label_1;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case NEW_LINE:
@@ -313,7 +102,11 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case BLANK:
         jj_consume_token(BLANK);
         break;
-      case T_numberFileUser:
+      case T_testName:
+      case T_baseDirectory:
+      case T_dirGraph:
+      case T_dirLog:
+      case T_dirConceptMap:
       case T_minIterationToVerifyUniqueConnectedComponent:
       case T_minIterationToVerifyRelationshipBetweenOriginalConcepts:
       case T_maxIteration:
@@ -342,7 +135,6 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_nameQueryDefaultFile:
       case T_nameVocabularyFile:
       case T_nameUselessConceptsFile:
-      case T_nameConsoleErrorFile:
       case T_dirRdfsPersistenceFiles:
       case T_dbpediaServer:
       case T_gephiVisualization:
@@ -351,8 +143,8 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_originalConceptWithGephiToolKitBug:
       case T_isEnableUselessTable:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-        case T_numberFileUser:
-          tokenVar = jj_consume_token(T_numberFileUser);
+        case T_testName:
+          tokenVar = jj_consume_token(T_testName);
           break;
         case T_minIterationToVerifyUniqueConnectedComponent:
           tokenVar = jj_consume_token(T_minIterationToVerifyUniqueConnectedComponent);
@@ -438,9 +230,6 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
         case T_nameUselessConceptsFile:
           tokenVar = jj_consume_token(T_nameUselessConceptsFile);
           break;
-        case T_nameConsoleErrorFile:
-          tokenVar = jj_consume_token(T_nameConsoleErrorFile);
-          break;
         case T_dirRdfsPersistenceFiles:
           tokenVar = jj_consume_token(T_dirRdfsPersistenceFiles);
           break;
@@ -462,14 +251,26 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
         case T_isEnableUselessTable:
           tokenVar = jj_consume_token(T_isEnableUselessTable);
           break;
+        case T_baseDirectory:
+          tokenVar = jj_consume_token(T_baseDirectory);
+          break;
+        case T_dirGraph:
+          tokenVar = jj_consume_token(T_dirGraph);
+          break;
+        case T_dirLog:
+          tokenVar = jj_consume_token(T_dirLog);
+          break;
+        case T_dirConceptMap:
+          tokenVar = jj_consume_token(T_dirConceptMap);
+          break;
         default:
-          jj_la1[14] = jj_gen;
+          jj_la1[1] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         jj_consume_token(EQUALS);
         tokenValue = jj_consume_token(TERM);
-      configTable.insert(tokenVar.image, tokenValue.image.trim());
+      WholeSystem.configTable.insert(tokenVar.image, tokenValue.image.trim());
         break;
       case T_nameUserTermsFile:
       case T_nameGexfGraphFile:
@@ -478,6 +279,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       case T_nameCompleteReportFile:
       case T_nameShortReportFile:
       case T_nameConsoleReportFile:
+      case T_nameConsoleErrorFile:
         switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
         case T_nameUserTermsFile:
           tokenVar = jj_consume_token(T_nameUserTermsFile);
@@ -494,6 +296,9 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
         case T_nameConsoleReportFile:
           tokenVar = jj_consume_token(T_nameConsoleReportFile);
           break;
+        case T_nameConsoleErrorFile:
+          tokenVar = jj_consume_token(T_nameConsoleErrorFile);
+          break;
         case T_nameTxtConceptMapFile:
           tokenVar = jj_consume_token(T_nameTxtConceptMapFile);
           break;
@@ -501,17 +306,335 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
           tokenVar = jj_consume_token(T_nameCxlConceptMapFile);
           break;
         default:
-          jj_la1[15] = jj_gen;
+          jj_la1[2] = jj_gen;
           jj_consume_token(-1);
           throw new ParseException();
         }
         jj_consume_token(EQUALS);
         tokenValue = jj_consume_token(TERM);
-          numberFileUser = WholeSystem.configTable.getString("numberFileUser");
-      configTable.insert(tokenVar.image, tokenValue.image.trim().replace("##",numberFileUser));
+          testName = WholeSystem.configTable.getString("testName");
+      WholeSystem.configTable.insert(tokenVar.image, tokenValue.image.trim().replace("##",testName));
+        break;
+      default:
+        jj_la1[3] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+  }
+
+// user terms
+  final public void parseUserTerms(SetQuerySparql originalSetQuerySparql) throws ParseException {
+    label_2:
+    while (true) {
+      elementUserTerm(originalSetQuerySparql);
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+      case TERM:
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[4] = jj_gen;
+        break label_2;
+      }
+    }
+    jj_consume_token(0);
+  }
+
+  final public void elementUserTerm(SetQuerySparql originalSetQuerySparql) throws ParseException {
+                                                               Token token; Concept concept;
+    label_3:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[5] = jj_gen;
+        break label_3;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SEPARATORS:
+        jj_consume_token(SEPARATORS);
+        break;
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      case NEW_LINE:
+        jj_consume_token(NEW_LINE);
+        break;
+      default:
+        jj_la1[6] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    token = jj_consume_token(TERM);
+                concept = new Concept(token);
+                originalSetQuerySparql.insertQuerySparql(concept);
+                // copy the concept to static attribute in root class:
+                WholeSystem.getConceptsRegister().add(concept);
+    label_4:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[7] = jj_gen;
+        break label_4;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SEPARATORS:
+        jj_consume_token(SEPARATORS);
+        break;
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      case NEW_LINE:
+        jj_consume_token(NEW_LINE);
+        break;
+      default:
+        jj_la1[8] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+  }
+
+// list of sentences, each one per line 
+  final public void parseSystemVocabulary(VocabularyTable vocabularyTable) throws ParseException {
+    label_5:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+      case TERM:
+        ;
+        break;
+      default:
+        jj_la1[9] = jj_gen;
+        break label_5;
+      }
+      line(vocabularyTable);
+    }
+    jj_consume_token(0);
+  }
+
+  final public void line(VocabularyTable vocabularyTable) throws ParseException {
+                                              Token tokenLeft; Token tokenRight;
+    label_6:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+        ;
+        break;
+      default:
+        jj_la1[10] = jj_gen;
+        break label_6;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      case NEW_LINE:
+        jj_consume_token(NEW_LINE);
+        break;
+      default:
+        jj_la1[11] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    tokenLeft = jj_consume_token(TERM);
+    label_7:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case TAB:
+      case BLANK:
+        ;
+        break;
+      default:
+        jj_la1[12] = jj_gen;
+        break label_7;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      default:
+        jj_la1[13] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    jj_consume_token(ARROW);
+    label_8:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case TAB:
+      case BLANK:
+        ;
+        break;
+      default:
+        jj_la1[14] = jj_gen;
+        break label_8;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      default:
+        jj_la1[15] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    tokenRight = jj_consume_token(TERM);
+                vocabularyTable.put(tokenLeft,tokenRight);
+    label_9:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+        ;
         break;
       default:
         jj_la1[16] = jj_gen;
+        break label_9;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      case NEW_LINE:
+        jj_consume_token(NEW_LINE);
+        break;
+      default:
+        jj_la1[17] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+  }
+
+// list of concepts, separate for comma or new line
+  final public void parseUselessConcepts(UselessConceptsTable uselessConceptsTable) throws ParseException {
+    label_10:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+      case TERM:
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[18] = jj_gen;
+        break label_10;
+      }
+      elementUselessConcept(uselessConceptsTable);
+    }
+    jj_consume_token(0);
+  }
+
+  final public void elementUselessConcept(UselessConceptsTable uselessConceptsTable) throws ParseException {
+                                                                         Token token;
+    label_11:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[19] = jj_gen;
+        break label_11;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SEPARATORS:
+        jj_consume_token(SEPARATORS);
+        break;
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      case NEW_LINE:
+        jj_consume_token(NEW_LINE);
+        break;
+      default:
+        jj_la1[20] = jj_gen;
+        jj_consume_token(-1);
+        throw new ParseException();
+      }
+    }
+    token = jj_consume_token(TERM);
+                // copy the useless concept to static attribute in root class:
+                WholeSystem.getUselessConceptsTable().insert(token.image.trim());
+    label_12:
+    while (true) {
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case NEW_LINE:
+      case TAB:
+      case BLANK:
+      case SEPARATORS:
+        ;
+        break;
+      default:
+        jj_la1[21] = jj_gen;
+        break label_12;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case SEPARATORS:
+        jj_consume_token(SEPARATORS);
+        break;
+      case BLANK:
+        jj_consume_token(BLANK);
+        break;
+      case TAB:
+        jj_consume_token(TAB);
+        break;
+      case NEW_LINE:
+        jj_consume_token(NEW_LINE);
+        break;
+      default:
+        jj_la1[22] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
@@ -527,7 +650,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
   public Token jj_nt;
   private int jj_ntk;
   private int jj_gen;
-  final private int[] jj_la1 = new int[17];
+  final private int[] jj_la1 = new int[23];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -535,10 +658,10 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0xfffffff0,0x7fffffd0,0x80000020,0xfffffff0,};
+      jj_la1_0 = new int[] {0xfffffff0,0xfffffdf0,0x200,0xfffffff0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x800000,0x10e0000,0x10e0000,0x800000,0xc0000,0xc0000,0xc0000,0xc0000,0xe0000,0xe0000,0x800000,0x10e0000,0x10e0000,0xeffff,0xff07,0xf8,0xeffff,};
+      jj_la1_1 = new int[] {0xefffff,0xfe077,0x1f88,0xefffff,0x18e00000,0x10e00000,0x10e00000,0x10e00000,0x10e00000,0x8e00000,0xe00000,0xe00000,0xc00000,0xc00000,0xc00000,0xc00000,0xe00000,0xe00000,0x18e00000,0x10e00000,0x10e00000,0x10e00000,0x10e00000,};
    }
 
   /** Constructor with InputStream. */
@@ -552,7 +675,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 23; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -566,7 +689,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 23; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -576,7 +699,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 23; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -586,7 +709,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 23; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -595,7 +718,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 23; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -604,7 +727,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 17; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 23; i++) jj_la1[i] = -1;
   }
 
   private Token jj_consume_token(int kind) throws ParseException {
@@ -655,12 +778,12 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
   /** Generate ParseException. */
   public ParseException generateParseException() {
     jj_expentries.clear();
-    boolean[] la1tokens = new boolean[57];
+    boolean[] la1tokens = new boolean[61];
     if (jj_kind >= 0) {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 17; i++) {
+    for (int i = 0; i < 23; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {
@@ -672,7 +795,7 @@ elementUselessConcept ->  < TERM > ( < SEPARATORS > | < BLANK > | < TAB > | <  N
         }
       }
     }
-    for (int i = 0; i < 57; i++) {
+    for (int i = 0; i < 61; i++) {
       if (la1tokens[i]) {
         jj_expentry = new int[1];
         jj_expentry[0] = i;

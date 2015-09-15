@@ -11,10 +11,11 @@ public class Log {
 	public static PrintStream printStreamError;
 
 	public static void initFiles() throws Exception {
-		fileCompleteReport = new BufferedWriter(new FileWriter(WholeSystem.configTable.getString("nameCompleteReportFile")));
-		fileShortReport    = new BufferedWriter(new FileWriter(WholeSystem.configTable.getString("nameShortReportFile")));
-		fileConsoleReport  = new BufferedWriter(new FileWriter(WholeSystem.configTable.getString("nameConsoleReportFile")));
-		printStreamError   = new PrintStream(WholeSystem.configTable.getString("nameConsoleErrorFile"));
+		String baseDir = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName")+"\\";
+		fileCompleteReport = new BufferedWriter(new FileWriter(baseDir+WholeSystem.configTable.getString("nameCompleteReportFile")));
+		fileShortReport    = new BufferedWriter(new FileWriter(baseDir+WholeSystem.configTable.getString("nameShortReportFile")));
+		fileConsoleReport  = new BufferedWriter(new FileWriter(baseDir+WholeSystem.configTable.getString("nameConsoleReportFile")));
+		printStreamError   = new PrintStream(baseDir+WholeSystem.configTable.getString("nameConsoleErrorFile"));
 		System.setErr(printStreamError);
 	}
 	public static void close() throws Exception {
@@ -27,22 +28,34 @@ public class Log {
 		fileCompleteReport.write(Constants.doubleLine);
 		fileCompleteReport.write(msgSingle);
 		fileCompleteReport.write("\n");
+		fileCompleteReport.flush();
 	}
 	public static void outFileShortReport(String msgSingle) throws Exception {
 		fileShortReport.write(Constants.doubleLine);
 		fileShortReport.write(msgSingle);
 		fileShortReport.write("\n");
+		fileShortReport.flush();
 	}
 	private static void print(String str) {
 		System.out.print(str);
-		try { fileConsoleReport.write(str); }
-		catch(Exception e) {;}
+		try { 
+			fileConsoleReport.write(str); 
+			fileConsoleReport.flush();
+		}
+		catch(Exception e) {
+			System.out.println("\nERROR in write of console log file");
+		}
 	}
 	private static void println(String str) {
 		System.out.println(str);
-		try { fileConsoleReport.write(str);
-		      fileConsoleReport.write("\n"); }
-		catch(Exception e) {;}		
+		try { 
+			fileConsoleReport.write(str);
+		    fileConsoleReport.write("\n"); 
+			fileConsoleReport.flush();
+		}
+		catch(Exception e) {
+			System.out.println("\nERROR in write of console log file");
+		}		
 	}
 	public static void console(String msg, String value) {
 		Log.print(Constants.doubleLine);
@@ -91,7 +104,7 @@ public class Log {
 	}
 	public static void consoleln(double value) {
 		Log.console(value);
-		System.out.print("\n");
+		Log.print("\n");
 	}
 	public static void consoleln(String msg, double value) {
 		Log.console(msg, value);

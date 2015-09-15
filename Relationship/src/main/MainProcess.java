@@ -1,4 +1,4 @@
-// v6.0 - Working!
+// v6.1 - improvement in struture files. Working!
 
 package main;
 
@@ -7,6 +7,7 @@ import graph.QuantityNodesEdges;
 import graph.StreamGraphData.DeletedStatus;
 import graph.SystemGraphData;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -23,6 +24,7 @@ import org.graphstream.stream.gephi.JSONSender;
 
 import parse.*;
 import rdf.QuerySparql;
+import rdf.RdfsFilesTable;
 import rdf.SetQuerySparql;
 import user.*;
 
@@ -233,15 +235,32 @@ public class MainProcess {
 	
 	private static void start(Wrapterms parser) throws Exception {
 		parseConfiguration(parser);
+		buildDirectoryStrutureToOutputFiles();
 		Log.initFiles();
 		Log.consoleln("- Starting process.");
+		showBuildDirectoryStructureToOutputFilesInformation();
 		showParseConfigurationInformation();
 	}
 	
 	private static void parseConfiguration(Wrapterms parser) throws Exception {
-		System.out.print("- Starting parse of configuration file and log files.");
+		System.out.println("- Starting parse of configuration and log files.");
 		parser = new Wrapterms(new FileInputStream(Constants.nameConfigFile));
-		parser.parseConfigurations(WholeSystem.configTable);
+		parser.parseConfigurations(WholeSystem.configTable);		
+	}
+	private static void buildDirectoryStrutureToOutputFiles() throws Exception {
+		String newDirectoryStr = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName");
+		File newDirectoryFile = new File(newDirectoryStr);  
+		newDirectoryFile.mkdir();
+		WholeSystem.copyFile(WholeSystem.configTable.getString("nameUserTermsFile"), 
+				             newDirectoryStr+"\\"+WholeSystem.configTable.getString("nameUserTermsFile").replace(".txt", "_"+WholeSystem.configTable.getString("testName")+".txt"));
+		WholeSystem.copyFile("config.txt", 
+	                         newDirectoryStr+"\\config_"+WholeSystem.configTable.getString("testName")+".txt");
+	}
+	private static void showBuildDirectoryStructureToOutputFilesInformation() throws Exception {
+		String sameReport = "directory structure to output files in "+WholeSystem.configTable.getString("baseDirectory");
+		Log.consoleln("- Building "+sameReport);
+		Log.outFileCompleteReport("Built "+sameReport);
+		Log.outFileShortReport("Built "+sameReport);
 	}
 	private static void showParseConfigurationInformation() throws Exception {
 		String sameReport = "Quantity of configuration parsed: " + WholeSystem.configTable.size() + 
@@ -680,15 +699,16 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);
 	}
 	private static void buildGexfGraphFile(Time time) throws Exception {
-		String nameFileGexf = null;
+		String nameFileGexf = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName")+"\\"+
+				              WholeSystem.configTable.getString("nameGexfGraphFile");
 		if(time == Time.t1_whileIteration) 
-			nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile").replace(".gexf", "_t1_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf");
+			nameFileGexf = nameFileGexf.replace(".gexf", "_t1_iteration" + (iteration<=9?"0"+iteration:iteration) + ".gexf");
 		else if(time == Time.t2_afterIterationAndKcore)
-	   		nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile").replace(".gexf", "_t2_after_iterations_and_kcore.gexf");
+	   		nameFileGexf = nameFileGexf.replace(".gexf", "_t2_after_iterations_and_kcore.gexf");
 		else if(time == Time.t3_afterHeadNodesPaths)
-	   		nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile").replace(".gexf", "_t3_after_head_nodes_path.gexf");
+	   		nameFileGexf = nameFileGexf.replace(".gexf", "_t3_after_head_nodes_path.gexf");
 		else if(time == Time.t4_afterSteadyUniqueConnected)
-			nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile").replace(".gexf", "_t4_after_steady_unique_connected.gexf");	
+			nameFileGexf = nameFileGexf.replace(".gexf", "_t4_after_steady_unique_connected.gexf");	
 		Log.console("- Building GEXF Graph File");
 		currentSystemGraphData.getGephiGraphData().buildGexfGraphFile(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
@@ -976,7 +996,8 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);		
 	}
 	private static void buildGexfGraphFileFromConceptMap() throws Exception {
-		String nameFileGexf = WholeSystem.configTable.getString("nameGexfGraphFile").replace(".gexf", "_t5_concept_map.gexf");
+		String nameFileGexf = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName")+"\\"+
+	                          WholeSystem.configTable.getString("nameGexfGraphFile").replace(".gexf", "_t5_concept_map.gexf");
 		Log.console("- Building GEXF Graph File from final concept map");
 		WholeSystem.getConceptMap().buildGexfGraphFileFromConceptMap(nameFileGexf);
 		Log.consoleln(" (generated file: " + nameFileGexf + ").");
@@ -986,9 +1007,11 @@ public class MainProcess {
 	}
 	private static void buildTxtFileFromConceptMap() throws Exception {
 		Log.console("- Building TXT final Concept Map");
-		WholeSystem.getConceptMap().buildTxtFileFromConceptMap(WholeSystem.configTable.getString("nameTxtConceptMapFile"));
-		Log.consoleln(" (generated file: " + WholeSystem.configTable.getString("nameTxtConceptMapFile") + ").");
-		String sameReport = "TXT concept map generated: " + WholeSystem.configTable.getString("nameTxtConceptMapFile");
+		String fileName = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName")+"\\"+
+				          WholeSystem.configTable.getString("nameTxtConceptMapFile");
+		WholeSystem.getConceptMap().buildTxtFileFromConceptMap(fileName);
+		Log.consoleln(" (generated file: " + fileName + ").");
+		String sameReport = "TXT concept map generated: " + fileName;
         Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
 	}
@@ -1008,9 +1031,11 @@ public class MainProcess {
 		}
 		else {
 			Log.console("- Building CXL final Concept Map");
-			String clxFileContent = WholeSystem.getConceptMap().buildCxlFileFromConceptMap(WholeSystem.configTable.getString("nameCxlConceptMapFile"));
-			Log.consoleln(" (generated file: " + WholeSystem.configTable.getString("nameCxlConceptMapFile") + ").");
-			String sameReport = "CXL concept map generated: " + WholeSystem.configTable.getString("nameCxlConceptMapFile");
+			String fileName = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName")+"\\"+
+			          WholeSystem.configTable.getString("nameCxlConceptMapFile");
+			String clxFileContent = WholeSystem.getConceptMap().buildCxlFileFromConceptMap(fileName);
+			Log.consoleln(" (generated file: " + fileName + ").");
+			String sameReport = "CXL concept map generated: " + fileName;
 			Log.outFileCompleteReport(WholeSystem.getConceptMap().toStringComplete());
 			Log.outFileCompleteReport(sameReport);
 			Log.outFileCompleteReport(clxFileContent);

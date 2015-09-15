@@ -11,111 +11,119 @@ public interface WraptermsConstants {
   /** End of File. */
   int EOF = 0;
   /** RegularExpression Id. */
-  int T_numberFileUser = 4;
+  int T_testName = 4;
   /** RegularExpression Id. */
-  int T_nameUserTermsFile = 5;
+  int T_baseDirectory = 5;
   /** RegularExpression Id. */
-  int T_minIterationToVerifyUniqueConnectedComponent = 6;
+  int T_dirGraph = 6;
   /** RegularExpression Id. */
-  int T_minIterationToVerifyRelationshipBetweenOriginalConcepts = 7;
+  int T_dirLog = 7;
   /** RegularExpression Id. */
-  int T_maxIteration = 8;
+  int T_dirConceptMap = 8;
   /** RegularExpression Id. */
-  int T_additionNewConceptWithoutCategory = 9;
+  int T_nameUserTermsFile = 9;
   /** RegularExpression Id. */
-  int T_kCoreFilter = 10;
+  int T_minIterationToVerifyUniqueConnectedComponent = 10;
   /** RegularExpression Id. */
-  int T_quantityNodesToApplyKcoreFilter = 11;
+  int T_minIterationToVerifyRelationshipBetweenOriginalConcepts = 11;
   /** RegularExpression Id. */
-  int T_nDegreeFilter = 12;
+  int T_maxIteration = 12;
   /** RegularExpression Id. */
-  int T_iterationTriggerApplyNDegreeFilterAlgorithm = 13;
+  int T_additionNewConceptWithoutCategory = 13;
   /** RegularExpression Id. */
-  int T_quantityNodesToApplyNdegreeFilter = 14;
+  int T_kCoreFilter = 14;
   /** RegularExpression Id. */
-  int T_conceptsQuantityCalculationFactor = 15;
+  int T_quantityNodesToApplyKcoreFilter = 15;
   /** RegularExpression Id. */
-  int T_conceptsMinMaxRange = 16;
+  int T_nDegreeFilter = 16;
   /** RegularExpression Id. */
-  int T_proporcionBetweenness = 17;
+  int T_iterationTriggerApplyNDegreeFilterAlgorithm = 17;
   /** RegularExpression Id. */
-  int T_proporcionBetweennessCloseness = 18;
+  int T_quantityNodesToApplyNdegreeFilter = 18;
   /** RegularExpression Id. */
-  int T_precisionBetweennessCloseness = 19;
+  int T_conceptsQuantityCalculationFactor = 19;
   /** RegularExpression Id. */
-  int T_maxBetweennessCloseness = 20;
+  int T_conceptsMinMaxRange = 20;
   /** RegularExpression Id. */
-  int T_proporcionEigenvector = 21;
+  int T_proporcionBetweenness = 21;
   /** RegularExpression Id. */
-  int T_precisionEigenvector = 22;
+  int T_proporcionBetweennessCloseness = 22;
   /** RegularExpression Id. */
-  int T_maxEigenvector = 23;
+  int T_precisionBetweennessCloseness = 23;
   /** RegularExpression Id. */
-  int T_isBetweennessCloseness = 24;
+  int T_maxBetweennessCloseness = 24;
   /** RegularExpression Id. */
-  int T_isEigenvector = 25;
+  int T_proporcionEigenvector = 25;
   /** RegularExpression Id. */
-  int T_isSelected = 26;
+  int T_precisionEigenvector = 26;
   /** RegularExpression Id. */
-  int T_isKeepNeighborsOfOriginalConcepts = 27;
+  int T_maxEigenvector = 27;
   /** RegularExpression Id. */
-  int T_quantityNodesShortReport = 28;
+  int T_isBetweennessCloseness = 28;
   /** RegularExpression Id. */
-  int T_backGroundcolorOriginalConcept = 29;
+  int T_isEigenvector = 29;
   /** RegularExpression Id. */
-  int T_borderThicknessConceptWithHint = 30;
+  int T_isSelected = 30;
   /** RegularExpression Id. */
-  int T_nameGexfGraphFile = 31;
+  int T_isKeepNeighborsOfOriginalConcepts = 31;
   /** RegularExpression Id. */
-  int T_nameQueryDefaultFile = 32;
+  int T_quantityNodesShortReport = 32;
   /** RegularExpression Id. */
-  int T_nameVocabularyFile = 33;
+  int T_backGroundcolorOriginalConcept = 33;
   /** RegularExpression Id. */
-  int T_nameUselessConceptsFile = 34;
+  int T_borderThicknessConceptWithHint = 34;
   /** RegularExpression Id. */
-  int T_nameTxtConceptMapFile = 35;
+  int T_nameGexfGraphFile = 35;
   /** RegularExpression Id. */
-  int T_nameCxlConceptMapFile = 36;
+  int T_nameQueryDefaultFile = 36;
   /** RegularExpression Id. */
-  int T_nameCompleteReportFile = 37;
+  int T_nameVocabularyFile = 37;
   /** RegularExpression Id. */
-  int T_nameShortReportFile = 38;
+  int T_nameUselessConceptsFile = 38;
   /** RegularExpression Id. */
-  int T_nameConsoleReportFile = 39;
+  int T_nameTxtConceptMapFile = 39;
   /** RegularExpression Id. */
-  int T_nameConsoleErrorFile = 40;
+  int T_nameCxlConceptMapFile = 40;
   /** RegularExpression Id. */
-  int T_dirRdfsPersistenceFiles = 41;
+  int T_nameCompleteReportFile = 41;
   /** RegularExpression Id. */
-  int T_dbpediaServer = 42;
+  int T_nameShortReportFile = 42;
   /** RegularExpression Id. */
-  int T_gephiVisualization = 43;
+  int T_nameConsoleReportFile = 43;
   /** RegularExpression Id. */
-  int T_graphStreamVisualization = 44;
+  int T_nameConsoleErrorFile = 44;
   /** RegularExpression Id. */
-  int T_isFixBugInGephiToolKit = 45;
+  int T_dirRdfsPersistenceFiles = 45;
   /** RegularExpression Id. */
-  int T_originalConceptWithGephiToolKitBug = 46;
+  int T_dbpediaServer = 46;
   /** RegularExpression Id. */
-  int T_isEnableUselessTable = 47;
+  int T_gephiVisualization = 47;
   /** RegularExpression Id. */
-  int EQUALS = 48;
+  int T_graphStreamVisualization = 48;
   /** RegularExpression Id. */
-  int NEW_LINE = 49;
+  int T_isFixBugInGephiToolKit = 49;
   /** RegularExpression Id. */
-  int TAB = 50;
+  int T_originalConceptWithGephiToolKitBug = 50;
   /** RegularExpression Id. */
-  int BLANK = 51;
+  int T_isEnableUselessTable = 51;
   /** RegularExpression Id. */
-  int ARROW = 52;
+  int EQUALS = 52;
   /** RegularExpression Id. */
-  int COMMON_CHARACTER = 53;
+  int NEW_LINE = 53;
   /** RegularExpression Id. */
-  int SPECIAL_CHARACTER = 54;
+  int TAB = 54;
   /** RegularExpression Id. */
-  int TERM = 55;
+  int BLANK = 55;
   /** RegularExpression Id. */
-  int SEPARATORS = 56;
+  int ARROW = 56;
+  /** RegularExpression Id. */
+  int COMMON_CHARACTER = 57;
+  /** RegularExpression Id. */
+  int SPECIAL_CHARACTER = 58;
+  /** RegularExpression Id. */
+  int TERM = 59;
+  /** RegularExpression Id. */
+  int SEPARATORS = 60;
 
   /** Lexical state. */
   int DEFAULT = 0;
@@ -128,7 +136,11 @@ public interface WraptermsConstants {
     "\"//\"",
     "\"\\n\"",
     "<token of kind 3>",
-    "\"numberFileUser\"",
+    "\"testName\"",
+    "\"baseDirectory\"",
+    "\"dirGraph\"",
+    "\"dirLog\"",
+    "\"dirConceptMap\"",
     "\"nameUserTermsFile\"",
     "\"minIterationToVerifyUniqueConnectedComponent\"",
     "\"minIterationToVerifyRelationshipBetweenOriginalConcepts\"",

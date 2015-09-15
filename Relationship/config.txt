@@ -3,11 +3,11 @@
 // BASIC CONFIG
 //================================================================================
 	
-// Current user terms file number (ex: 00, 01, 02, ..., ##)
-numberFileUser = 12
+// Current test name 
+testName = mais um teste
 
-// Name of file with the concepts (it is recommended an amount of 2 to 12 concepts)
-nameUserTermsFile = userterms\\terms##.txt
+// Base directory to creation of output files: absolut path 'C:\\path\\results' or relative path 'path\\results' or current path '.'
+baseDirectory = C:\\Users\\Henrique\\Documents\\tests
 
 // minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
 minIterationToVerifyUniqueConnectedComponent = 4
@@ -47,6 +47,9 @@ conceptsMinMaxRange = 5
 //================================================================================
 // ADVANCED CONFIG
 //================================================================================
+
+// Name of file with the concepts (it is recommended an amount of 2 to 12 concepts)
+nameUserTermsFile = terms.txt
 
 // use of the useless table to discart terms in rdfs collect fase
 isEnableUselessTable = true
@@ -88,18 +91,23 @@ backGroundcolorOriginalConcept = 200.200.200.255
 // thickness of concepts with hint (good value: 2)
 borderThicknessConceptWithHint = 2
 
-// Directories and names of files
+// Names of files  (## = will be change to testName)
 nameQueryDefaultFile    = query_model\\query.txt
 nameVocabularyFile      = vocabulary\\linkvocabulary.txt
 nameUselessConceptsFile = vocabulary\\uselessconcepts.txt
-nameTxtConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap##.txt
-nameCxlConceptMapFile   = C:\\Users\\Henrique\\Documents\\conceptmap##.cxl
-nameGexfGraphFile       = C:\\Users\\Henrique\\Documents\\networks\\graph##.gexf
-nameCompleteReportFile  = C:\\Users\\Henrique\\Documents\\log\\complete_report_##.txt
-nameShortReportFile     = C:\\Users\\Henrique\\Documents\\log\\short_report_##.txt
-nameConsoleReportFile   = C:\\Users\\Henrique\\Documents\\log\\console_report_##.txt
-nameConsoleErrorFile    = C:\\Users\\Henrique\\Documents\\log\\consoleErr.txt
+nameTxtConceptMapFile   = conceptmap_##.txt
+nameCxlConceptMapFile   = conceptmap_##.cxl
+nameGexfGraphFile       = graph_##.gexf
+nameCompleteReportFile  = complete_report_##.txt
+nameShortReportFile     = short_report_##.txt
+nameConsoleReportFile   = console_report_##.txt
+nameConsoleErrorFile    = consoleErr_##.txt
+
+// Names of directories
 dirRdfsPersistenceFiles = persistenceRdfs
+dirGraph                = graph
+dirLog					= log
+dirConceptMap           = conceptMap    	
     	
 // DBPEDIA server (good value: http://dbpedia.org/sparql) (alternative good value: http://lod.openlinksw.com/sparql/)
 dbpediaServer = http://dbpedia.org/sparql

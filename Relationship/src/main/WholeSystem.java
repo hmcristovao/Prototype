@@ -6,6 +6,11 @@ import user.Concept;
 import user.ConceptsGroup;
 import map.*;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.LinkedList;
 
 public class WholeSystem {
@@ -121,4 +126,17 @@ public class WholeSystem {
 	public static void insertListSystemGraphData(SystemGraphData systemGraphData) {
 		WholeSystem.listSystemGraphData.add(systemGraphData);
 	}
+	
+	public static void copyFile(String sourceFile, String targetFile) throws Exception {
+		InputStream in = new FileInputStream(new File(sourceFile));
+		OutputStream out = new FileOutputStream(new File(targetFile));           
+		byte[] buffer = new byte[1024];
+		int lenght;
+		while ((lenght= in.read(buffer)) > 0) {
+			out.write(buffer, 0, lenght);
+		}
+		in.close();
+		out.close();
+    }
+	 
 }

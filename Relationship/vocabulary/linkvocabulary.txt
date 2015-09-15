@@ -1,3 +1,5 @@
+// optional line of comment
+
 schoolTradition -> has school tradition
 shortDescription -> has short description
 influenced -> influenced
@@ -35,6 +37,7 @@ south -> is in the south
 north -> is in the north
 west -> is in the west
 east -> is in the east
+
 subdivisionType -> is a subdivision of
 doctoralAdvisor -> had as doctoral advisor
 doctoralStudents -> was doctoral student of
