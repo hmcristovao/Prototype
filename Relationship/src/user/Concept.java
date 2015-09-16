@@ -1,6 +1,6 @@
 package user;
 
-import parse.Token;
+import parsersystem.Token;
 import main.*;
 
 public class Concept {

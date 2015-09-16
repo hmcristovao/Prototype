@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import parse.Token;
+import parsersystem.Token;
 
 // it mainly has been used in StreamGraph.insertRDF_withinTheStreamGraph
 

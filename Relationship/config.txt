@@ -4,7 +4,7 @@
 //================================================================================
 	
 // Current test name 
-testName = mais um teste
+testName = only_names1
 
 // Base directory to creation of output files: absolut path 'C:\\path\\results' or relative path 'path\\results' or current path '.'
 baseDirectory = C:\\Users\\Henrique\\Documents\\tests

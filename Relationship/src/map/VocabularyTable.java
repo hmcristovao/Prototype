@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import parse.Token;
+import parsersystem.Token;
 
 public class VocabularyTable {
 	Map<String,String> table;

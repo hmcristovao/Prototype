@@ -1,11 +1,11 @@
-/*  Wrapterms.jj  -  Process some parsers in system */ 
+/*  Parser.jj  -  Process the parsers of the system */ 
 options {
   DEBUG_PARSER = false;
   DEBUG_TOKEN_MANAGER = false;
   STATIC = false;
 }
-PARSER_BEGIN(Wrapterms)
-package parse;
+PARSER_BEGIN(Parser)
+package parsersystem;
 
 import java.io.*;
 import main.*;
@@ -14,13 +14,13 @@ import rdf.*;
 import map.*;
 import graph.*;
 
-public class Wrapterms {
+public class Parser {
    public static void main(String args[])  throws Exception {
-      Wrapterms firstParser = null;
+      Parser firstParser = null;
 	  MainProcess.body(firstParser);
    }
 }
-PARSER_END(Wrapterms)
+PARSER_END(Parser)
 
 SKIP : { "//" : comentario_final }
 <comentario_final>

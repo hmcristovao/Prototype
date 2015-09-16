@@ -8,7 +8,7 @@ import java.util.Map;
 
 import main.Constants;
 import main.WholeSystem;
-import parse.Token;
+import parsersystem.Token;
 
 public class RdfsFilesTable  implements Serializable   {
 	Map<String, String> table; // concept, fileName (change : to ;)

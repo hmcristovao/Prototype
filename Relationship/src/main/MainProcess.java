@@ -1,4 +1,4 @@
-// v6.1 - improvement in struture files. Working!
+// v6.2 - rename parser. Working!
 
 package main;
 
@@ -13,7 +13,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import map.Proposition;
@@ -22,9 +21,7 @@ import org.graphstream.graph.Edge;
 import org.graphstream.graph.Node;
 import org.graphstream.stream.gephi.JSONSender;
 
-import parse.*;
-import rdf.QuerySparql;
-import rdf.RdfsFilesTable;
+import parsersystem.*;
 import rdf.SetQuerySparql;
 import user.*;
 
@@ -40,14 +37,17 @@ public class MainProcess {
 	
 	private enum Time {t1_whileIteration, t2_afterIterationAndKcore, t3_afterHeadNodesPaths, t4_afterSteadyUniqueConnected, t5_finalGraph };
 	
-	public static void body(Wrapterms parser) throws Exception {
+	public static void body(Parser parser) throws Exception {
 		try {
+			// ***** Initial Stage *****
 			iteration = 0;
 			start(parser);
 			parseTerms(parser);
 			parseUselessConcepts(parser);
 			parseVocabulary(parser);
 			readRdfsFileNameToRdfsFileTable();
+
+			// ***** Iterations Stage *****
 			do {
 				indicateIterationNumber();
 				updateCurrentSetQuerySparqlVar();
@@ -61,7 +61,7 @@ public class MainProcess {
 				if(iteration >= 1) 
 					copyAllObjectsLastIteration();
 				if(isApplyNDegreeFilterTrigger())
- 				   applyNDegreeFilterTrigger(WholeSystem.configTable.getInt("nDegreeFilter"), false);
+ 				    applyNDegreeFilterTrigger(WholeSystem.configTable.getInt("nDegreeFilter"), false);
 				buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 				clearStreamGraphSink();
 				classifyConnectedComponent();
@@ -86,6 +86,8 @@ public class MainProcess {
 				prepareDataToNewIteration();
 				iteration++;
 			} while(true);
+			
+			// ***** Internediate Stage 1 *****
 			int lastIterationWithinOfLoopWithDistanceMeasuresCalculation = iteration-1;
 			// only entry in this stage if connected component = 1
 			indicateAlgorithmIntermediateStage1(); // apply k-core
@@ -99,6 +101,7 @@ public class MainProcess {
 				buildGexfGraphFile(Time.t2_afterIterationAndKcore);
 			}
 			
+			// ***** Internediate Stage 2 *****
 			indicateAlgorithmIntermediateStage2(); // build finalHeadNodes to calculate paths to final stage
 			buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts(lastIterationWithinOfLoopWithDistanceMeasuresCalculation);
 			filterStreamGraphWithNodesAndEdgesBelongToShortestPathsOfFinalHeadNodes();
@@ -107,7 +110,8 @@ public class MainProcess {
 			buildGephiGraphData_NodesTableHash_NodesTableArray_fromStreamGraph();
 			classifyConnectedComponent();
  			buildGexfGraphFile(Time.t3_afterHeadNodesPaths);
-
+ 			
+			// ***** Internediate Stage 3 *****
 			indicateAlgorithmIntermediateStage3(); // remove nodes steadying connected component == 1
 			iteration++;
 			createCurrentSystemGraphData();
@@ -185,6 +189,8 @@ public class MainProcess {
 			// reportAfterSelectionMainConcepts_selectedConcepts();
 			reportAfterSelectionMainConcepts_remainingConcepts();
 
+			
+			// ***** Final Stage *****
             indicateAlgorithmFinalStage(); // building concept map
             // create the last GEXF file that represent the graph
             buildGexfGraphFile(Time.t4_afterSteadyUniqueConnected);
@@ -204,6 +210,8 @@ public class MainProcess {
 			
 			end();
 		}
+		
+		// ***** Error treatment *****
 		catch(FileNotFoundException e) {
 			System.err.println("Error: file not found.");
 			e.printStackTrace();
@@ -233,7 +241,11 @@ public class MainProcess {
 		Log.close();
 	}
 	
-	private static void start(Wrapterms parser) throws Exception {
+	
+	
+	
+	// ***** Static methods to macro support *****
+	private static void start(Parser parser) throws Exception {
 		parseConfiguration(parser);
 		buildDirectoryStrutureToOutputFiles();
 		Log.initFiles();
@@ -242,9 +254,9 @@ public class MainProcess {
 		showParseConfigurationInformation();
 	}
 	
-	private static void parseConfiguration(Wrapterms parser) throws Exception {
+	private static void parseConfiguration(Parser parser) throws Exception {
 		System.out.println("- Starting parse of configuration and log files.");
-		parser = new Wrapterms(new FileInputStream(Constants.nameConfigFile));
+		parser = new Parser(new FileInputStream(Constants.nameConfigFile));
 		parser.parseConfigurations(WholeSystem.configTable);		
 	}
 	private static void buildDirectoryStrutureToOutputFiles() throws Exception {
@@ -269,9 +281,9 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport + "\n\n"+ WholeSystem.configTable.toString());
 		Log.outFileShortReport(sameReport + "\n\n"+ WholeSystem.configTable.toString());
 	}
-	private static void parseTerms(Wrapterms parser) throws Exception {
+	private static void parseTerms(Parser parser) throws Exception {
 		Log.console("- Parsing user terms");
-		parser = new Wrapterms(new FileInputStream(WholeSystem.configTable.getString("nameUserTermsFile")));
+		parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameUserTermsFile")));
 		WholeSystem.insertListSetQuerySparql(new SetQuerySparql());
 		parser.parseUserTerms(WholeSystem.getListSetQuerySparql().getFirst());
 		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
@@ -284,10 +296,10 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport + WholeSystem.getOriginalConcepts().toStringLong());
 		Log.outFileShortReport(sameReport + WholeSystem.getOriginalConcepts().toString());
 	}
-	private static void parseUselessConcepts(Wrapterms parser) throws Exception {
+	private static void parseUselessConcepts(Parser parser) throws Exception {
 		if(WholeSystem.configTable.getBoolean("isEnableUselessTable")) {
 			Log.console("- Parsing useless concepts");
-			parser = new Wrapterms(new FileInputStream(WholeSystem.configTable.getString("nameUselessConceptsFile")));
+			parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameUselessConceptsFile")));
 			parser.parseUselessConcepts(WholeSystem.getUselessConceptsTable());
 			Log.consoleln(" - " + WholeSystem.getUselessConceptsTable().size() + " concepts parsed.");
 			String sameReport = "Quantity of useless concepts parsed: " + WholeSystem.getUselessConceptsTable().size() +   
@@ -297,9 +309,9 @@ public class MainProcess {
 			Log.outFileShortReport(sameReport);
 		}
 	}
-	private static void parseVocabulary(Wrapterms parser) throws Exception {
+	private static void parseVocabulary(Parser parser) throws Exception {
 		Log.console("- Parsing vocabulary");
-		parser = new Wrapterms(new FileInputStream(WholeSystem.configTable.getString("nameVocabularyFile")));
+		parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameVocabularyFile")));
 		parser.parseSystemVocabulary(WholeSystem.getVocabularyTable());
 		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " sentences parsed.");
 		String sameReport = "Quantity of vocabulary sentences parsed: " + WholeSystem.getVocabularyTable().size() +   
