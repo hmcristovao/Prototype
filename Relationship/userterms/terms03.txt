@@ -1,6 +1,0 @@
-Semantic Web,
-Linked open data,
-Network science,
-Social network analysis,
-Complex network,
-Concept map

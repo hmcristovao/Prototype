@@ -411,14 +411,23 @@ public class SystemGraphData {
 		// build finalHeadNodes: contains the head nodes to build the paths to final stage
 		int maximumHeadNodes = WholeSystem.getQuantityOriginalConcepts();
 		ConceptsGroup selectedConcepts = null;
-		if(WholeSystem.configTable.getBoolean("isSelected"))
+		int countOptions=0;
+		if(WholeSystem.configTable.getBoolean("isSelected")) {
 			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedConcepts();
-		if(WholeSystem.configTable.getBoolean("isBetweennessCloseness"))
+			countOptions++;
+		}
+		if(WholeSystem.configTable.getBoolean("isBetweennessCloseness")) {
 			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedBetweennessClosenessConcepts();
-		else if(WholeSystem.configTable.getBoolean("isEigenvector"))
+			countOptions++;
+		}
+		if(WholeSystem.configTable.getBoolean("isEigenvector")) {
 			selectedConcepts = WholeSystem.getConceptsRegister().getSelectedEigenvectorConcepts();
-		else
-			System.err.println("\none of the config variables must be true: isSelected, isBetweennessCloseness, isEigenvector");
+			countOptions++;
+		}
+		if(countOptions != 1) {
+			System.err.println("\nExactly one config variable must be true: isSelected, isBetweennessCloseness or isEigenvector.");
+			System.exit(1);
+		}
 		maximumHeadNodes += selectedConcepts.size();
 		WholeSystem.setFinalHeadNodes(new NodesTableArray(maximumHeadNodes));
 		// insert original concepts in finalHeadNodes
@@ -432,13 +441,17 @@ public class SystemGraphData {
 		for(int i=0; i<selectedConcepts.size(); i++) {
 			Concept concept = selectedConcepts.getConcept(i);
 			NodeData nodeData = this.getNodeData(concept.getBlankName());
+			
 			// do not permit nodes with betweenness == 0, in last iteration
-			if(WholeSystem.getListSystemGraphData().get(lastIterationWithinOfLoopWithDistanceMeasuresCalculation).getNodeData(concept.getBlankName()).getBetweenness() > 0) {
-				WholeSystem.getFinalHeadNodes().insert(nodeData);
+			if(WholeSystem.getListSystemGraphData().get(lastIterationWithinOfLoopWithDistanceMeasuresCalculation).getNodeData(concept.getBlankName()) != null) {
+			    if(WholeSystem.getListSystemGraphData().get(lastIterationWithinOfLoopWithDistanceMeasuresCalculation).getNodeData(concept.getBlankName()).getBetweenness() > 0) {
+	  			   WholeSystem.getFinalHeadNodes().insert(nodeData);
+			    }
 			}
 			else {
 				count++;
 			}
+			
 		}
 		return count;
 	}

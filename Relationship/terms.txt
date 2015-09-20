@@ -1,13 +1,38 @@
-// comment line
+Educational software
+Jean Piaget
+Seymour Papert
 
-//Distance education
-//Massive open online course
+
+//Lev Vygotsky
 //Virtual learning environment
-//Concept map
+
+
 //Meaningful learning
 //David Ausubel
 
-Jean Piaget
-John Dewey
-David Ausubel
-Lev Vygotsky
+//Concept map
+//David Ausubel
+//John Dewey
+
+//Socrates
+
+//
+//David Ausubel
+//Lev Vygotsky
+
+//Semantic Web
+//Linked open data
+//Network science
+//Social network analysis
+//Complex network
+//Concept map
+
+//Socrates
+
+
+//Wine
+//Grape
+//United States
+//Brazil
+//International trade
+

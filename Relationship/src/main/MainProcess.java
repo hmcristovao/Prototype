@@ -1,4 +1,4 @@
-// v6.2 - rename parser. Working!
+// v6.3 - fix small bug. Working!
 
 package main;
 
@@ -263,10 +263,15 @@ public class MainProcess {
 		String newDirectoryStr = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName");
 		File newDirectoryFile = new File(newDirectoryStr);  
 		newDirectoryFile.mkdir();
+		// copy files of current configuration
 		WholeSystem.copyFile(WholeSystem.configTable.getString("nameUserTermsFile"), 
 				             newDirectoryStr+"\\"+WholeSystem.configTable.getString("nameUserTermsFile").replace(".txt", "_"+WholeSystem.configTable.getString("testName")+".txt"));
 		WholeSystem.copyFile("config.txt", 
 	                         newDirectoryStr+"\\config_"+WholeSystem.configTable.getString("testName")+".txt");
+		WholeSystem.copyFile(WholeSystem.configTable.getString("nameUselessConceptsFile"), 
+	                         newDirectoryStr+"\\uselessconcepts_"+WholeSystem.configTable.getString("testName")+".txt");
+		WholeSystem.copyFile(WholeSystem.configTable.getString("nameQueryDefaultFile"), 
+                             newDirectoryStr+"\\query_"+WholeSystem.configTable.getString("testName")+".txt");
 	}
 	private static void showBuildDirectoryStructureToOutputFilesInformation() throws Exception {
 		String sameReport = "directory structure to output files in "+WholeSystem.configTable.getString("baseDirectory");
@@ -471,7 +476,7 @@ public class MainProcess {
 	}
 	private static boolean isApplyNDegreeFilterTrigger() throws Exception {
 		Log.console("- Verifying whether apply N-degree filter: ");
-		String sameReport = "iteration ("+iteration+" > "+WholeSystem.configTable.getInt("iterationTriggerApplyNDegreeFilterAlgorithm")+"), " 
+		String sameReport = "iteration ("+iteration+" >= "+WholeSystem.configTable.getInt("iterationTriggerApplyNDegreeFilterAlgorithm")+"), " 
 		                   +"nodes count ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+" > "+WholeSystem.configTable.getInt("quantityNodesToApplyNdegreeFilter")+"), "
 		                   +"connected component ("
 		                   + (iteration==0 ? "?" : WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount())

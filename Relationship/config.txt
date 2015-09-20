@@ -4,16 +4,16 @@
 //================================================================================
 	
 // Current test name 
-testName = only_names1
+testName = base18i
 
 // Base directory to creation of output files: absolut path 'C:\\path\\results' or relative path 'path\\results' or current path '.'
 baseDirectory = C:\\Users\\Henrique\\Documents\\tests
 
 // minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
-minIterationToVerifyUniqueConnectedComponent = 4
+minIterationToVerifyUniqueConnectedComponent = 5
 
 // minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
-minIterationToVerifyRelationshipBetweenOriginalConcepts = 8
+minIterationToVerifyRelationshipBetweenOriginalConcepts = 5
 
 // maximum quantity of iterations to get out of loop (good value: 50)  
 maxIteration = 50  
@@ -38,7 +38,7 @@ quantityNodesToApplyKcoreFilter = 700
 	
 // fator added in logarithmic function to calculate goal of concepts quantity in final concept to map (good value: 3)
 // function: log2(1/countOriginal)+4+factor
-conceptsQuantityCalculationFactor = 3
+conceptsQuantityCalculationFactor = 4
 
 // top limit to range of concepts quantity (good value: 5)
 conceptsMinMaxRange = 5
@@ -58,16 +58,16 @@ isEnableUselessTable = true
 proporcionBetweenness = 10
 
 // BETWEENNESS + CLOSENESS
-// quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of original nodes) (good value: 2.0)
-proporcionBetweennessCloseness = 2.0
+// quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of original nodes) (good value: 3.0)
+proporcionBetweennessCloseness = 3.0
 // precision added up to rounding the calculate of quantity of each connected component (good value: 0.5)
 precisionBetweennessCloseness = 0.5
 // maximum limit to quantity of new concepts distributed in all connected component, +0.5 in each component (excluding the addition of nodes by "Category:") (good value: 15)
 maxBetweennessCloseness = 15
 
 // EIGENVECTOR
-// quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of original nodes) (good value: 2.0)
-proporcionEigenvector = 2.0
+// quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of original nodes) (good value: 1.0)
+proporcionEigenvector = 1.0
 // precision added up to rounding the calculate of quantity of each connected component (good value: 0.5)
 precisionEigenvector = 0.5 
 // maximum limit to quantity of new concepts distributed in all connected component, +0.5 in each component (excluding the addition of nodes by "Category:") (good value: 15)

@@ -40,7 +40,8 @@ east -> is in the east
 
 subdivisionType -> is a subdivision of
 doctoralAdvisor -> had as doctoral advisor
-doctoralStudents -> was doctoral student of
+doctoralStudents -> had as doctoral student
+doctoralStudent -> had as doctoral student
 citizenship -> has citizenship in
 residence -> has residence in
 owner -> is owned by
@@ -49,4 +50,5 @@ isPartOf -> is part of
 foundationPlace -> has place foundation
 type -> is a type of
 location -> has location in
-
+developer -> was developed for
+designer -> was designed for
