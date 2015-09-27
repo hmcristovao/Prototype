@@ -169,7 +169,33 @@ public class ConceptMap {
 		}
 		return originalConcepts;
 	}
-	
+	// insert new line before category word
+	public int 	upgradeConceptMap_heuristic_07_putNewLineInCategory() {
+		int n = 0;
+		for( Proposition proposition : this.getPropositions()) {
+			// at first, verify whether it is not alone concept 
+			if(proposition.getLink() != null)
+			{
+				int sourceConceptLength = proposition.getSourceConcept().getLabel().length();
+				if(sourceConceptLength > 8) {
+					if(proposition.getSourceConcept().getLabel().substring(sourceConceptLength-8).equals("category")) {
+						String newSourceConcept = proposition.getSourceConcept().getLabel().replace("category","&#xa;category");
+						proposition.setSourcetConcept(newSourceConcept);
+						n++;
+					}
+				}
+				int targetConceptLength = proposition.getTargetConcept().getLabel().length();
+				if(targetConceptLength > 8) {
+					if(proposition.getTargetConcept().getLabel().substring(targetConceptLength-8).equals("category")) {
+						String newTargetConcept = proposition.getTargetConcept().getLabel().replace("category","&#xa;category");
+						proposition.setTargetConcept(newTargetConcept);
+						n++;
+					}
+				}
+			}
+		}
+		return n;
+	}
 	
 	// create a gephiGraph from concept map and generate a gexf file
 	public void buildGexfGraphFileFromConceptMap(String fileGexf) throws Exception {

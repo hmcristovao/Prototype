@@ -19,7 +19,6 @@ import org.gephi.project.api.ProjectController;
 import org.gephi.project.api.Workspace;
 import org.gephi.statistics.plugin.ConnectedComponents;
 import org.gephi.statistics.plugin.EigenvectorCentrality;
-//import org.gephi.project.api.Workspace;
 import org.gephi.statistics.plugin.GraphDistance;
 import org.openide.util.Lookup;
 
@@ -122,8 +121,8 @@ public class GephiGraphData {
 	public int classifyConnectedComponent() {
 		ConnectedComponents connectedComponents = new ConnectedComponents();
 		connectedComponents.execute(this.graphModel, this.attributeModel);
-		int count = connectedComponents.getConnectedComponentsCount();
 		this.connectedComponentColumn = this.attributeModel.getNodeTable().getColumn(ConnectedComponents.WEAKLY);
+		int count = connectedComponents.getConnectedComponentsCount();
 		return count;
 	}
 	

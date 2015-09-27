@@ -3,6 +3,7 @@ package main;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 import parsersystem.Token;
 
@@ -34,16 +35,20 @@ public class ConfigTable {
 		return this.table.size();
 	}
 	public String toString() {
-		StringBuffer out = new StringBuffer();
+		// at first: sort
+		TreeSet<String> sortSet = new TreeSet<String>();
 		Iterator<String> i = this.table.keySet().iterator(); 
 		while(i.hasNext()) {
-		   String var   = (String)i.next(); 
-		   String value = this.table.get(var);
-		   out.append("   ");
-		   out.append(var);
-		   out.append(" = ");
-		   out.append(value);
-		   out.append("\n");
+		   String key   = (String)i.next(); 
+		   String value = this.table.get(key);
+		   sortSet.add(key + " = " + value);
+		}	
+		// second: list
+		StringBuffer out = new StringBuffer();
+		for(String str : sortSet) {
+			out.append("   ");
+			out.append(str);
+			out.append("\n");
 		}
 		return out.toString();
 	}

@@ -3,6 +3,7 @@ package graph;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 import parsersystem.Token;
 
@@ -38,16 +39,20 @@ public class UselessConceptsTable {
 		return this.table.size();
 	}
 	public String toString() {
-		StringBuffer out = new StringBuffer();
+		// at first: sort
+		TreeSet<String> sortSet = new TreeSet<String>();
 		Iterator<String> i = this.table.keySet().iterator(); 
 		while(i.hasNext()) {
-		   String uselessConcept = (String)i.next(); 
-		   Integer count = this.table.get(uselessConcept);
-		   out.append("   ");
-		   out.append(uselessConcept);
-		   out.append(" (count: ");
-		   out.append(count.toString());
-		   out.append(")\n");
+		   String key   = (String)i.next(); 
+		   int value = this.table.get(key);
+		   sortSet.add(key + " (count: " + value + ")");
+		}	
+		// second: list
+		StringBuffer out = new StringBuffer();
+		for(String str : sortSet) {
+			out.append("   ");
+			out.append(str);
+			out.append("\n");
 		}
 		return out.toString();
 	}

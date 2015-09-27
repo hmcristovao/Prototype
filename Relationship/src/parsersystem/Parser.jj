@@ -87,8 +87,8 @@ TOKEN : {
 
 TOKEN : {
       < ARROW:              "->" > |
-      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9","."] > |
-      < #SPECIAL_CHARACTER: [ "-","_",":","#","\'","/","\\" ] > |
+      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9",".","(",")" ] > |
+      < #SPECIAL_CHARACTER: [ "-","_",":","#","\'","/","\\","%" ] > |
       < TERM:               < COMMON_CHARACTER > 
                             (
                               ( < COMMON_CHARACTER > | < SPECIAL_CHARACTER > | < BLANK > )*

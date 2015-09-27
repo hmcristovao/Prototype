@@ -1,4 +1,4 @@
-// v6.3 - fix small bug. Working!
+// v6.5 - small improvements. Working!
 
 package main;
 
@@ -87,12 +87,12 @@ public class MainProcess {
 				iteration++;
 			} while(true);
 			
-			// ***** Internediate Stage 1 *****
+			// ***** Intermediate Stage 1 *****
+			// (only entry in this stage if connected component = 1, or if maximum iteration achived)
 			int lastIterationWithinOfLoopWithDistanceMeasuresCalculation = iteration-1;
-			// only entry in this stage if connected component = 1
 			indicateAlgorithmIntermediateStage1(); // apply k-core
 			if(isApplyKCoreFilterTrigger()) {
-				applyKCoreFilterTrigger(2, false); 
+				applyKCoreFilterTrigger(WholeSystem.configTable.getInt("kCoreFilter"), false); 
 				calculateRelationshipLevelBetweenOriginalConcepts_allCases();  // regardless of the value of connected component
 				iteration++;
 				createCurrentSystemGraphData();
@@ -101,7 +101,7 @@ public class MainProcess {
 				buildGexfGraphFile(Time.t2_afterIterationAndKcore);
 			}
 			
-			// ***** Internediate Stage 2 *****
+			// ***** Intermediate Stage 2 *****
 			indicateAlgorithmIntermediateStage2(); // build finalHeadNodes to calculate paths to final stage
 			buildFinalHeadNodesFromOriginalConceptsAndSelectedConcepts(lastIterationWithinOfLoopWithDistanceMeasuresCalculation);
 			filterStreamGraphWithNodesAndEdgesBelongToShortestPathsOfFinalHeadNodes();
@@ -111,7 +111,7 @@ public class MainProcess {
 			classifyConnectedComponent();
  			buildGexfGraphFile(Time.t3_afterHeadNodesPaths);
  			
-			// ***** Internediate Stage 3 *****
+			// ***** Intermediate Stage 3 *****
 			indicateAlgorithmIntermediateStage3(); // remove nodes steadying connected component == 1
 			iteration++;
 			createCurrentSystemGraphData();
@@ -121,8 +121,7 @@ public class MainProcess {
 			calculateEigenvectorMeasureWholeNetwork();
 			storeEigenvectorMeasuresWholeNetworkToMainNodeTable();
 			classifyConnectedComponent();
- 			// createSortEccentricityAndAverageOnlySelectedConcepts(); // exit whether zero selected concepts
-			createSortEccentricityAndAverageOnlyRemainingConcepts();
+ 			createSortEccentricityAndAverageOnlyRemainingConcepts();
 			baseConnectedComponentCount = currentSystemGraphData.getConnectedComponentsCount();
 			nodeDataPos = 0;
 			// loop while:
@@ -206,7 +205,9 @@ public class MainProcess {
             
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
-			buildCxlFileFromConceptMap();
+			
+			upgradeConceptMap_heuristic_07_putNewLineInCategory();
+            buildCxlFileFromConceptMap();
 			
 			end();
 		}
@@ -245,6 +246,7 @@ public class MainProcess {
 	
 	
 	// ***** Static methods to macro support *****
+	
 	private static void start(Parser parser) throws Exception {
 		parseConfiguration(parser);
 		buildDirectoryStrutureToOutputFiles();
@@ -274,7 +276,8 @@ public class MainProcess {
                              newDirectoryStr+"\\query_"+WholeSystem.configTable.getString("testName")+".txt");
 	}
 	private static void showBuildDirectoryStructureToOutputFilesInformation() throws Exception {
-		String sameReport = "directory structure to output files in "+WholeSystem.configTable.getString("baseDirectory");
+		String sameReport = "directory structure to output files in "+WholeSystem.configTable.getString("baseDirectory")+
+	                        "\\" + WholeSystem.configTable.getString("testName");
 		Log.consoleln("- Building "+sameReport);
 		Log.outFileCompleteReport("Built "+sameReport);
 		Log.outFileShortReport("Built "+sameReport);
@@ -476,11 +479,11 @@ public class MainProcess {
 	}
 	private static boolean isApplyNDegreeFilterTrigger() throws Exception {
 		Log.console("- Verifying whether apply N-degree filter: ");
-		String sameReport = "iteration ("+iteration+" >= "+WholeSystem.configTable.getInt("iterationTriggerApplyNDegreeFilterAlgorithm")+"), " 
-		                   +"nodes count ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+" > "+WholeSystem.configTable.getInt("quantityNodesToApplyNdegreeFilter")+"), "
+		String sameReport = "iteration ("+iteration+": >= "+WholeSystem.configTable.getInt("iterationTriggerApplyNDegreeFilterAlgorithm")+"), " 
+		                   +"nodes count ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+": > "+WholeSystem.configTable.getInt("quantityNodesToApplyNdegreeFilter")+"), "
 		                   +"connected component ("
 		                   + (iteration==0 ? "?" : WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount())
-		                   +" = 1)"; 
+		                   +": = 1)"; 
 		if(iteration >= WholeSystem.configTable.getInt("iterationTriggerApplyNDegreeFilterAlgorithm") 
 		   && WholeSystem.getStreamGraphData().getRealTotalNodes() > WholeSystem.configTable.getInt("quantityNodesToApplyNdegreeFilter")
 		   && WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount() == 1) { 
@@ -498,7 +501,7 @@ public class MainProcess {
 	}
 	private static boolean isApplyKCoreFilterTrigger() throws Exception {
 		Log.console("- Verifying whether apply K-core filter: ");
-		String sameReport = "quantity of nodes ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+" > "+WholeSystem.configTable.getInt("quantityNodesToApplyKcoreFilter")+")"; 
+		String sameReport = "quantity of nodes ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+": > "+WholeSystem.configTable.getInt("quantityNodesToApplyKcoreFilter")+")"; 
 		if(WholeSystem.getStreamGraphData().getRealTotalNodes() > WholeSystem.configTable.getInt("quantityNodesToApplyKcoreFilter")) { 
 			Log.consoleln(sameReport+" - OK!");
 	        Log.outFileCompleteReport("Apply K-core filter "+sameReport);
@@ -782,11 +785,11 @@ public class MainProcess {
 	}	
 	private static boolean breakIteration() throws Exception {
 		Log.console("- Verifying exit conditions: ");
-		String sameReport = "maximum iteration ("+iteration+" = "+WholeSystem.configTable.getInt("maxIteration")+") \n  or " 
-		                   +"[ minimum iteration ("+iteration+" >= "+WholeSystem.configTable.getInt("minIterationToVerifyUniqueConnectedComponent")+") and "
-		                   +"connected component ("+currentSystemGraphData.getConnectedComponentsCount()+" = 1) ]\n  or "
-		                   +"[ minimum iteration ("+iteration+" >= "+WholeSystem.configTable.getInt("minIterationToVerifyRelationshipBetweenOriginalConcepts")+") and "
-		                   +"relationship level between original concepts ("+WholeSystem.getStreamGraphData().getCurrentLevelRelationshipBetweenOriginalConcepts()+" = 0) ]";
+		String sameReport = "maximum iteration ("+iteration+": = "+WholeSystem.configTable.getInt("maxIteration")+") \n  or " 
+		                   +"[ minimum iteration ("+iteration+": >= "+WholeSystem.configTable.getInt("minIterationToVerifyUniqueConnectedComponent")+") and "
+		                   +"connected component ("+currentSystemGraphData.getConnectedComponentsCount()+": = 1) ]\n  or "
+		                   +"[ minimum iteration ("+iteration+": >= "+WholeSystem.configTable.getInt("minIterationToVerifyRelationshipBetweenOriginalConcepts")+") and "
+		                   +"relationship level between original concepts ("+WholeSystem.getStreamGraphData().getCurrentLevelRelationshipBetweenOriginalConcepts()+": = 0) ]";
 		Log.consoleln(sameReport);
 		Log.outFileCompleteReport("Verification of exit conditions of loop\n"+sameReport);
 		Log.outFileShortReport("Verification of exit conditions of loop\n"+sameReport);		
@@ -1108,7 +1111,15 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
-	
+	private static void upgradeConceptMap_heuristic_07_putNewLineInCategory() throws Exception {
+		Log.console("- Upgrading the concept map with seventh heuristic (put new line in category word)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_07_putNewLineInCategory();
+		Log.consoleln(" - " + n + " concepts changed.");
+		String sameReport = "Heuristic 07: upgraded "+n+" concepts with insertion of new line in category word\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+
 	private static void end() throws Exception {
 		Log.consoleln("- Closing.");
 		if(WholeSystem.configTable.getBoolean("graphStreamVisualization")) 
