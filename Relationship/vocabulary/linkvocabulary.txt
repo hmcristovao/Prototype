@@ -13,7 +13,7 @@ leaderName	-> is leader
 author	-> is author
 genre -> has genre
 core#related -> is related to
-wikiPageDisambiguates -> can be confused with
+wikiPageDisambiguates -> maybe
 rdf-schema#seeAlso -> see also
 wikiPageRedirects -> see also
 core#broader -> is part of

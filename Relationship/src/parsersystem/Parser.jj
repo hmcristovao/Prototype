@@ -73,8 +73,11 @@ TOKEN : {
 < T_gephiVisualization: 						"gephiVisualization" > |
 < T_graphStreamVisualization: 					"graphStreamVisualization" > |
 < T_isFixBugInGephiToolKit: 					"isFixBugInGephiToolKit" > |
-< T_originalConceptWithGephiToolKitBug: 		"originalConceptWithGephiToolKitBug" > |
-< T_isEnableUselessTable:						"isEnableUselessTable" > 
+< T_originalConceptWithGephiToolKitBug1: 		"originalConceptWithGephiToolKitBug1" > |
+< T_originalConceptWithGephiToolKitBug2: 		"originalConceptWithGephiToolKitBug2" > |
+< T_originalConceptWithGephiToolKitBug3: 		"originalConceptWithGephiToolKitBug3" > |
+< T_isEnableUselessTable:						"isEnableUselessTable" > |
+< T_isUniqueConnectedComponentToApplyNdegreeFilter: "isUniqueConnectedComponentToApplyNdegreeFilter" >
 }
 
 TOKEN : {
@@ -158,12 +161,15 @@ void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token token
 	tokenVar=< T_gephiVisualization >  |
 	tokenVar=< T_graphStreamVisualization >  |
 	tokenVar=< T_isFixBugInGephiToolKit >  |
-	tokenVar=< T_originalConceptWithGephiToolKitBug > |
+	tokenVar=< T_originalConceptWithGephiToolKitBug1 > |
+	tokenVar=< T_originalConceptWithGephiToolKitBug2 > |
+	tokenVar=< T_originalConceptWithGephiToolKitBug3 > |
 	tokenVar=< T_isEnableUselessTable >  |
 	tokenVar=< T_baseDirectory > |
 	tokenVar=< T_dirGraph > |
 	tokenVar=< T_dirLog > |
-	tokenVar=< T_dirConceptMap >  
+	tokenVar=< T_dirConceptMap > |
+	tokenVar=< T_isUniqueConnectedComponentToApplyNdegreeFilter >
     )
     < EQUALS > tokenValue = < TERM > 
     { WholeSystem.configTable.insert(tokenVar.image, tokenValue.image.trim()); }

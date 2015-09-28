@@ -134,8 +134,107 @@ public class ConceptMap {
 		}
 		return n;
 	}
-	// remove self references
-	public int upgradeConceptMap_heuristic_05_removeSelfReference() {
+	
+	public ConceptsGroup upgradeConceptMap_heuristic_05_createOriginalConceptsWithZeroDegree(SystemGraphData currentSystemGraphData) {
+		// search in Gephi Graph, alone original concepts 
+		ConceptsGroup originalConcepts = new ConceptsGroup();
+		for( Node node : currentSystemGraphData.getGephiGraphData().getGephiGraph().getNodes() ) {
+			if(currentSystemGraphData.getGephiGraphData().getGephiGraph().getDegree(node) == 0) {
+				if(WholeSystem.getConceptsRegister().isOriginalConcept(node.getNodeData().getLabel())) {
+					originalConcepts.add(WholeSystem.getConceptsRegister().getConcept(node.getNodeData().getLabel()));
+				}
+			}
+		}
+		// insert concepts selected, without link in concept map
+		for(Concept concept : originalConcepts.getList()) {
+			WholeSystem.getConceptMap().insert(concept);
+		}
+		return originalConcepts;
+	}
+
+	// return quantity of concepts changed
+	public int changeConceptStringToStringAllMap(String oldConcept, String newConcept) {
+		int n = 0;
+		// search for another concepts in map to also change
+		for( Proposition prop : this.getPropositions()) {
+			if(prop.getLink() != null) {
+				// if is source concept
+				if(oldConcept.equals(prop.getSourceConcept().getLabel())) {
+					prop.setSourcetConcept(newConcept);
+					n++;
+				}
+				// or if is target concept
+				if(oldConcept.equals(prop.getTargetConcept().getLabel())) {
+					prop.setTargetConcept(newConcept);
+					n++;
+				}
+			}
+		}
+		return n;
+	}
+	
+	// return quantity of concepts changed
+	public int changeConceptStringToObjectAllMap(String oldConcept, SimpleConcept newConcept) {
+		int n = 0;
+		// search for another concepts in map to also change
+		for( Proposition prop : this.getPropositions()) {
+			if(prop.getLink() != null) {
+				// if is source concept
+				if(oldConcept.equals(prop.getSourceConcept().getLabel())) {
+					prop.setSourceConcept(newConcept);
+					n++;
+				}
+				// or if is target concept
+				if(oldConcept.equals(prop.getTargetConcept().getLabel())) {
+					prop.setTargetConcept(newConcept);
+					n++;
+				}
+			}
+		}
+		return n;
+	}
+	
+	public int upgradeConceptMap_heuristic_06_joinEqualsConceptsWithoutAndWithCategory() {
+		int n = 0;
+		for( Proposition proposition : this.getPropositions()) {
+			// at first, verify whether it is not alone concept 
+			if(proposition.getLink() == null) {
+				continue;
+			}
+			
+			// verify if "category" is in source concept and if the description is the same
+			// in this case, remove "category" of source concept of all concepts in map
+			String        simpleConceptWithouCategoryString = null;
+			int sourceConceptLength = proposition.getSourceConcept().getLabel().length();
+			if(sourceConceptLength > 8) {
+				if(proposition.getSourceConcept().getLabel().substring(sourceConceptLength-8).equals("category")) {
+					// get only description (without category)
+					simpleConceptWithouCategoryString = proposition.getSourceConcept().getLabel().substring(0,sourceConceptLength-8).trim();
+					// if two concept are sufix equals, set the concept to the same description
+					if(proposition.getTargetConcept().getLabel().equals(simpleConceptWithouCategoryString)) {
+						n += this.changeConceptStringToObjectAllMap(proposition.getSourceConcept().getLabel(), proposition.getTargetConcept());
+					}
+				}
+			}
+
+			// verify if "category" is in target concept and if the description is the same
+			// in this case, remove "category" of source concept of all concepts in map
+			int targetConceptLength = proposition.getTargetConcept().getLabel().length();
+			if(targetConceptLength > 8) {
+				if(proposition.getTargetConcept().getLabel().substring(targetConceptLength-8).equals("category")) {
+					// get only description (without category)
+					simpleConceptWithouCategoryString = proposition.getTargetConcept().getLabel().substring(0,targetConceptLength-8).trim();
+					// if two concept are sufix equals, set the concept to the same description
+					if(proposition.getSourceConcept().getLabel().equals(simpleConceptWithouCategoryString)) {
+						n += this.changeConceptStringToObjectAllMap(proposition.getTargetConcept().getLabel(), proposition.getSourceConcept());
+					}
+				}
+			}
+		} 
+		return n;
+	}
+	
+	public int upgradeConceptMap_heuristic_07_removeSelfReference() {
 		int n = 0;
 		List<Proposition> excludedPropositions = new ArrayList<Proposition>();
 		for( Proposition proposition : this.getPropositions()) {
@@ -153,24 +252,9 @@ public class ConceptMap {
 		}
 		return n;
 	}
-	public ConceptsGroup upgradeConceptMap_heuristic_06_createOriginalConceptsWithZeroDegree(SystemGraphData currentSystemGraphData) {
-		// search in Gephi Graph, alone original concepts 
-		ConceptsGroup originalConcepts = new ConceptsGroup();
-		for( Node node : currentSystemGraphData.getGephiGraphData().getGephiGraph().getNodes() ) {
-			if(currentSystemGraphData.getGephiGraphData().getGephiGraph().getDegree(node) == 0) {
-				if(WholeSystem.getConceptsRegister().isOriginalConcept(node.getNodeData().getLabel())) {
-					originalConcepts.add(WholeSystem.getConceptsRegister().getConcept(node.getNodeData().getLabel()));
-				}
-			}
-		}
-		// insert concepts selected, without link in concept map
-		for(Concept concept : originalConcepts.getList()) {
-			WholeSystem.getConceptMap().insert(concept);
-		}
-		return originalConcepts;
-	}
+	
 	// insert new line before category word
-	public int 	upgradeConceptMap_heuristic_07_putNewLineInCategory() {
+	public int 	upgradeConceptMap_heuristic_08_putNewLineInCategory() {
 		int n = 0;
 		for( Proposition proposition : this.getPropositions()) {
 			// at first, verify whether it is not alone concept 

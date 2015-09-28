@@ -1,4 +1,4 @@
-// v6.5 - small improvements. Working!
+// v6.6 - insert eighth herustic, option to shoot NdegreeFilter, more words options to fix bug Gephi. Working!
 
 package main;
 
@@ -135,7 +135,7 @@ public class MainProcess {
 				// if node is link with original concepts then get the next
 				// (try to fix a bug in Gephi Tool Kit - calculate with wrong the value of connected component)
 				if(WholeSystem.configTable.getBoolean("isFixBugInGephiToolKit")) {
-					if(isCurrentNodeHasLinkWithAnEspecificOriginalConcept(WholeSystem.configTable.getString("originalConceptWithGephiToolKitBug"))) {
+					if(isCurrentNodeHasLinkWithAnEspecificOriginalConcept()) { 
 						nodeDataPos++;
 						continue;
 					}
@@ -200,13 +200,14 @@ public class MainProcess {
 			upgradeConceptMap_heuristic_02_vocabularyTable();
 			upgradeConceptMap_heuristic_03_categoryInTargetConcept();
 			upgradeConceptMap_heuristic_04_categoryInSourceConcept();
-            upgradeConceptMap_heuristic_05_removeSelfReference();
-            upgradeConceptMap_heuristic_06_createOriginalConceptsWithZeroDegree();
+            upgradeConceptMap_heuristic_05_createOriginalConceptsWithZeroDegree();
+            upgradeConceptMap_heuristic_06_joinEqualsConceptsWithoutAndWithCategory();
+            upgradeConceptMap_heuristic_07_removeSelfReference();
             
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
 			
-			upgradeConceptMap_heuristic_07_putNewLineInCategory();
+			upgradeConceptMap_heuristic_08_putNewLineInCategory();
             buildCxlFileFromConceptMap();
 			
 			end();
@@ -259,7 +260,7 @@ public class MainProcess {
 	private static void parseConfiguration(Parser parser) throws Exception {
 		System.out.println("- Starting parse of configuration and log files.");
 		parser = new Parser(new FileInputStream(Constants.nameConfigFile));
-		parser.parseConfigurations(WholeSystem.configTable);		
+		parser.parseConfigurations(WholeSystem.configTable);
 	}
 	private static void buildDirectoryStrutureToOutputFiles() throws Exception {
 		String newDirectoryStr = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName");
@@ -477,16 +478,25 @@ public class MainProcess {
 		Log.consoleln("- Quantities Stream Graph built: "+WholeSystem.getStreamGraphData().getRealTotalNodes()+
 				" nodes, "+WholeSystem.getStreamGraphData().getRealTotalEdges()+" edges.");
 	}
+	// apply Ndegree filter if:
+	//       achieved # iteration
+	//  and  achieved # nodes
+	//  and  ( connected component == 1  OR isUniqueConnectedComponetToApplyNdegreeFilter = false) 
 	private static boolean isApplyNDegreeFilterTrigger() throws Exception {
 		Log.console("- Verifying whether apply N-degree filter: ");
 		String sameReport = "iteration ("+iteration+": >= "+WholeSystem.configTable.getInt("iterationTriggerApplyNDegreeFilterAlgorithm")+"), " 
-		                   +"nodes count ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+": > "+WholeSystem.configTable.getInt("quantityNodesToApplyNdegreeFilter")+"), "
-		                   +"connected component ("
+		                   +"nodes count ("+WholeSystem.getStreamGraphData().getRealTotalNodes()+": > "+WholeSystem.configTable.getInt("quantityNodesToApplyNdegreeFilter")+")";
+		if(WholeSystem.configTable.getBoolean("isUniqueConnectedComponentToApplyNdegreeFilter")) {
+			sameReport +=  ", connected component ("
 		                   + (iteration==0 ? "?" : WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount())
 		                   +": = 1)"; 
+		}
 		if(iteration >= WholeSystem.configTable.getInt("iterationTriggerApplyNDegreeFilterAlgorithm") 
 		   && WholeSystem.getStreamGraphData().getRealTotalNodes() > WholeSystem.configTable.getInt("quantityNodesToApplyNdegreeFilter")
-		   && WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount() == 1) { 
+		   && 
+		      ( WholeSystem.getListSystemGraphData().get(iteration-1).getConnectedComponentsCount() == 1
+		       || !WholeSystem.configTable.getBoolean("isUniqueConnectedComponentToApplyNdegreeFilter")
+		      ) ) { 
 			Log.consoleln(sameReport+" - OK!");
 	        Log.outFileCompleteReport("Apply N-degree filter "+sameReport);
 			Log.outFileShortReport("Apply N-degree filter "+sameReport);		
@@ -534,20 +544,25 @@ public class MainProcess {
 			return false;
 		}
 	}
-	private static boolean isCurrentNodeHasLinkWithAnEspecificOriginalConcept(String originalConcept) throws Exception {
+	private static boolean isCurrentNodeHasLinkWithAnEspecificOriginalConcept() throws Exception {
+		String concept1 = WholeSystem.configTable.getString("originalConceptWithGephiToolKitBug1");
+		String concept2 = WholeSystem.configTable.getString("originalConceptWithGephiToolKitBug2");
+		String concept3 = WholeSystem.configTable.getString("originalConceptWithGephiToolKitBug3");
 		Node node = nodeDataWithLeastEccentricityAndAverage.getStreamNode();
-		Log.console("- Verifying whether "+node.getId()+" has link with "+originalConcept+": ");
+		Log.console("- Verifying whether "+node.getId()+" has link with "+concept1+", "+concept2+", "+concept3+": ");
 		String sameReport;
-		if(WholeSystem.getStreamGraphData().isNodeHasLinkWithAnEspecificOriginalConcept(node, originalConcept)) { 
+		if(WholeSystem.getStreamGraphData().isNodeHasLinkWithAnEspecificOriginalConcept(node, concept1) ||
+		   WholeSystem.getStreamGraphData().isNodeHasLinkWithAnEspecificOriginalConcept(node, concept2) ||
+		   WholeSystem.getStreamGraphData().isNodeHasLinkWithAnEspecificOriginalConcept(node, concept3)) { 
 			Log.consoleln(" - yes, it has. Then it will not be removed.");
-			sameReport = "Node "+node.getId()+" has link with "+originalConcept+". It was not removed.";
+			sameReport = "Node "+node.getId()+" has link with "+concept1+" or "+concept2+" or "+concept3+". It was not removed.";
 			Log.outFileCompleteReport(sameReport);
 			Log.outFileShortReport(sameReport);		
 			return true;
 		}
 		else {
 			Log.consoleln(" - no, it hasn't. Then it will be able to remotion.");
-			sameReport = "Node "+node.getId()+" has not link with "+originalConcept+". It will be able to remotion.";
+			sameReport = "Node "+node.getId()+" has not link with "+concept1+", "+concept2+", "+concept3+". It will be able to remotion.";
 			Log.outFileCompleteReport(sameReport);
 			Log.outFileShortReport(sameReport);		
 			return false;
@@ -1066,7 +1081,7 @@ public class MainProcess {
 		Log.console("- Upgrading the concept map with first heuristic (remove link id number)");
 		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_01_removeLinkNumber();
 		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Heuristic 01: upgraded "+n+" concept map propositions with remove of link number:\n" + WholeSystem.getConceptMap().toString();
+		String sameReport = "Heuristic 01: upgraded "+n+" concept map propositions with remove of link number:\n\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
@@ -1074,7 +1089,7 @@ public class MainProcess {
 		Log.console("- Upgrading the concept map with second heuristic (change links with vocabulary table)");
 		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_02_vocabularyTable();
 		Log.consoleln(" - " + n + " links name changed.");
-		String sameReport = "Heuristic 02: upgraded "+n+" concept map propositions with use of link vocabulary table:\n" + WholeSystem.getConceptMap().toString();
+		String sameReport = "Heuristic 02: upgraded "+n+" concept map propositions with use of link vocabulary table:\n\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
@@ -1082,7 +1097,7 @@ public class MainProcess {
 		Log.console("- Upgrading the concept map with third heuristic (change category in target concepts and links)");
 		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_03_categoryInTargetConcept();
 		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Heuristic 03: upgraded "+n+" concept map propositions with change of category in target concept:\n" + WholeSystem.getConceptMap().toString();
+		String sameReport = "Heuristic 03: upgraded "+n+" concept map propositions with change of category in target concept:\n\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
@@ -1090,32 +1105,40 @@ public class MainProcess {
 		Log.console("- Upgrading the concept map with fourth heuristic (change category in source concept)");
 		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_04_categoryInSourceConcept();
 		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Heuristic 04: upgraded "+n+" concept map propositions with change of category in source concept:\n" + WholeSystem.getConceptMap().toString();
+		String sameReport = "Heuristic 04: upgraded "+n+" concept map propositions with change of category in source concept:\n\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
-	private static void upgradeConceptMap_heuristic_05_removeSelfReference()  throws Exception {
-		Log.console("- Upgrading the concept map with fifth heuristic (remove self references)");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_05_removeSelfReference();
-		Log.consoleln(" - " + n + " propositions changed.");
-		String sameReport = "Heuristic 05: upgraded "+n+" concept map propositions with remotions of the self reference:\n" + WholeSystem.getConceptMap().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);		
-	}
-	private static void upgradeConceptMap_heuristic_06_createOriginalConceptsWithZeroDegree()  throws Exception {
-		Log.console("- Upgrading the concept map with sixth heuristic (create original concepts with zero degrees)");
-		ConceptsGroup originalConcepts = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_06_createOriginalConceptsWithZeroDegree(currentSystemGraphData);
+	private static void upgradeConceptMap_heuristic_05_createOriginalConceptsWithZeroDegree()  throws Exception {
+		Log.console("- Upgrading the concept map with fifth heuristic (create original concepts with zero degrees)");
+		ConceptsGroup originalConcepts = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_05_createOriginalConceptsWithZeroDegree(currentSystemGraphData);
 		Log.consoleln(" - " + originalConcepts.size() + " propositions changed.");
-		String sameReport = "Heuristic 06: upgraded "+originalConcepts.size()+" alone original concepts created:\n" + 
+		String sameReport = "Heuristic 05: upgraded "+originalConcepts.size()+" alone original concepts created:\n" + 
 							originalConcepts + "\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
-	private static void upgradeConceptMap_heuristic_07_putNewLineInCategory() throws Exception {
-		Log.console("- Upgrading the concept map with seventh heuristic (put new line in category word)");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_07_putNewLineInCategory();
+	private static void upgradeConceptMap_heuristic_06_joinEqualsConceptsWithoutAndWithCategory() throws Exception {
+		Log.console("- Upgrading the concept map with sixth heuristic (join equals concepts without and with category)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_06_joinEqualsConceptsWithoutAndWithCategory();
 		Log.consoleln(" - " + n + " concepts changed.");
-		String sameReport = "Heuristic 07: upgraded "+n+" concepts with insertion of new line in category word\n" + WholeSystem.getConceptMap().toString();
+		String sameReport = "Heuristic 06: upgraded "+n+" concepts equaled (same description without and with category)\n\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}	
+	private static void upgradeConceptMap_heuristic_07_removeSelfReference()  throws Exception {
+		Log.console("- Upgrading the concept map with seventh heuristic (remove self references)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_07_removeSelfReference();
+		Log.consoleln(" - " + n + " propositions changed.");
+		String sameReport = "Heuristic 07: upgraded "+n+" concept map propositions with remotions of the self reference:\n\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	private static void upgradeConceptMap_heuristic_08_putNewLineInCategory() throws Exception {
+		Log.console("- Upgrading the concept map with eighth heuristic (put new line in category word)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_08_putNewLineInCategory();
+		Log.consoleln(" - " + n + " concepts changed.");
+		String sameReport = "Heuristic 08: upgraded "+n+" concepts with insertion of new line in category word\n\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
