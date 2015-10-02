@@ -1,5 +1,4 @@
-// optional line of comment
-
+// general
 Category:Year of death unknown
 Category:Missing middle or first names
 Category:Year of birth uncertain
@@ -22,12 +21,22 @@ Category:Indexes of topics
 Category:Container
 Category:Main topic classifications
 Category:Articles containing video clips
+Category:Academic disciplines
+Category:Sociology index
+Category:Sociological terminology
+Category:Mythemes
 
 // special cases
 Connectome: How the Brain's Wiring Makes Us Who We Are
 Category:MacArthur Fellows
-Category:Catalysts and potential catalysts of change category
+Category:Catalysts and potential catalysts of change
 
 // specific case
+
+
+
+
+
+
 
 

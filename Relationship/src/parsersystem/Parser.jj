@@ -44,7 +44,7 @@ TOKEN : {
 < T_quantityNodesToApplyNdegreeFilter: 			"quantityNodesToApplyNdegreeFilter" > |
 < T_conceptsQuantityCalculationFactor: 			"conceptsQuantityCalculationFactor" > |
 < T_conceptsMinMaxRange: 						"conceptsMinMaxRange" > |
-< T_proporcionBetweenness: 						"proporcionBetweenness" > |
+< T_proporcionBetweennessOnly: 						"proporcionBetweennessOnly" > |
 < T_proporcionBetweennessCloseness: 			"proporcionBetweennessCloseness" > |
 < T_precisionBetweennessCloseness: 				"precisionBetweennessCloseness" > |
 < T_maxBetweennessCloseness: 					"maxBetweennessCloseness" > |
@@ -90,8 +90,8 @@ TOKEN : {
 
 TOKEN : {
       < ARROW:              "->" > |
-      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9",".","(",")" ] > |
-      < #SPECIAL_CHARACTER: [ "-","_",":","#","\'","/","\\","%" ] > |
+      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9",".","(",")","á","é","í","ó","ú","ê","ô","ã","ñ","ç" ] > |
+      < #SPECIAL_CHARACTER: [ "-","_",":","#","\'","/","\\","%","?" ] > |
       < TERM:               < COMMON_CHARACTER > 
                             (
                               ( < COMMON_CHARACTER > | < SPECIAL_CHARACTER > | < BLANK > )*
@@ -139,7 +139,7 @@ void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token token
 	tokenVar=< T_quantityNodesToApplyNdegreeFilter >  |
 	tokenVar=< T_conceptsQuantityCalculationFactor >  |
 	tokenVar=< T_conceptsMinMaxRange >  |
-	tokenVar=< T_proporcionBetweenness >  |
+	tokenVar=< T_proporcionBetweennessOnly >  |
 	tokenVar=< T_proporcionBetweennessCloseness >  |
 	tokenVar=< T_precisionBetweennessCloseness >  |
 	tokenVar=< T_maxBetweennessCloseness >  |

@@ -309,8 +309,8 @@ public class SystemGraphData {
 			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayEigenvector();
 			this.ranks.getMeasuresRankTable(i).setEigenvector(sortedNodesTableArray);
 			
-			int filterQuantity = (int)(WholeSystem.getQuantityOriginalConcepts() * WholeSystem.configTable.getDouble("proporcionBetweenness"));
-			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayBetweennessCloseness(filterQuantity);
+			sortedNodesTableArray  = currentNodesTableArray.createSortedNodesTableArrayBetweennessCloseness(
+					                 (int)(WholeSystem.getQuantityOriginalConcepts() * WholeSystem.configTable.getDouble("proporcionBetweennessOnly")));
 			this.ranks.getMeasuresRankTable(i).setBetweennessCloseness(sortedNodesTableArray);	
 		}
 	}
@@ -330,9 +330,10 @@ public class SystemGraphData {
 			        WholeSystem.configTable.getDouble("precisionBetweennessCloseness")
 			      );
 			// mark the level of the firt nodes to new status, except original nodes
+			int maxBetweennessCloseness = (int)( (WholeSystem.getQuantityOriginalConcepts() * WholeSystem.configTable.getDouble("maxBetweennessCloseness")) / this.connectedComponentsCount + 0.5);
 			for(int j=0, k=0; k < countConnectedComponentSelectNodes &&
 					          j < this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getCount() &&
-					          k < (WholeSystem.configTable.getDouble("maxBetweennessCloseness") / this.connectedComponentsCount + 0.5); 
+					          k < maxBetweennessCloseness; 
 				j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getBetweennessCloseness().getNodeData(j);
 				// changes status only of nodes still not selected or not original concept
@@ -367,9 +368,10 @@ public class SystemGraphData {
 			        WholeSystem.configTable.getDouble("precisionEigenvector")
 			      );
 			// mark the level of the firt nodes to new status, except original nodes
+			int maxEigenvector = (int)( (WholeSystem.getQuantityOriginalConcepts() * WholeSystem.configTable.getDouble("maxEigenvector")) / this.connectedComponentsCount + 0.5);
 			for(int j=0, k=0; k < countConnectedComponentSelectNodes && 
 					          j < this.ranks.getMeasuresRankTable(i).getEigenvector().getCount() &&
-					          k < ( WholeSystem.configTable.getDouble("maxEigenvector") / this.connectedComponentsCount + 0.5);  
+					          k < maxEigenvector;  
 				j++) {
 				currentNodeData = this.ranks.getMeasuresRankTable(i).getEigenvector().getNodeData(j);
 				// changes status only of nodes still not selected or not original concept

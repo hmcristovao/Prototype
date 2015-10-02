@@ -588,12 +588,18 @@ public class StreamGraphData {
 		return false;
 	}
 	
+	// It is necessary that the node has only one edge to be not able to exclude
 	public boolean isNodeHasLinkWithAnEspecificOriginalConcept(Node currentNode, String originalConcept) {
 		for(Edge edge : currentNode.getEachEdge()) {
 			if(edge.getSourceNode().getId().equals(originalConcept))
-				return true;
+				// verify if there are another edges
+				if(edge.getSourceNode().getDegree() <= 1)
+					return true;
+			
 			if(edge.getTargetNode().getId().equals(originalConcept))
-				return true;
+				// verify if there are another edges
+				if(edge.getTargetNode().getDegree() <= 1)
+					return true;
 		}
 		return false;
 	}

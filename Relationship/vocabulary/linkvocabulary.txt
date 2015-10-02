@@ -52,3 +52,9 @@ type -> is a type of
 location -> has location in
 developer -> was developed for
 designer -> was designed for
+
+nonFictionSubject -> is non-fiction subject of
+license -> has license
+focus -> has focus in
+core#subject -> core subject
+notableIdea -> notable idea

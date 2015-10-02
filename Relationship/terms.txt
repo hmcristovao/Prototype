@@ -1,3 +1,1 @@
-//Arthur Schopenhauer	,	Vegetarianism	,	Wish
-Foucault	,	Power	,	Biopolitics ,	Health	,	Control
-
+Distance education	,	School discipline	,	Feedback	,	Social interaction	,	Teacher	,	Student

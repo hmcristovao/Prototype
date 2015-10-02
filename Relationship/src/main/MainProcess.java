@@ -1,4 +1,4 @@
-// v6.6 - insert eighth herustic, option to shoot NdegreeFilter, more words options to fix bug Gephi. Working!
+// v6.7 - improvement in fix Gephi connected component. Working!
 
 package main;
 
@@ -133,6 +133,7 @@ public class MainProcess {
 				getNodeDataWithLeastEccentricityAndAverageFromRemainingConcepts();
 				
 				// if node is link with original concepts then get the next
+				// it is necessary that the node has only one edge to be not able to exclude
 				// (try to fix a bug in Gephi Tool Kit - calculate with wrong the value of connected component)
 				if(WholeSystem.configTable.getBoolean("isFixBugInGephiToolKit")) {
 					if(isCurrentNodeHasLinkWithAnEspecificOriginalConcept()) { 
@@ -784,7 +785,8 @@ public class MainProcess {
 	private static void reportSelectedNodesToNewIteration() throws Exception {
 		Log.consoleln("- Reporting selected nodes to new iteration.");
 		Log.outFileCompleteReport("Current System Graph Data:\n" + currentSystemGraphData.toString());
-		// Log.outFileShortReport("Current System Graph Data:\n" + currentSystemGraphData.toStringShort(Config.quantityNodesShortReport));
+		if(WholeSystem.configTable.getInt("quantityNodesShortReport") > 0)
+			Log.outFileShortReport("Current System Graph Data:\n" + currentSystemGraphData.toStringShort(WholeSystem.configTable.getInt("quantityNodesShortReport")));
 		String sameReport = "Final report of iteration "+iteration+"\n"+currentSystemGraphData.reportSelectedNodes(iteration);			
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);
