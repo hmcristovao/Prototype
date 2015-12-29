@@ -5,8 +5,8 @@ shortDescription -> has short description
 influenced -> influenced
 influences -> received influences of
 influencedBy -> influenced by
-field -> belongs to field
-fields -> belongs to fields
+field -> works in the field
+fields -> works in the fields
 subject	-> has subject
 core#broader -> is broader of
 leaderName	-> is leader

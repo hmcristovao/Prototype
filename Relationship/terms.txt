@@ -1,1 +1,2 @@
-Distance education	,	School discipline	,	Feedback	,	Social interaction	,	Teacher	,	Student
+Distance education	,	Internet	,	Social network	,	Social interaction	,	Virtual learning environment	,	Cooperation
+

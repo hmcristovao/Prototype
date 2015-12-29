@@ -1,4 +1,4 @@
-// v6.7 - improvement in fix Gephi connected component. Working!
+// v7.0 - starting the building of use of the my knowledge base. Do not working.
 
 package main;
 
@@ -46,6 +46,7 @@ public class MainProcess {
 			parseUselessConcepts(parser);
 			parseVocabulary(parser);
 			readRdfsFileNameToRdfsFileTable();
+			readRdfsInMyKnowledgeBaseFile();
 
 			// ***** Iterations Stage *****
 			do {
@@ -339,6 +340,19 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);			
 	}
 	
+	private static void readRdfsInMyKnowledgeBaseFile() throws Exception {
+		Log.console("- Reading RDFs in my knowledge base file");
+		WholeSystem.getRdfsFileTable().init(WholeSystem.configTable.getString("dirRdfsPersistenceFiles"));  
+ 		Log.consoleln(" - " + WholeSystem.getRdfsFileTable().size() + " RDFs files identified.");
+		String sameReport = "RDFs files identified: "+WholeSystem.getRdfsFileTable().size()+".";
+		Log.outFileCompleteReport(sameReport+"\n"+WholeSystem.getRdfsFileTable());
+		Log.outFileShortReport(sameReport);			
+	}
+	;
+	// < 1. read from my knowledge base >
+	// if dbpediaServer var do not contais "http", is because the RDFs are in my knowledge base
+	if(!WholeSystem.configTable.getString("dbpediaServer").contains("http:")) {
+
 	private static void indicateIterationNumber() throws Exception {
 		Log.consoleln("\n*** Iteration "+iteration+" ***");
 		String sameReport = Constants.starsLine+"Iteration "+iteration+Constants.starsLine;

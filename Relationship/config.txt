@@ -4,16 +4,18 @@
 //================================================================================
 	
 // Current test name 
-testName = user18_map?
+// testName = user19_map1
+testName = map01
 
 // Base directory to creation of output files: absolut path 'C:\\path\\results' or relative path 'path\\results' or current path '.'
-baseDirectory = C:\\Users\\Henrique\\Documents\\data_collect
+// baseDirectory = C:\\Users\\Henrique\\Documents\\data_collect
+baseDirectory = C:\\documentos\\Doutorado\\Tese\\my_knowledge_base
 
 // minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
 minIterationToVerifyUniqueConnectedComponent = 6
 
 // minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
-minIterationToVerifyRelationshipBetweenOriginalConcepts = 6
+minIterationToVerifyRelationshipBetweenOriginalConcepts = 8
 
 // maximum quantity of iterations to get out of loop (good value: 50)  
 maxIteration = 50  
@@ -22,7 +24,7 @@ maxIteration = 50
 nDegreeFilter = 2
 
 // apply n-degree filter trigger from iteration number (good value: 2)
-iterationTriggerApplyNDegreeFilterAlgorithm = 2
+iterationTriggerApplyNDegreeFilterAlgorithm = 3
 
 // quantity of nodes to shoot n-degree filter algorithm (good value: 10000)
 quantityNodesToApplyNdegreeFilter = 10000
@@ -31,7 +33,7 @@ quantityNodesToApplyNdegreeFilter = 10000
 isUniqueConnectedComponentToApplyNdegreeFilter = false
 
 // make the duplication of concept: from with "category" to without one (change to modify quantity of concepts with "category")
-additionNewConceptWithoutCategory = false
+additionNewConceptWithoutCategory = true
 	
 // K-core used in all system (good value: 2)
 kCoreFilter = 2
@@ -41,7 +43,7 @@ quantityNodesToApplyKcoreFilter = 700
 	
 // fator added in logarithmic function to calculate goal of concepts quantity in final concept to map (good value: 3)
 // function: log2(1/countOriginal)+4+factor
-conceptsQuantityCalculationFactor = 1
+conceptsQuantityCalculationFactor = 3
 
 // top limit to range of concepts quantity (good value: 5)
 conceptsMinMaxRange = 5
@@ -59,7 +61,7 @@ isEnableUselessTable = true
 	
 // BETWEENNESS + CLOSENESS
 // quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of user terms) (good value: 3.0)
-proporcionBetweennessCloseness = 2.5
+proporcionBetweennessCloseness = 3.0
 // precision added up to rounding the calculate of quantity of each connected component (good value: 0.5)
 precisionBetweennessCloseness = 0.5
 // quantity of nodes to use as base to build betweenness+closeness sorted table. 
@@ -80,9 +82,9 @@ precisionEigenvector = 0.5
 maxEigenvector = 5
 
 // choice of nodes to be head. They are used to build the shortest paths (obs. the original concepts are always chosen) (good value: isBetweennessCloseness = true)
-isBetweennessCloseness = false
+isBetweennessCloseness = true
 isEigenvector = false
-isSelected = true
+isSelected = false
 	
 // keep all nodes with link to original concepts (in stage after selection of head nodes) (good value: false)
 // (normally this flag improves much more the final quantity of concepts in concept map) 
@@ -116,7 +118,9 @@ dirLog					= log
 dirConceptMap           = conceptMap    	
     	
 // DBPEDIA server (good value: http://dbpedia.org/sparql) (alternative good value: http://lod.openlinksw.com/sparql)
-dbpediaServer = http://dbpedia.org/sparql
+// or, my knowledge base: 
+// dbpediaServer = http://dbpedia.org/sparql
+dbpediaServer = C:\\documentos\\Doutorado\\Tese\\my_knowledge_base\\base.txt
 
 // to see simultaneously the build of graph in Gephi (good value: false)	
 gephiVisualization = false

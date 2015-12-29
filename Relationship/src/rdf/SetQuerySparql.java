@@ -172,14 +172,29 @@ public class SetQuerySparql {
 		return total;
 	}
 	
-	//  read all RDF triples belongs to one query concept 
+	// read all RDF triples belongs to one query concept 
 	private int collectRDFsOneQuery(QuerySparql querySparql, Count numRdfsInInternet, Count numRdfsInFile) throws Exception {
 		int count = 0;
-		// if concept exists in persistence data, read it
-		if(WholeSystem.getRdfsFileTable().containsKey(querySparql.getConcept().getBlankName())) {
+		
+		// decide to read the RDFs among three ways: 
+		// 1. read from my knowledge base;
+		// 2. read from RDFs files offline
+		// 3. read from DBPEDIA Server
+		
+		// < 1. read from my knowledge base >
+		// if dbpediaServer var do not contais "http", is because the RDFs are in my knowledge base
+		if(!WholeSystem.configTable.getString("dbpediaServer").contains("http:")) {
+-----			
+		}
+
+		// < 2. read from RDFs files offline >
+		// else, if concept exists in persistence data, read it
+		else if(WholeSystem.getRdfsFileTable().containsKey(querySparql.getConcept().getBlankName())) {
 			count = readPersistenceRDFsOneQuery(querySparql);
 			numRdfsInFile.incCount(count);
 		}
+		
+		// < 3. read from DBPEDIA Server >
 		// else, read it of the Internet DataBase
 		else {
 			count = readInternetDataBaseOneQuery(querySparql);			
