@@ -11,6 +11,10 @@ public class Links {
 		this.linkList = new LinkedList<Link>();
 	}
 	
+	public List<Link> getLinkList() {
+		return this.linkList;
+	}
+	
 	public boolean add(Link link) {
 		return this.linkList.add(link);
 	}

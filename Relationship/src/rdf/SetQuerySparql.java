@@ -16,6 +16,8 @@ import main.Constants;
 import main.Count;
 import main.Log;
 import main.WholeSystem;
+import myBase.Links;
+import myBase.Link;
 import user.Concept;
 import user.ConceptsGroup;
 
@@ -183,21 +185,22 @@ public class SetQuerySparql {
 		
 		// < 1. read from my knowledge base >
 		// if dbpediaServer var do not contais "http", is because the RDFs are in my knowledge base
-		if(!WholeSystem.configTable.getString("dbpediaServer").contains("http:")) {
------			
+		if(WholeSystem.configTable.getInt("knowledgeBaseLocal") == 1) {
+			count = readMyKnowledgeBaseRDFsOneQuery(querySparql);
+			numRdfsInFile.incCount(count);
 		}
 
 		// < 2. read from RDFs files offline >
 		// else, if concept exists in persistence data, read it
 		else if(WholeSystem.getRdfsFileTable().containsKey(querySparql.getConcept().getBlankName())) {
-			count = readPersistenceRDFsOneQuery(querySparql);
+			count = this.readPersistenceRDFsOneQuery(querySparql);
 			numRdfsInFile.incCount(count);
 		}
 		
 		// < 3. read from DBPEDIA Server >
 		// else, read it of the Internet DataBase
 		else {
-			count = readInternetDataBaseOneQuery(querySparql);			
+			count = this.readInternetDataBaseOneQuery(querySparql);			
 			numRdfsInInternet.incCount(count);
 			
 			// and save it in file
@@ -211,6 +214,37 @@ public class SetQuerySparql {
 		return count;
 	}
 	
+	private int readMyKnowledgeBaseRDFsOneQuery(QuerySparql querySparql) throws Exception {
+
+		String strConcept = querySparql.getConcept().getBlankName();
+		Links linkList = WholeSystem.getMyKnowledgeBase().get(strConcept);
+		
+		ListRDF listRDF = querySparql.getListRDF();
+
+		ItemRDF subjectRDF, predicateRDF, objectRDF; 
+		for(Link link : linkList.getLinkList()) {
+
+			// verify the direction of arrow
+			if(link.isNodeSubject()) {
+				subjectRDF   = new ItemRDF(link.getNodeDesc());
+				objectRDF    = new ItemRDF(strConcept);
+			}
+			else {
+				subjectRDF   = new ItemRDF(strConcept);
+				objectRDF    = new ItemRDF(link.getNodeDesc());
+			}
+			
+			predicateRDF  = new ItemRDF(link.getLinkDesc());
+			OneRDF oneRDF = new OneRDF(subjectRDF, predicateRDF, objectRDF);
+
+			// insert complete item into listQuerySparql of the RDFs
+			listRDF.getList().add(oneRDF);
+
+			this.incTotalRDFs();
+		}
+		return querySparql.getListRDF().size();
+	}
+
 	private int readPersistenceRDFsOneQuery(QuerySparql querySparql) throws Exception {
 		String strConcept = querySparql.getConcept().getBlankName();
 		String fileName   = RdfsFilesTable.formatToFileName(strConcept);

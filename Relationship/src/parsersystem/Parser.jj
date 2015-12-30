@@ -1,7 +1,7 @@
 /*  Parser.jj  -  Process the parsers of the system */ 
 options {
   DEBUG_PARSER = false;
-  DEBUG_TOKEN_MANAGER = false;
+  DEBUG_TOKEN_MANAGER = true;
   STATIC = false;
 }
 PARSER_BEGIN(Parser)
@@ -13,6 +13,7 @@ import user.*;
 import rdf.*;
 import map.*;
 import graph.*;
+import myBase.*;
 
 public class Parser {
    public static void main(String args[])  throws Exception {
@@ -77,20 +78,23 @@ TOKEN : {
 < T_originalConceptWithGephiToolKitBug2: 		"originalConceptWithGephiToolKitBug2" > |
 < T_originalConceptWithGephiToolKitBug3: 		"originalConceptWithGephiToolKitBug3" > |
 < T_isEnableUselessTable:						"isEnableUselessTable" > |
-< T_isUniqueConnectedComponentToApplyNdegreeFilter: "isUniqueConnectedComponentToApplyNdegreeFilter" >
+< T_isUniqueConnectedComponentToApplyNdegreeFilter: "isUniqueConnectedComponentToApplyNdegreeFilter" > |
+< T_nameMyKnowledgeBaseFile:                    "nameMyKnowledgeBaseFile" > |
+< T_knowledgeBaseLocal:                         "knowledgeBaseLocal" >
 }
 
 TOKEN : {
       < EQUALS:             (" "|"\t")* "=" (" "|"\t")* > |
       < NEW_LINE:           ( "\n" | "\r" )+ > |
       < TAB:                ( "\t" )+ > |
-      < BLANK:              " " >
+      < BLANK:              " " > |
+      < QUOTE:              "\"" >
  }
 
 
 TOKEN : {
       < ARROW:              "->" > |
-      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9",".","(",")","á","é","í","ó","ú","ê","ô","ã","ñ","ç" ] > |
+      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9",".","(",")","á","é","í","ó","ú","â","ê","ô","ã","ñ","ç","º" ] > |
       < #SPECIAL_CHARACTER: [ "-","_",":","#","\'","/","\\","%","?" ] > |
       < TERM:               < COMMON_CHARACTER > 
                             (
@@ -169,7 +173,9 @@ void parseConfigurations(ConfigTable configTable) : {Token tokenVar; Token token
 	tokenVar=< T_dirGraph > |
 	tokenVar=< T_dirLog > |
 	tokenVar=< T_dirConceptMap > |
-	tokenVar=< T_isUniqueConnectedComponentToApplyNdegreeFilter >
+	tokenVar=< T_isUniqueConnectedComponentToApplyNdegreeFilter > |
+	tokenVar=< T_nameMyKnowledgeBaseFile > |
+	tokenVar=< T_knowledgeBaseLocal >
     )
     < EQUALS > tokenValue = < TERM > 
     { WholeSystem.configTable.insert(tokenVar.image, tokenValue.image.trim()); }
@@ -232,12 +238,12 @@ void line(VocabularyTable vocabularyTable) : {Token tokenLeft; Token tokenRight;
 
 
 // list of concepts, separate for comma or new line
-void parseUselessConcepts(UselessConceptsTable uselessConceptsTable) : {} 
+void parseUselessConcepts() : {} 
 {
-    ( elementUselessConcept(uselessConceptsTable) )*
+    ( elementUselessConcept() )*
     < EOF >
 }
-void elementUselessConcept(UselessConceptsTable uselessConceptsTable) : {Token token;}  
+void elementUselessConcept() : {Token token;}  
 {
     ( < SEPARATORS > | < BLANK > | < TAB > | <  NEW_LINE > )*
 	token = < TERM >
@@ -249,5 +255,21 @@ void elementUselessConcept(UselessConceptsTable uselessConceptsTable) : {Token t
 }
 
 
+// list of RDFs belongs to my knowledge base - values separated for TAB, and RDFs separated for new line
+void parseMyKnowledgeBase() : {} 
+{
+    ( elementMyKnowledgeBase() )*
+    < EOF >
+}
+void elementMyKnowledgeBase() : {Token tokenSubject; Token tokenPredicate; Token tokenObject;}  
+{
+    tokenSubject   = < TERM > (< BLANK >)* < TAB >
+    (< QUOTE >)? tokenPredicate =  < TERM > (< QUOTE >)? (< BLANK >)* < TAB >
+    tokenObject    = < TERM > (< BLANK >)*
+    ( < NEW_LINE > )?
+    {
+	   WholeSystem.getMyKnowledgeBase().insert(tokenSubject.image.trim(), tokenPredicate.image.trim(), tokenObject.image.trim());			
+    }
+}
 
 

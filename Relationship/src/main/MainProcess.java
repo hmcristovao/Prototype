@@ -1,4 +1,4 @@
-// v7.0 - starting the building of use of the my knowledge base. Do not working.
+// v7.1 - MyKnowledgeBase ready. But still have errors...
 
 package main;
 
@@ -46,7 +46,7 @@ public class MainProcess {
 			parseUselessConcepts(parser);
 			parseVocabulary(parser);
 			readRdfsFileNameToRdfsFileTable();
-			readRdfsInMyKnowledgeBaseFile();
+			readMyKnowledgeBaseFile(parser);
 
 			// ***** Iterations Stage *****
 			do {
@@ -311,7 +311,7 @@ public class MainProcess {
 		if(WholeSystem.configTable.getBoolean("isEnableUselessTable")) {
 			Log.console("- Parsing useless concepts");
 			parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameUselessConceptsFile")));
-			parser.parseUselessConcepts(WholeSystem.getUselessConceptsTable());
+			parser.parseUselessConcepts();
 			Log.consoleln(" - " + WholeSystem.getUselessConceptsTable().size() + " concepts parsed.");
 			String sameReport = "Quantity of useless concepts parsed: " + WholeSystem.getUselessConceptsTable().size() +   
 					" (file: "+WholeSystem.configTable.getString("nameUselessConceptsFile")+")\n" +
@@ -340,18 +340,16 @@ public class MainProcess {
 		Log.outFileShortReport(sameReport);			
 	}
 	
-	private static void readRdfsInMyKnowledgeBaseFile() throws Exception {
-		Log.console("- Reading RDFs in my knowledge base file");
-		WholeSystem.getRdfsFileTable().init(WholeSystem.configTable.getString("dirRdfsPersistenceFiles"));  
- 		Log.consoleln(" - " + WholeSystem.getRdfsFileTable().size() + " RDFs files identified.");
-		String sameReport = "RDFs files identified: "+WholeSystem.getRdfsFileTable().size()+".";
-		Log.outFileCompleteReport(sameReport+"\n"+WholeSystem.getRdfsFileTable());
-		Log.outFileShortReport(sameReport);			
+	private static void readMyKnowledgeBaseFile(Parser parser) throws Exception {
+		Log.console("- Reading my knowledge base file");
+		parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameMyKnowledgeBaseFile")));
+		parser.parseMyKnowledgeBase();
+		Log.consoleln(" - " + WholeSystem.getMyKnowledgeBase().size() + " nodes parsed.");
+		String sameReport = "Quantity of nodes of the my knowledge base parsed: " + WholeSystem.getMyKnowledgeBase().size() +   
+				" (file: "+WholeSystem.configTable.getString("nameMyKnowledgeBaseFile")+")\n";
+		Log.outFileCompleteReport(sameReport + "\nNodes and links parsed:\n" + WholeSystem.getMyKnowledgeBase().toString());
+		Log.outFileShortReport(sameReport);
 	}
-	;
-	// < 1. read from my knowledge base >
-	// if dbpediaServer var do not contais "http", is because the RDFs are in my knowledge base
-	if(!WholeSystem.configTable.getString("dbpediaServer").contains("http:")) {
 
 	private static void indicateIterationNumber() throws Exception {
 		Log.consoleln("\n*** Iteration "+iteration+" ***");

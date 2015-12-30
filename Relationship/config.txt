@@ -7,6 +7,9 @@
 // testName = user19_map1
 testName = map01
 
+// Knowledge base local (1 = DBpedia; 2 = my knowledge base)
+knowledgeBaseLocal = 2
+
 // Base directory to creation of output files: absolut path 'C:\\path\\results' or relative path 'path\\results' or current path '.'
 // baseDirectory = C:\\Users\\Henrique\\Documents\\data_collect
 baseDirectory = C:\\documentos\\Doutorado\\Tese\\my_knowledge_base
@@ -110,6 +113,7 @@ nameCompleteReportFile  = complete_report_##.txt
 nameShortReportFile     = short_report_##.txt
 nameConsoleReportFile   = console_report_##.txt
 nameConsoleErrorFile    = consoleErr_##.txt
+nameMyKnowledgeBaseFile = myKnowledgeBase\\base.txt
 
 // Names of directories
 dirRdfsPersistenceFiles = persistenceRdfs
@@ -118,9 +122,7 @@ dirLog					= log
 dirConceptMap           = conceptMap    	
     	
 // DBPEDIA server (good value: http://dbpedia.org/sparql) (alternative good value: http://lod.openlinksw.com/sparql)
-// or, my knowledge base: 
-// dbpediaServer = http://dbpedia.org/sparql
-dbpediaServer = C:\\documentos\\Doutorado\\Tese\\my_knowledge_base\\base.txt
+dbpediaServer = http://dbpedia.org/sparql
 
 // to see simultaneously the build of graph in Gephi (good value: false)	
 gephiVisualization = false

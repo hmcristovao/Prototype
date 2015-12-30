@@ -2,9 +2,9 @@ package main;
 
 import graph.*;
 import rdf.*;
-import user.Concept;
-import user.ConceptsGroup;
+import user.*;
 import map.*;
+import myBase.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +17,7 @@ public class WholeSystem {
 	public static  ConfigTable configTable = new ConfigTable();
 	private static UselessConceptsTable uselessConceptsTable = new UselessConceptsTable();
 	private static RdfsFilesTable rdfsFilesTable = new RdfsFilesTable();
+	private static MyKnowledgeBase myKnowledgeBase = new MyKnowledgeBase();
 	private static StreamGraphData streamGraphData = new StreamGraphData();  // It manages the Gephi graph visualization, just in Time.  Only one to store all iterations.
 	private static ConceptsGroup conceptsRegister = new ConceptsGroup();
 	private static ConceptsGroup originalConcepts = null;  // will be filled in MainProcess.parseTerms()
@@ -62,9 +63,11 @@ public class WholeSystem {
 	public static RdfsFilesTable getRdfsFileTable() {
 		return WholeSystem.rdfsFilesTable;
 	}
-	public static void setRdfsFilesTable(RdfsFilesTable rdfsFilesTable) {
-		WholeSystem.rdfsFilesTable = rdfsFilesTable;
+	 
+	public static MyKnowledgeBase getMyKnowledgeBase() {
+		return WholeSystem.myKnowledgeBase;
 	}
+	
 	public static StreamGraphData getStreamGraphData() {
 		return WholeSystem.streamGraphData;
 	}
