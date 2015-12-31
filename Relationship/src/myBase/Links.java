@@ -23,10 +23,11 @@ public class Links {
 		StringBuffer out = new StringBuffer();
 		out.append(" (#");
 		out.append(this.linkList.size());
-		out.append(") ");
+		out.append(")\n");
 		for(Link link : this.linkList) {
+			out.append("   ");
 			out.append(link.toString());
-			out.append(" , ");
+			out.append("\n");
 		}
 		return out.toString();
 	}

@@ -1,7 +1,7 @@
 /*  Parser.jj  -  Process the parsers of the system */ 
 options {
   DEBUG_PARSER = false;
-  DEBUG_TOKEN_MANAGER = true;
+  DEBUG_TOKEN_MANAGER = false;
   STATIC = false;
 }
 PARSER_BEGIN(Parser)
@@ -16,11 +16,8 @@ import graph.*;
 import myBase.*;
 
 public class Parser {
-   public static void main(String args[])  throws Exception {
-      Parser firstParser = null;
-	  MainProcess.body(firstParser);
-   }
 }
+
 PARSER_END(Parser)
 
 SKIP : { "//" : comentario_final }
@@ -87,14 +84,13 @@ TOKEN : {
       < EQUALS:             (" "|"\t")* "=" (" "|"\t")* > |
       < NEW_LINE:           ( "\n" | "\r" )+ > |
       < TAB:                ( "\t" )+ > |
-      < BLANK:              " " > |
-      < QUOTE:              "\"" >
+      < BLANK:              " " > 
  }
 
 
 TOKEN : {
       < ARROW:              "->" > |
-      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9",".","(",")","á","é","í","ó","ú","â","ê","ô","ã","ñ","ç","º" ] > |
+      < #COMMON_CHARACTER:  [ "a"-"z","A"-"Z","0"-"9",".","(",")","á","é","í","ó","ú","â","ê","ô","ã","õ","ñ","à","ç","º","ª" ] > |
       < #SPECIAL_CHARACTER: [ "-","_",":","#","\'","/","\\","%","?" ] > |
       < TERM:               < COMMON_CHARACTER > 
                             (
@@ -255,21 +251,5 @@ void elementUselessConcept() : {Token token;}
 }
 
 
-// list of RDFs belongs to my knowledge base - values separated for TAB, and RDFs separated for new line
-void parseMyKnowledgeBase() : {} 
-{
-    ( elementMyKnowledgeBase() )*
-    < EOF >
-}
-void elementMyKnowledgeBase() : {Token tokenSubject; Token tokenPredicate; Token tokenObject;}  
-{
-    tokenSubject   = < TERM > (< BLANK >)* < TAB >
-    (< QUOTE >)? tokenPredicate =  < TERM > (< QUOTE >)? (< BLANK >)* < TAB >
-    tokenObject    = < TERM > (< BLANK >)*
-    ( < NEW_LINE > )?
-    {
-	   WholeSystem.getMyKnowledgeBase().insert(tokenSubject.image.trim(), tokenPredicate.image.trim(), tokenObject.image.trim());			
-    }
-}
 
 

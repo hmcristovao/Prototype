@@ -5,9 +5,11 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 import main.Constants;
 import main.WholeSystem;
+import myBase.Links;
 import parsersystem.Token;
 
 public class RdfsFilesTable  implements Serializable   {
@@ -69,14 +71,22 @@ public class RdfsFilesTable  implements Serializable   {
 	}
 	
 	public String toString() {
-		StringBuffer out = new StringBuffer();
+		// at first: sort
+		TreeSet<String> sortSet = new TreeSet<String>();
 		Iterator<String> i = this.table.keySet().iterator(); 
 		while(i.hasNext()) {
-		   out.append((String)i.next()); 
-		   out.append(", ");
+			String key     = (String)i.next(); 
+			sortSet.add(key);
+		}	
+		// second: list
+		StringBuffer out = new StringBuffer();
+		for(String str : sortSet) {
+			out.append(str);
+			out.append("\n");
 		}
 		return out.toString();
 	}
+
 	public String toStringAux() {
 		StringBuffer out = new StringBuffer();
 		Iterator<String> i = this.table.keySet().iterator(); 

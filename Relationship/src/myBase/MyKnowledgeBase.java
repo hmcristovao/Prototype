@@ -1,7 +1,9 @@
 package myBase;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 
 public class MyKnowledgeBase {
 
@@ -44,5 +46,21 @@ public class MyKnowledgeBase {
 		return this.nodeHash.get(nodeDesc);
 	}
 
-
+	public String toString() {
+		// at first: sort
+		TreeSet<String> sortSet = new TreeSet<String>();
+		Iterator<String> i = this.nodeHash.keySet().iterator(); 
+		while(i.hasNext()) {
+		   String key     = (String)i.next(); 
+		   Links linkList = this.nodeHash.get(key);
+		   sortSet.add(key + " => " + linkList.toString());
+		}	
+		// second: list
+		StringBuffer out = new StringBuffer();
+		for(String str : sortSet) {
+			out.append(str);
+			out.append("\n");
+		}
+		return out.toString();
+	}
 }

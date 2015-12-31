@@ -1,4 +1,4 @@
-// v7.1 - MyKnowledgeBase ready. But still have errors...
+// v7.2 - created new parser. Contains erros.
 
 package main;
 
@@ -27,6 +27,8 @@ import user.*;
 
 // this class manages the main process and it does system logs
 public class MainProcess {	
+	private static Parser  firstParser;
+	private static Parser2 secondParser;
 	private static int iteration, baseConnectedComponentCount, nodeDataPos;
 	private static SetQuerySparql  currentSetQuerySparql;
 	private static SystemGraphData currentSystemGraphData, oldSystemGraphData;
@@ -37,16 +39,17 @@ public class MainProcess {
 	
 	private enum Time {t1_whileIteration, t2_afterIterationAndKcore, t3_afterHeadNodesPaths, t4_afterSteadyUniqueConnected, t5_finalGraph };
 	
-	public static void body(Parser parser) throws Exception {
-		try {
+    public static void main(String args[])  throws Exception {
+
+    	try {
 			// ***** Initial Stage *****
 			iteration = 0;
-			start(parser);
-			parseTerms(parser);
-			parseUselessConcepts(parser);
-			parseVocabulary(parser);
+			start();
+			parseTerms();
+			parseUselessConcepts();
+			parseVocabulary();
 			readRdfsFileNameToRdfsFileTable();
-			readMyKnowledgeBaseFile(parser);
+			readMyKnowledgeBaseFile();
 
 			// ***** Iterations Stage *****
 			do {
@@ -250,8 +253,8 @@ public class MainProcess {
 	
 	// ***** Static methods to macro support *****
 	
-	private static void start(Parser parser) throws Exception {
-		parseConfiguration(parser);
+	private static void start() throws Exception {
+		parseConfiguration();
 		buildDirectoryStrutureToOutputFiles();
 		Log.initFiles();
 		Log.consoleln("- Starting process.");
@@ -259,10 +262,10 @@ public class MainProcess {
 		showParseConfigurationInformation();
 	}
 	
-	private static void parseConfiguration(Parser parser) throws Exception {
+	private static void parseConfiguration() throws Exception {
 		System.out.println("- Starting parse of configuration and log files.");
-		parser = new Parser(new FileInputStream(Constants.nameConfigFile));
-		parser.parseConfigurations(WholeSystem.configTable);
+		MainProcess.firstParser = new Parser(new FileInputStream(Constants.nameConfigFile));
+		MainProcess.firstParser.parseConfigurations(WholeSystem.configTable);
 	}
 	private static void buildDirectoryStrutureToOutputFiles() throws Exception {
 		String newDirectoryStr = WholeSystem.configTable.getString("baseDirectory")+"\\"+WholeSystem.configTable.getString("testName");
@@ -292,11 +295,11 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport + "\n\n"+ WholeSystem.configTable.toString());
 		Log.outFileShortReport(sameReport + "\n\n"+ WholeSystem.configTable.toString());
 	}
-	private static void parseTerms(Parser parser) throws Exception {
+	private static void parseTerms() throws Exception {
 		Log.console("- Parsing user terms");
-		parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameUserTermsFile")));
+		MainProcess.firstParser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameUserTermsFile")));
 		WholeSystem.insertListSetQuerySparql(new SetQuerySparql());
-		parser.parseUserTerms(WholeSystem.getListSetQuerySparql().getFirst());
+		MainProcess.firstParser.parseUserTerms(WholeSystem.getListSetQuerySparql().getFirst());
 		WholeSystem.initQuantityOriginalConcepts(WholeSystem.getConceptsRegister().size());
 		WholeSystem.initGoalMaxConceptsQuantity();
 		WholeSystem.setOriginalConcepts(WholeSystem.getConceptsRegister().getOriginalConcepts());
@@ -307,11 +310,11 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport + WholeSystem.getOriginalConcepts().toStringLong());
 		Log.outFileShortReport(sameReport + WholeSystem.getOriginalConcepts().toString());
 	}
-	private static void parseUselessConcepts(Parser parser) throws Exception {
+	private static void parseUselessConcepts() throws Exception {
 		if(WholeSystem.configTable.getBoolean("isEnableUselessTable")) {
 			Log.console("- Parsing useless concepts");
-			parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameUselessConceptsFile")));
-			parser.parseUselessConcepts();
+			MainProcess.firstParser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameUselessConceptsFile")));
+			MainProcess.firstParser.parseUselessConcepts();
 			Log.consoleln(" - " + WholeSystem.getUselessConceptsTable().size() + " concepts parsed.");
 			String sameReport = "Quantity of useless concepts parsed: " + WholeSystem.getUselessConceptsTable().size() +   
 					" (file: "+WholeSystem.configTable.getString("nameUselessConceptsFile")+")\n" +
@@ -320,10 +323,10 @@ public class MainProcess {
 			Log.outFileShortReport(sameReport);
 		}
 	}
-	private static void parseVocabulary(Parser parser) throws Exception {
+	private static void parseVocabulary() throws Exception {
 		Log.console("- Parsing vocabulary");
-		parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameVocabularyFile")));
-		parser.parseSystemVocabulary(WholeSystem.getVocabularyTable());
+		MainProcess.firstParser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameVocabularyFile")));
+		MainProcess.firstParser.parseSystemVocabulary(WholeSystem.getVocabularyTable());
 		Log.consoleln(" - " + WholeSystem.getVocabularyTable().size() + " sentences parsed.");
 		String sameReport = "Quantity of vocabulary sentences parsed: " + WholeSystem.getVocabularyTable().size() +   
                 " (file: "+WholeSystem.configTable.getString("nameVocabularyFile")+")\n" +
@@ -336,18 +339,18 @@ public class MainProcess {
 		WholeSystem.getRdfsFileTable().init(WholeSystem.configTable.getString("dirRdfsPersistenceFiles"));  
  		Log.consoleln(" - " + WholeSystem.getRdfsFileTable().size() + " RDFs files identified.");
 		String sameReport = "RDFs files identified: "+WholeSystem.getRdfsFileTable().size()+".";
-		Log.outFileCompleteReport(sameReport+"\n"+WholeSystem.getRdfsFileTable());
+		Log.outFileCompleteReport(sameReport+"\n\n"+WholeSystem.getRdfsFileTable());
 		Log.outFileShortReport(sameReport);			
 	}
 	
-	private static void readMyKnowledgeBaseFile(Parser parser) throws Exception {
+	private static void readMyKnowledgeBaseFile() throws Exception {
 		Log.console("- Reading my knowledge base file");
-		parser = new Parser(new FileInputStream(WholeSystem.configTable.getString("nameMyKnowledgeBaseFile")));
-		parser.parseMyKnowledgeBase();
+		MainProcess.secondParser = new Parser2(new FileInputStream(WholeSystem.configTable.getString("nameMyKnowledgeBaseFile")));
+		MainProcess.secondParser.parseMyKnowledgeBase();
 		Log.consoleln(" - " + WholeSystem.getMyKnowledgeBase().size() + " nodes parsed.");
 		String sameReport = "Quantity of nodes of the my knowledge base parsed: " + WholeSystem.getMyKnowledgeBase().size() +   
 				" (file: "+WholeSystem.configTable.getString("nameMyKnowledgeBaseFile")+")\n";
-		Log.outFileCompleteReport(sameReport + "\nNodes and links parsed:\n" + WholeSystem.getMyKnowledgeBase().toString());
+		Log.outFileCompleteReport(sameReport + "\nNodes and links parsed:\n\n" + WholeSystem.getMyKnowledgeBase().toString());
 		Log.outFileShortReport(sameReport);
 	}
 
