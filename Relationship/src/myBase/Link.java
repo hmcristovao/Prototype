@@ -6,39 +6,27 @@ public class Link {
 	private String  nodeDesc;
 	private boolean isNodeSubject;
 	
-	public Link(String descLink, String descNode, boolean nodeSubject) {
+	public Link(String descLink, String descNode, boolean isNodeSubject) {
 		super();
-		this.linkDesc     = descLink;
-		this.nodeDesc     = descNode;
-		this.isNodeSubject = nodeSubject;
+		this.linkDesc      = descLink;
+		this.nodeDesc      = descNode;
+		this.isNodeSubject = isNodeSubject;
 	}
 
 	public String getLinkDesc() {
 		return this.linkDesc;
 	}
 
-	public void setLinkDesc(String linkDesc) {
-		this.linkDesc = linkDesc;
-	}
-
 	public String getNodeDesc() {
 		return this.nodeDesc;
-	}
-
-	public void setNodeDesc(String nodeDesc) {
-		this.nodeDesc = nodeDesc;
 	}
 
 	public boolean isNodeSubject() {
 		return this.isNodeSubject;
 	}
 	
-	public void setIsNodeSubject(boolean isNodeSubject) {
-		this.isNodeSubject = isNodeSubject;
-	}
-	
 	public String toString() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		out.append(this.linkDesc);
 		if(this.isNodeSubject)
 			out.append(" -> ");

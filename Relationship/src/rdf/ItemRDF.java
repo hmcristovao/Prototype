@@ -2,6 +2,7 @@ package rdf;
 
 import java.io.Serializable;
 
+import main.WholeSystem;
 import user.Concept;
 
 public class ItemRDF implements Serializable {
@@ -27,10 +28,14 @@ public class ItemRDF implements Serializable {
 	
 	// shortening a name, normally cut the address part and keep on the suffix until the bar
 	static private String doShortName(String longName) {
-		String shortName;
-		int positionLastBar = longName.lastIndexOf("/");
-		shortName = longName.substring(positionLastBar+1);
-		return shortName;
+		// only shortening if base is DBPedia (if base is my knowledge then do nothing)
+		if(WholeSystem.configTable.getInt("knowledgeBasePlace") == 1) {
+			String shortName;
+			int positionLastBar = longName.lastIndexOf("/");
+			shortName = longName.substring(positionLastBar+1);
+			return shortName;
+		}
+		return longName;
 	}
 	
 	@Override

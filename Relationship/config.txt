@@ -8,17 +8,17 @@
 testName = map01
 
 // Knowledge base local (1 = DBpedia; 2 = my knowledge base)
-knowledgeBaseLocal = 2
+knowledgeBasePlace = 2
 
 // Base directory to creation of output files: absolut path 'C:\\path\\results' or relative path 'path\\results' or current path '.'
 // baseDirectory = C:\\Users\\Henrique\\Documents\\data_collect
 baseDirectory = C:\\documentos\\Doutorado\\Tese\\my_knowledge_base
 
 // minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
-minIterationToVerifyUniqueConnectedComponent = 6
+minIterationToVerifyUniqueConnectedComponent = 2
 
 // minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
-minIterationToVerifyRelationshipBetweenOriginalConcepts = 8
+minIterationToVerifyRelationshipBetweenOriginalConcepts = 2
 
 // maximum quantity of iterations to get out of loop (good value: 50)  
 maxIteration = 50  
@@ -101,6 +101,10 @@ backGroundcolorOriginalConcept = 200.200.200.255
 
 // thickness of concepts with hint (good value: 2)
 borderThicknessConceptWithHint = 2
+
+// line maximum length of sentences in the final concept map
+maxLineLengthConcept    = 20
+maxLineLengthLinkPhrase = 20
 
 // Names of files  (## = will be change to value of the testName var)
 nameQueryDefaultFile    = query_model\\query.txt

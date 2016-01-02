@@ -4,22 +4,22 @@ import user.Concept;
 
 public class QueryString {
 	
-	private StringBuffer queryStr;
+	private StringBuilder queryStr;
 	
 	public QueryString() {
-		this.queryStr = new StringBuffer();
+		this.queryStr = new StringBuilder();
 	}
-	public QueryString(StringBuffer queryStr) {
+	public QueryString(StringBuilder queryStr) {
 		this.queryStr = queryStr;
 	}
 	public QueryString(Concept concept) {
 		this.queryStr = this.buildQuery(concept);
 	}
-	public StringBuffer buildQuery(Concept concept) {
-		StringBuffer aux = new StringBuffer();
+	public StringBuilder buildQuery(Concept concept) {
+		StringBuilder aux = new StringBuilder();
 		return aux;
 	}
-	public StringBuffer getQueryStr() {
+	public StringBuilder getQueryStr() {
 		return this.queryStr;
 	}
 	public String getQueryStrString() {

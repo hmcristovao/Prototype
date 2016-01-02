@@ -40,7 +40,7 @@ public class RdfsFilesTable  implements Serializable   {
 	
 	public static String formatToConcept(String fileName) {
 		String str = fileName.replace(';', ':').replace('_', ' ');
-		StringBuffer newStr = new StringBuffer();
+		StringBuilder newStr = new StringBuilder();
 		for(int i=0; i < str.length() - 4; i++) {
 			if(str.charAt(i) == '^') {
 			   i++;
@@ -55,7 +55,7 @@ public class RdfsFilesTable  implements Serializable   {
 	}
 	public static String formatToFileName(String concept) {
 		String str = concept.replace(':', ';').replace(' ', '_');
-		StringBuffer newStr = new StringBuffer();
+		StringBuilder newStr = new StringBuilder();
 		for(int i=0; i < str.length(); i++) {
 			if(str.charAt(i) >= 'A' && str.charAt(i) <= 'Z' ) {
 			   newStr.append('^');
@@ -79,7 +79,7 @@ public class RdfsFilesTable  implements Serializable   {
 			sortSet.add(key);
 		}	
 		// second: list
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		for(String str : sortSet) {
 			out.append(str);
 			out.append("\n");
@@ -88,7 +88,7 @@ public class RdfsFilesTable  implements Serializable   {
 	}
 
 	public String toStringAux() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		Iterator<String> i = this.table.keySet().iterator(); 
 		while(i.hasNext()) {
 		   String concept = (String)i.next(); 

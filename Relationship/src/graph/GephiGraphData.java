@@ -139,7 +139,7 @@ public class GephiGraphData {
 	}
 	
 	public String toString() {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		str.append("\nGephi Graph:\n\n");
 		//Iterate over nodes
 		for(Node node : this.gephiGraph.getNodes()) {

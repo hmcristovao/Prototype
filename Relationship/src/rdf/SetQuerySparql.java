@@ -101,7 +101,7 @@ public class SetQuerySparql {
 	// exceptional function, direct access to current concepts listQuerySparql
 	// return one concept short name per line
 	public String getCurrentConcepts() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		for(QuerySparql x: this.listQuerySparql) {
 			out.append(x.getConcept().toString());
 			out.append("\n");
@@ -117,9 +117,9 @@ public class SetQuerySparql {
 		return list;
 	}
 
-	private StringBuffer readFileQueryDefault() throws IOException {
+	private StringBuilder readFileQueryDefault() throws IOException {
 		BufferedReader fileQueryDefault = new BufferedReader(new FileReader(WholeSystem.configTable.getString("nameQueryDefaultFile")));
-		StringBuffer queryDefault = new StringBuffer();
+		StringBuilder queryDefault = new StringBuilder();
 		String linhaAux = null;
 	    while (true) {
 	       linhaAux = fileQueryDefault.readLine();
@@ -132,8 +132,8 @@ public class SetQuerySparql {
         return queryDefault;
 	}
 	// replace and make a copy of the query
-	private StringBuffer replaceQueryDefault(StringBuffer queryDefault, String concept) {
-		StringBuffer newQueryDefault = new StringBuffer(queryDefault);
+	private StringBuilder replaceQueryDefault(StringBuilder queryDefault, String concept) {
+		StringBuilder newQueryDefault = new StringBuilder(queryDefault);
 		int start = 0;
 		while( (start = newQueryDefault.indexOf(Constants.markQueryReplacement, start)) != -1)
 		   newQueryDefault.replace(start, start+Constants.markQueryReplacement.length(), concept);
@@ -141,8 +141,8 @@ public class SetQuerySparql {
 	}
 	
 	public int assemblyQueries() throws IOException {	
-	    StringBuffer queryDefault = this.readFileQueryDefault();
-	    StringBuffer newQueryDefault = null;
+		StringBuilder queryDefault = this.readFileQueryDefault();
+		StringBuilder newQueryDefault = null;
 	    String newConcept = null;
 	    QueryString queryString = null;
 	    int n = 0;
@@ -185,7 +185,7 @@ public class SetQuerySparql {
 		
 		// < 1. read from my knowledge base >
 		// if dbpediaServer var do not contais "http", is because the RDFs are in my knowledge base
-		if(WholeSystem.configTable.getInt("knowledgeBaseLocal") == 1) {
+		if(WholeSystem.configTable.getInt("knowledgeBasePlace") == 2) { // 1=DBpedia, 2=my knowledge base
 			count = readMyKnowledgeBaseRDFsOneQuery(querySparql);
 			numRdfsInFile.incCount(count);
 		}
@@ -320,7 +320,7 @@ public class SetQuerySparql {
 	}
 	
 	public String toStringShort() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		int n = 1;
 		for(QuerySparql x: this.listQuerySparql) {
 			out.append("\nConcept number ");
@@ -333,7 +333,7 @@ public class SetQuerySparql {
 
 	@Override
 	public String toString() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		int n = 1;
 		for(QuerySparql x: this.listQuerySparql) {
 			out.append("\n***** Concept number ");

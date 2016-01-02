@@ -50,7 +50,7 @@ public class EdgesTableHash {
 		return edgeData.incTimes();
 	}
 	public String toString() {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		for(String idEdge: this.table.keySet()) {
 			str.append((this.table.get(idEdge)).toString());
 			str.append("\n");

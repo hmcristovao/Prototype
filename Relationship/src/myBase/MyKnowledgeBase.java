@@ -17,12 +17,18 @@ public class MyKnowledgeBase {
 		return this.nodeHash.size(); 
 	}
 	public void insert(String nodeSubject, String predicate, String nodeObject) {
+	
+		// remove possible of quotation marks in each sentences
+		nodeSubject = MyKnowledgeBase.removeQuotationMarks(nodeSubject);
+		predicate   = MyKnowledgeBase.removeQuotationMarks(predicate);
+		nodeObject  = MyKnowledgeBase.removeQuotationMarks(nodeObject);		
+		
 		Link link;
 		
-		link = new Link(predicate, nodeObject, true);
+		link = new Link(predicate, nodeObject, false);
 		this.insertElement(nodeSubject, link);
 		
-		link = new Link(predicate, nodeSubject, false);
+		link = new Link(predicate, nodeSubject, true);
 		this.insertElement(nodeObject, link);
 		
 	}
@@ -46,6 +52,16 @@ public class MyKnowledgeBase {
 		return this.nodeHash.get(nodeDesc);
 	}
 
+	// this method is important because the Excel put quotation marks when it find comma in sentence (in generation of file separated for TAB)
+	public static String removeQuotationMarks(String str) {
+		// if exists quotation marks in the begin and in the end of string, then remove them.
+		if(str.charAt(0) == '\"' && str.charAt(str.length()-1) == '\"') {
+			str = str.substring(1, str.length()-1);
+		}
+		return str;
+	}
+
+	
 	public String toString() {
 		// at first: sort
 		TreeSet<String> sortSet = new TreeSet<String>();
@@ -56,7 +72,7 @@ public class MyKnowledgeBase {
 		   sortSet.add(key + " => " + linkList.toString());
 		}	
 		// second: list
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		for(String str : sortSet) {
 			out.append(str);
 			out.append("\n");

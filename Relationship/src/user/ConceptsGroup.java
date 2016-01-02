@@ -306,7 +306,7 @@ public class ConceptsGroup {
 	// toString's() ========================================================================
 	
 	public String toStringLong() {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		if(this.list != null)
     		for(Concept x : this.list) {
 	    		str.append("- ");
@@ -318,7 +318,7 @@ public class ConceptsGroup {
 	
 	@Override
 	public String toString() {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		if(this.list != null)
     		for(Concept x : this.list) {
 	    		str.append("- ");

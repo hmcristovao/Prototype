@@ -35,7 +35,7 @@ public class VocabularyTable {
 		   sortSet.add(key + " => " + value);
 		}	
 		// second: list
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		for(String str : sortSet) {
 			out.append("   ");
 			out.append(str);

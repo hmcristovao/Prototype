@@ -18,6 +18,8 @@ import org.gephi.graph.api.Node;
 import user.Concept;
 import user.Concept.ConceptStatus;
 import user.ConceptsGroup;
+import main.Constants;
+import main.Count;
 import main.Log;
 import main.WholeSystem;
 
@@ -25,7 +27,7 @@ public class ConceptMap {
 	private List<Proposition> propositions;
 	private Map<String,SimpleConcept> concepts;  // will be filled in fillAttributesOfFileCXL()
 	private Map<String,String> links;            // will be filled in fillAttributesOfFileCXL()
-	
+			
 	public ConceptMap() {
 		this.propositions = new ArrayList<Proposition>();	
 		this.concepts     = new HashMap<String, SimpleConcept>();  // id, SimpleConcept
@@ -281,6 +283,92 @@ public class ConceptMap {
 		return n;
 	}
 	
+	// break long sentences inserting new lines 
+	public int 	upgradeConceptMap_heuristic_09_putNewLineInLongSentence() {
+		int total = 0;
+		Count count = new Count(0);
+		for( Proposition proposition : this.getPropositions()) {
+			// at first, verify whether it is not alone concept 
+			if(proposition.getLink() != null) {
+				count.setCount(0);
+				proposition.getSourceConcept().setLabel(
+						ConceptMap.putNewLineInLongSentence(proposition.getSourceConcept().getLabel(), 
+						                                    WholeSystem.configTable.getInt("maxLineLengthConcept"),
+						                                    count)
+				);
+				total += count.getCount();
+				count.setCount(0);
+				proposition.getTargetConcept().setLabel(
+						ConceptMap.putNewLineInLongSentence(proposition.getTargetConcept().getLabel(), 
+						                                    WholeSystem.configTable.getInt("maxLineLengthConcept"),
+						                                    count)
+				);
+				total += count.getCount();
+				count.setCount(0);
+				proposition.setLink(
+						ConceptMap.putNewLineInLongSentence(proposition.getLink(), 
+						                                    WholeSystem.configTable.getInt("maxLineLengthLinkPhrase"),
+						                                    count)
+				);		
+				total += count.getCount();
+				count.setCount(0);
+			}
+		}
+		return total;
+	}
+
+	public static String putNewLineInLongSentence(String str, int max, Count n) {
+		// if contains new line, it does nothing
+		if(str.length() > max && !str.contains("\n")) {
+			int countNewLine = str.length() / max;
+			StringBuilder s = new StringBuilder(str);
+			int i,k;
+			for(i=max, k=max; i<str.length()-max/2 && n.getCount() < countNewLine; i++, k++) {
+				if(k>=max && s.charAt(i)==' ') {
+					s.insert(i+1,"&#xa;");
+					k=0;
+					n.incCount();
+				}
+			}
+			str = s.toString();
+		}	
+		return str;
+	}
+
+	public int upgradeConceptMap_heuristic_10_setAccentedCharacterInCxlFile() {
+		int total = 0;
+		StringBuilder str;
+		for( Proposition proposition : this.getPropositions()) {
+			// at first, verify whether it is not alone concept 
+			if(proposition.getLink() != null) {
+				str = new StringBuilder(proposition.getSourceConcept().getLabel());
+				total += ConceptMap.setAccentedCharacter(str);
+				proposition.getSourceConcept().setLabel(str.toString());
+
+				str = new StringBuilder(proposition.getTargetConcept().getLabel());
+				total += ConceptMap.setAccentedCharacter(str);
+				proposition.getTargetConcept().setLabel(str.toString());
+				
+				str = new StringBuilder(proposition.getLink());
+				total += ConceptMap.setAccentedCharacter(str);
+				proposition.setLink(str.toString());
+			}
+		}
+		return total;		
+	}
+
+	public static int setAccentedCharacter(StringBuilder str) {
+		int n = 0;
+		for(int i=0; i<str.length(); i++) {
+			for(int k=0; k<Constants.characteres.length; k++)
+				if(str.charAt(i) == Constants.characteres[k][0].charAt(0)) {
+					str.replace(i, i+1, Constants.characteres[k][1]);
+					n++;
+				}
+		}	
+		return n;
+	}
+
 	// create a gephiGraph from concept map and generate a gexf file
 	public void buildGexfGraphFileFromConceptMap(String fileGexf) throws Exception {
 		// at first, create a new gephi graph
@@ -320,7 +408,7 @@ public class ConceptMap {
 	// create a TXT file from concept map
 	// use tab ('\t') to separate concepts and links
 	public void buildTxtFileFromConceptMap(String fileTxt) throws Exception {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		for(Proposition proposition : this.propositions) {
  			str.append(proposition.getSourceConcept().getLabel());
  			str.append('\t');
@@ -739,7 +827,7 @@ public class ConceptMap {
 		int countJ = this.fillAttributesInPropositionTable();
 
 		// buffer to store the content that will be stored in CLX file
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 	
 		str.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\r\n");
 		str.append("<cmap xmlns:dcterms=\"http://purl.org/dc/terms/\"\r\n");
@@ -860,7 +948,7 @@ public class ConceptMap {
 
 
 	public String toStringComplete() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		out.append("Total propositions: ");
 		out.append(this.propositions.size());
 		out.append("\n");
@@ -877,7 +965,7 @@ public class ConceptMap {
 	}
 	
 	public String toString() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		for(Proposition p : this.propositions) {
 			out.append("   ");
 			out.append(p.toString());

@@ -129,7 +129,7 @@ public class NodesTableArray {
 		return new NodesTableArray(newTable);
 	}
 	public String toStringShort(int quantityNodes) {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		str.append("Parcial quantity: "+quantityNodes+"\n\n");
 		for(int i=0; i<quantityNodes && i<this.count; i++) {
 			str.append(this.table[i].toString());
@@ -139,7 +139,7 @@ public class NodesTableArray {
 	}
 	
 	public String toString() {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		str.append("Total quantity: "+this.count+" (intern), "+this.table.length+" (max size).\n\n");
 		for(int i=0; i<this.count; i++) {
 			str.append(this.table[i].toString());

@@ -48,7 +48,7 @@ public class UselessConceptsTable {
 		   sortSet.add(key + " (count: " + value + ")");
 		}	
 		// second: list
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		for(String str : sortSet) {
 			out.append("   ");
 			out.append(str);

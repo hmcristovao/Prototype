@@ -20,7 +20,7 @@ public class Links {
 	}
 	
 	public String toString() {
-		StringBuffer out = new StringBuffer();
+		StringBuilder out = new StringBuilder();
 		out.append(" (#");
 		out.append(this.linkList.size());
 		out.append(")\n");

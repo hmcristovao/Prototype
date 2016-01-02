@@ -34,7 +34,7 @@ public class Ranks {
 	}
 	
 	public String toStringShort(int quantityNodes) {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		for(int i=0; i<this.count; i++) {
 			str.append(Constants.doubleLine);
 			str.append("Connected component number: "+i);
@@ -46,7 +46,7 @@ public class Ranks {
 	}
 	
 	public String toString() {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		for(int i=0; i<this.count; i++) {
 			str.append(Constants.singleLine);
 			str.append("Connected component number: "+i);

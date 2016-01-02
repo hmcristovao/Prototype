@@ -1,4 +1,4 @@
-// v7.2 - created new parser. Contains erros.
+// v7.3 - inserted accented characters and new line in long sentences, changed StringBuffer for StringBuilder. Working!
 
 package main;
 
@@ -213,7 +213,9 @@ public class MainProcess {
 			buildTxtFileFromConceptMap();
 			
 			upgradeConceptMap_heuristic_08_putNewLineInCategory();
-            buildCxlFileFromConceptMap();
+			upgradeConceptMap_heuristic_09_putNewLineInLongSentence();
+			upgradeConceptMap_heuristic_10_setAccentedCharacterInCxlFile();
+			buildCxlFileFromConceptMap();
 			
 			end();
 		}
@@ -415,7 +417,7 @@ public class MainProcess {
 		int num =  currentSetQuerySparql.collectRDFsAllQueries(numRdfsInInternet, numRdfsInFile);
 		Log.consoleln(" - "+num+" new RDFs triples collected ("+numRdfsInInternet+" in internet, "+numRdfsInFile+" in file).");
 		// extract collected quantity of RDFs to each concept
-		StringBuffer conceptsOut = new StringBuffer();
+		StringBuilder conceptsOut = new StringBuilder();
 		DecimalFormat formater =  new DecimalFormat("00000");
 		for(int i=0; i < currentSetQuerySparql.getTotalConcepts(); i++) {
 			conceptsOut.append("\n");
@@ -1159,6 +1161,23 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
+	private static void upgradeConceptMap_heuristic_09_putNewLineInLongSentence() throws Exception {
+		Log.console("- Upgrading the concept map with nineth heuristic (put new line in long sentence)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_09_putNewLineInLongSentence();
+		Log.consoleln(" - " + n + " new lines inserted.");
+		String sameReport = "Heuristic 09: upgraded "+n+" new lines inserted in all long sentences\n\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	private static void upgradeConceptMap_heuristic_10_setAccentedCharacterInCxlFile() throws Exception {
+		Log.console("- Upgrading the concept map with tenth heuristic (set accented characters in CXL file)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_10_setAccentedCharacterInCxlFile();
+		Log.consoleln(" - " + n + " new lines inserted.");
+		String sameReport = "Heuristic 10: upgraded "+n+" characters\n\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	
 
 	private static void end() throws Exception {
 		Log.consoleln("- Closing.");

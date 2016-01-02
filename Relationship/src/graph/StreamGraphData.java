@@ -193,7 +193,6 @@ public class StreamGraphData {
 		ItemRDF subjectRDF   = oneRDF.getSubject() ;
 		ItemRDF predicateRDF = oneRDF.getPredicate();
 		ItemRDF objectRDF    = oneRDF.getObject();
-		
 		// verify whether one of nodes belong to RDF is useless
 		// in this case, discard RDF
 		if(WholeSystem.configTable.getBoolean("isEnableUselessTable")) {
@@ -605,7 +604,7 @@ public class StreamGraphData {
 	}
 
 	public static String nodeToString(Node node) {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		str.append("\nID: ");
 		str.append(node.toString());
 		str.append(" - Full name: ");
@@ -661,7 +660,7 @@ public class StreamGraphData {
 
 	
 	public String toStringGraph() {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		Graph graph = this.getStreamGraph();
 		str.append("\n\nGraph stream:\n");
 		for( Node node : graph.getEachNode() ) {

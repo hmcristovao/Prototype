@@ -459,7 +459,7 @@ public class SystemGraphData {
 	}
 	
 	public String reportSelectedNodes(int iteration) throws Exception {
-		StringBuffer str = new StringBuffer();
+		StringBuilder str = new StringBuilder();
 		for(int i=0; i < this.connectedComponentsCount; i++) {
 			str.append("Connected component number: ");
 			str.append(this.ranks.getMeasuresRankTable(i).getConnectedComponentNumber());
