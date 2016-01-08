@@ -1,4 +1,6 @@
-// v7.3 - inserted accented characters and new line in long sentences, changed StringBuffer for StringBuilder. Working!
+// v7.4 - changed ampersand character. Working!
+//(was verifyed that mapping case 9 do not work because stream graph must be undirected to AStar class work correctly.
+//Case 09 = source and target node with links to go and to come)
 
 package main;
 
@@ -212,9 +214,10 @@ public class MainProcess {
 			buildGexfGraphFileFromConceptMap();
 			buildTxtFileFromConceptMap();
 			
-			upgradeConceptMap_heuristic_08_putNewLineInCategory();
-			upgradeConceptMap_heuristic_09_putNewLineInLongSentence();
-			upgradeConceptMap_heuristic_10_setAccentedCharacterInCxlFile();
+			upgradeConceptMap_heuristic_08_changeAmpersandCharacterInCxlFile();
+			upgradeConceptMap_heuristic_09_putNewLineInCategory();
+			upgradeConceptMap_heuristic_10_putNewLineInLongSentence();
+			upgradeConceptMap_heuristic_11_setAccentedCharacterInCxlFile();
 			buildCxlFileFromConceptMap();
 			
 			end();
@@ -1153,27 +1156,37 @@ public class MainProcess {
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}
-	private static void upgradeConceptMap_heuristic_08_putNewLineInCategory() throws Exception {
-		Log.console("- Upgrading the concept map with eighth heuristic (put new line in category word)");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_08_putNewLineInCategory();
-		Log.consoleln(" - " + n + " concepts changed.");
-		String sameReport = "Heuristic 08: upgraded "+n+" concepts with insertion of new line in category word\n\n" + WholeSystem.getConceptMap().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);		
-	}
-	private static void upgradeConceptMap_heuristic_09_putNewLineInLongSentence() throws Exception {
-		Log.console("- Upgrading the concept map with nineth heuristic (put new line in long sentence)");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_09_putNewLineInLongSentence();
-		Log.consoleln(" - " + n + " new lines inserted.");
-		String sameReport = "Heuristic 09: upgraded "+n+" new lines inserted in all long sentences\n\n" + WholeSystem.getConceptMap().toString();
-		Log.outFileCompleteReport(sameReport);
-		Log.outFileShortReport(sameReport);		
-	}
-	private static void upgradeConceptMap_heuristic_10_setAccentedCharacterInCxlFile() throws Exception {
-		Log.console("- Upgrading the concept map with tenth heuristic (set accented characters in CXL file)");
-		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_10_setAccentedCharacterInCxlFile();
-		Log.consoleln(" - " + n + " new lines inserted.");
+	// must be run before heuristics 09, 10 and 11 because they insert several ampersand characteres
+	private static void upgradeConceptMap_heuristic_08_changeAmpersandCharacterInCxlFile() throws Exception {
+		Log.console("- Upgrading the concept map with eighth heuristic (change ampersand characters in CXL file)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_08_changeAmpersandCharacterInCxlFile();
+		Log.consoleln(" - " + n + " characters changed.");
 		String sameReport = "Heuristic 10: upgraded "+n+" characters\n\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+
+	private static void upgradeConceptMap_heuristic_09_putNewLineInCategory() throws Exception {
+		Log.console("- Upgrading the concept map with nineth heuristic (put new line in category word)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_09_putNewLineInCategory();
+		Log.consoleln(" - " + n + " concepts changed.");
+		String sameReport = "Heuristic 09: upgraded "+n+" concepts with insertion of new line in category word\n\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	private static void upgradeConceptMap_heuristic_10_putNewLineInLongSentence() throws Exception {
+		Log.console("- Upgrading the concept map with tenth heuristic (put new line in long sentence)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_10_putNewLineInLongSentence();
+		Log.consoleln(" - " + n + " new lines inserted.");
+		String sameReport = "Heuristic 10: upgraded "+n+" new lines inserted in all long sentences\n\n" + WholeSystem.getConceptMap().toString();
+		Log.outFileCompleteReport(sameReport);
+		Log.outFileShortReport(sameReport);		
+	}
+	private static void upgradeConceptMap_heuristic_11_setAccentedCharacterInCxlFile() throws Exception {
+		Log.console("- Upgrading the concept map with eleventh heuristic (set accented characters in CXL file)");
+		int n = WholeSystem.getConceptMap().upgradeConceptMap_heuristic_11_setAccentedCharacterInCxlFile();
+		Log.consoleln(" - " + n + " characters changed.");
+		String sameReport = "Heuristic 11: upgraded "+n+" characters\n\n" + WholeSystem.getConceptMap().toString();
 		Log.outFileCompleteReport(sameReport);
 		Log.outFileShortReport(sameReport);		
 	}

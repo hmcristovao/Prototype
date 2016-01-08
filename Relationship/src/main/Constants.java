@@ -19,7 +19,10 @@ public interface Constants {
 		boolean edgeLabelFileGephi   = true;
 		boolean nodeLabelFileGephi   = false; // original concepts always have label in Stream Gephi
 
-		boolean directedStreamGraph = false; // must be false because AStar class
+		boolean directedStreamGraph = false; // must be FALSE because AStar class only work in undirected graph.
+		// AStar is used to calculate paths between original concepts
+		// but, if false do not accept edge that to go and to come in thd same nodes (case 9)
+		
 		boolean directedGephiGraph  = true;  // only accept true 
 		
 		// indicate value of concepts that do not belong to connected component (for example: original concepts)
@@ -88,8 +91,7 @@ public interface Constants {
 			{"Ç","&#xc7;"},
 
 			{"º","&#xba;"},
-			{"ª","&#xaa;"},
-
+			{"ª","&#xaa;"}
 		};
 		
 		

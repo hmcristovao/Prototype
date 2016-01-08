@@ -254,9 +254,45 @@ public class ConceptMap {
 		}
 		return n;
 	}
-	
+
+	// must be run before heuristics 09, 10 and 11 because they insert several ampersand characteres
+	public int upgradeConceptMap_heuristic_08_changeAmpersandCharacterInCxlFile() {
+		int total = 0;
+		StringBuilder str;
+		for( Proposition proposition : this.getPropositions()) {
+			// at first, verify whether it is not alone concept 
+			if(proposition.getLink() != null) {
+				str = new StringBuilder(proposition.getSourceConcept().getLabel());
+				total += ConceptMap.setAmpersandCharacter(str);
+				proposition.getSourceConcept().setLabel(str.toString());
+
+				str = new StringBuilder(proposition.getTargetConcept().getLabel());
+				total += ConceptMap.setAmpersandCharacter(str);
+				proposition.getTargetConcept().setLabel(str.toString());
+				
+				str = new StringBuilder(proposition.getLink());
+				total += ConceptMap.setAmpersandCharacter(str);
+				proposition.setLink(str.toString());
+			}
+		}
+		return total;		
+	}
+	private static int setAmpersandCharacter(StringBuilder str) {
+		int n = 0;
+		// only change if do not contains '&' (="&amp;")
+		if(str.indexOf("&amp;") == -1) {
+			for(int i=0; i<str.length(); i++) {
+				if(str.charAt(i) == '&') {
+					str.replace(i, i+1, "&amp;");
+					n++;
+				}
+			}
+		}
+		return n;
+	}
+
 	// insert new line before category word
-	public int 	upgradeConceptMap_heuristic_08_putNewLineInCategory() {
+	public int 	upgradeConceptMap_heuristic_09_putNewLineInCategory() {
 		int n = 0;
 		for( Proposition proposition : this.getPropositions()) {
 			// at first, verify whether it is not alone concept 
@@ -284,7 +320,7 @@ public class ConceptMap {
 	}
 	
 	// break long sentences inserting new lines 
-	public int 	upgradeConceptMap_heuristic_09_putNewLineInLongSentence() {
+	public int 	upgradeConceptMap_heuristic_10_putNewLineInLongSentence() {
 		int total = 0;
 		Count count = new Count(0);
 		for( Proposition proposition : this.getPropositions()) {
@@ -316,10 +352,9 @@ public class ConceptMap {
 		}
 		return total;
 	}
-
-	public static String putNewLineInLongSentence(String str, int max, Count n) {
+	private static String putNewLineInLongSentence(String str, int max, Count n) {
 		// if contains new line, it does nothing
-		if(str.length() > max && !str.contains("\n")) {
+		if(str.length() > max && !str.contains("&#xa;")) {
 			int countNewLine = str.length() / max;
 			StringBuilder s = new StringBuilder(str);
 			int i,k;
@@ -334,8 +369,8 @@ public class ConceptMap {
 		}	
 		return str;
 	}
-
-	public int upgradeConceptMap_heuristic_10_setAccentedCharacterInCxlFile() {
+	
+	public int upgradeConceptMap_heuristic_11_setAccentedCharacterInCxlFile() {
 		int total = 0;
 		StringBuilder str;
 		for( Proposition proposition : this.getPropositions()) {
@@ -356,8 +391,7 @@ public class ConceptMap {
 		}
 		return total;		
 	}
-
-	public static int setAccentedCharacter(StringBuilder str) {
+	private static int setAccentedCharacter(StringBuilder str) {
 		int n = 0;
 		for(int i=0; i<str.length(); i++) {
 			for(int k=0; k<Constants.characteres.length; k++)

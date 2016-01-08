@@ -25,10 +25,10 @@ public class MyKnowledgeBase {
 		
 		Link link;
 		
-		link = new Link(predicate, nodeObject, false);
+		link = new Link(predicate, nodeObject, true);
 		this.insertElement(nodeSubject, link);
 		
-		link = new Link(predicate, nodeSubject, true);
+		link = new Link(predicate, nodeSubject, false);
 		this.insertElement(nodeObject, link);
 		
 	}

@@ -226,12 +226,12 @@ public class SetQuerySparql {
 
 			// verify the direction of arrow
 			if(link.isNodeSubject()) {
-				subjectRDF   = new ItemRDF(link.getNodeDesc());
-				objectRDF    = new ItemRDF(strConcept);
+				subjectRDF   = new ItemRDF(strConcept);
+				objectRDF    = new ItemRDF(link.getNodeDesc());				
 			}
 			else {
-				subjectRDF   = new ItemRDF(strConcept);
-				objectRDF    = new ItemRDF(link.getNodeDesc());
+				subjectRDF   = new ItemRDF(link.getNodeDesc());
+				objectRDF    = new ItemRDF(strConcept);
 			}
 			
 			predicateRDF  = new ItemRDF(link.getLinkDesc());
@@ -240,7 +240,7 @@ public class SetQuerySparql {
 			// insert complete item into listQuerySparql of the RDFs
 			listRDF.getList().add(oneRDF);
 
-			this.incTotalRDFs();
+			this.incTotalRDFs();		
 		}
 		return querySparql.getListRDF().size();
 	}

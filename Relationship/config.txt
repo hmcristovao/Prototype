@@ -4,10 +4,9 @@
 //================================================================================
 	
 // Current test name 
-// testName = user19_map1
 testName = map01
 
-// Knowledge base local (1 = DBpedia; 2 = my knowledge base)
+// Knowledge base local (1 = DBpedia; 2 = my knowledge base, in this case directedStreamGraph was changed to true)
 knowledgeBasePlace = 2
 
 // Base directory to creation of output files: absolut path 'C:\\path\\results' or relative path 'path\\results' or current path '.'
@@ -15,10 +14,10 @@ knowledgeBasePlace = 2
 baseDirectory = C:\\documentos\\Doutorado\\Tese\\my_knowledge_base
 
 // minimum quantity of iterations to get out of loop when connected component = 1 (good value: 6) 
-minIterationToVerifyUniqueConnectedComponent = 2
+minIterationToVerifyUniqueConnectedComponent = 6
 
 // minimum quantity of iterations to get out of loop when exist relationship between original concepts (good value: 10)
-minIterationToVerifyRelationshipBetweenOriginalConcepts = 2
+minIterationToVerifyRelationshipBetweenOriginalConcepts = 8
 
 // maximum quantity of iterations to get out of loop (good value: 50)  
 maxIteration = 50  
@@ -46,7 +45,7 @@ quantityNodesToApplyKcoreFilter = 700
 	
 // fator added in logarithmic function to calculate goal of concepts quantity in final concept to map (good value: 3)
 // function: log2(1/countOriginal)+4+factor
-conceptsQuantityCalculationFactor = 3
+conceptsQuantityCalculationFactor = 0
 
 // top limit to range of concepts quantity (good value: 5)
 conceptsMinMaxRange = 5
@@ -64,7 +63,7 @@ isEnableUselessTable = true
 	
 // BETWEENNESS + CLOSENESS
 // quantity of nodes to selection in all connected componentes (proporcion relative to quantity total of user terms) (good value: 3.0)
-proporcionBetweennessCloseness = 3.0
+proporcionBetweennessCloseness = 1.0
 // precision added up to rounding the calculate of quantity of each connected component (good value: 0.5)
 precisionBetweennessCloseness = 0.5
 // quantity of nodes to use as base to build betweenness+closeness sorted table. 
@@ -103,8 +102,8 @@ backGroundcolorOriginalConcept = 200.200.200.255
 borderThicknessConceptWithHint = 2
 
 // line maximum length of sentences in the final concept map
-maxLineLengthConcept    = 20
-maxLineLengthLinkPhrase = 20
+maxLineLengthConcept    = 15
+maxLineLengthLinkPhrase = 15
 
 // Names of files  (## = will be change to value of the testName var)
 nameQueryDefaultFile    = query_model\\query.txt

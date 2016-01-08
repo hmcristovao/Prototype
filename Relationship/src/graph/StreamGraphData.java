@@ -205,10 +205,10 @@ public class StreamGraphData {
 		
 		Node node = null;
 		Edge edge = null;
-		// work with the subject RDF
+		// work with the RDF subject
 		try {
-			// case 01
-			node = this.streamGraph.addNode(subjectRDF.getShortBlankName());
+			// try case 01
+			node = this.streamGraph.addNode(subjectRDF.getShortBlankName()); // if it can not, because it exists, go to case 02
 			quantityNodesEdges.incNumNodes();
 			node.addAttribute("fullname",           subjectRDF.getFullName());
 			node.addAttribute("shortunderlinename", subjectRDF.getShortUnderlineName());
@@ -220,14 +220,14 @@ public class StreamGraphData {
 				node.addAttribute("label", subjectRDF.getShortBlankName());
 			}		
 		}
-		// case 02
+		// starting case 02
 		catch(IdAlreadyInUseException e) {
 			// repeated node, do nothing, only get it to continue the process
 			node = this.streamGraph.getNode(subjectRDF.getShortBlankName());
 		}
 
 		// case 12
-		// if predicate is known, transform it in attributes into node
+		// if predicate is one of the cataloged, transform it in attributes into node
 		if(predicateRDF.getFullName().equals(Constants.addressBasic + "homepage"))
 			node.addAttribute("homepage", objectRDF.getShortBlankName());
 		else if(predicateRDF.getFullName().equals(Constants.addressBasic + "comment"))
@@ -237,11 +237,12 @@ public class StreamGraphData {
 		else if(predicateRDF.getFullName().equals(Constants.addressBasic + "image"))
 			node.addAttribute("image", objectRDF.getShortBlankName());
         
-		// continue to common predicate (unknown)
+		// continue case 02
+		// to common predicate (unknown predicate)
 		// work with the object RDF
 		else {
 			try {
-				// case 01
+				// try case 01
 				node = this.streamGraph.addNode(objectRDF.getShortBlankName());
 				quantityNodesEdges.incNumNodes();
 				node.addAttribute("fullname",           objectRDF.getFullName());
